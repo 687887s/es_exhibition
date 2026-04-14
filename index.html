@@ -3,143 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>捕捉宇宙的脈動 | 天文股展覽</title>
+    <title>捕捉宇宙的脈動：徑向速度法</title>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    
     <style>
         :root {
+            --deep-red: #4d0000;
+            --vibrant-blue: #0033cc;
             --neon-blue: #00d4ff;
+            --text-color: #f0f0f0;
+            --pulse-ratio: 50%; 
+            --bg-color-red: #330000;
+            --bg-color-blue: #001133;
             --accent-gold: #ffcc00;
         }
 
-        body, html {
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+            background: #000;
+            color: var(--text-color);
+            line-height: 1.6;
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: linear-gradient(145deg, 
+                var(--bg-color-red) 0%, 
+                var(--bg-color-red) calc(var(--pulse-ratio) - 45%), 
+                var(--bg-color-blue) calc(var(--pulse-ratio) + 45%), 
+                var(--bg-color-blue) 100%
+            );
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 30px 4vw;
+            text-align: center;
+            border-bottom: 2px solid var(--vibrant-blue);
+        }
+
+        h1 { color: var(--neon-blue); font-size: 1.5em; text-shadow: 0 0 10px rgba(0, 212, 255, 0.5); font-weight: 800; margin: 0; }
+
+        .container { width: 92vw; max-width: 600px; margin: 0 auto; padding: 20px 0; }
+
+        section {
+            background: rgba(20, 20, 35, 0.8);
+            backdrop-filter: blur(15px);
+            margin-bottom: 20px;
+            padding: 25px 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 { color: var(--accent-gold); margin-top: 0; padding-bottom: 12px; display: flex; align-items: center; font-size: 1.3em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        h2::before { content: ""; width: 4px; height: 1.2em; background: var(--neon-blue); margin-right: 12px; border-radius: 2px; }
+
+        .highlight { color: var(--neon-blue); font-weight: bold; }
+
+        .image-box {
+            margin: 20px -18px;
+            background: #000;
+            min-height: 150px;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* 動態星空背景 */
-        .stars-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at center, #001133 0%, #000 100%);
-        }
+        .image-box img { max-width: 100%; height: auto; display: block; }
 
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.5;
-            animation: twinkle var(--duration) infinite ease-in-out;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        /* 標題區塊 */
-        .portal {
+        .formula-card {
+            font-size: 1.25em;
+            color: var(--accent-gold);
             text-align: center;
-            padding: 20px;
-            z-index: 10;
+            margin: 20px -18px;
+            padding: 25px 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 1px solid rgba(255, 204, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 204, 0, 0.2);
+            text-shadow: 0 0 8px rgba(255, 204, 0, 0.4);
         }
 
-        h1 {
-            font-size: 2.2em;
-            letter-spacing: 5px;
-            margin: 0;
+        details { background: rgba(255, 255, 255, 0.05); margin: 20px -18px -25px -18px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        summary { padding: 15px 20px; font-weight: bold; color: var(--neon-blue); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; outline: none; }
+        summary::after { content: "↓"; color: var(--accent-gold); transition: transform 0.3s; }
+        details[open] summary::after { transform: rotate(180deg); }
+        .details-content { padding: 15px 20px; background: rgba(0, 0, 0, 0.3); font-size: 0.95em; color: #ccc; }
+
+        .table-wrapper { width: 100%; overflow-x: auto; margin: 20px -18px; width: calc(100% + 36px); border-top: 1px solid #333; border-bottom: 1px solid #333; }
+        .comparison-table { width: 100%; min-width: 320px; border-collapse: collapse; }
+        .comparison-table td { padding: 15px 8px; text-align: center; border-bottom: 1px solid #222; font-size: 0.9em; }
+        .row-blue { background: rgba(0, 100, 255, 0.15); }
+        .row-red { background: rgba(255, 50, 50, 0.15); }
+
+        .back-nav {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .back-btn {
             color: var(--neon-blue);
-            text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
-            font-weight: 800;
-        }
-
-        p {
-            font-size: 1em;
-            color: #aaa;
-            margin-top: 15px;
-            letter-spacing: 2px;
-        }
-
-        /* 進入按鈕 */
-        .enter-btn {
-            margin-top: 50px;
-            padding: 15px 40px;
-            border: 1px solid var(--neon-blue);
-            background: transparent;
-            color: var(--neon-blue);
-            font-size: 1.1em;
             text-decoration: none;
-            border-radius: 50px;
+            font-size: 0.9em;
+            border: 1px solid var(--neon-blue);
+            padding: 8px 20px;
+            border-radius: 20px;
             transition: all 0.3s;
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
-            display: inline-block;
         }
 
-        .enter-btn:active {
+        .back-btn:hover {
             background: var(--neon-blue);
             color: #000;
-            box-shadow: 0 0 30px var(--neon-blue);
         }
 
-        footer {
-            position: absolute;
-            bottom: 30px;
-            font-size: 0.8em;
-            color: #444;
-            letter-spacing: 1px;
-        }
+        footer { text-align: center; padding: 50px 20px; font-size: 0.85em; color: #777; background: rgba(0, 0, 0, 0.8); }
     </style>
 </head>
 <body>
 
-<div class="stars-container" id="stars"></div>
+<div class="bg-layer" id="bgLayer"></div>
 
-<div class="portal">
+<header>
     <h1>捕捉宇宙的脈動</h1>
-    <p>—— 地科展天文股 ——</p>
-    
-    <!-- 這裡連結到您的詳細科普分頁 -->
-    <a href="radial_velocity_method.html" class="enter-btn">進入展覽</a>
+    <p style="color:#aaa; font-size:0.9em; margin-top:5px;">徑向速度法：解碼引力與光譜</p>
+</header>
+
+<div class="container">
+    <section>
+        <h2>★ 宇宙的引力華爾滋</h2>
+        <p>系外行星探索是一場精密的追蹤。當行星繞行恆星時，兩者實際上都在繞著共同的<span class="highlight">質心</span>旋轉。</p>
+        
+        <div class="image-box">
+            <img src="Exoplanet_radial_velocity_doppler_spectroscopy_dark.gif" alt="徑向速度法示意圖">
+        </div>
+        <div style="text-align: center;"><span style="font-size:0.8em; color:#888;">示意圖：恆星與行星的同步擺動</span></div>
+
+        <details>
+            <summary>科普深度：質心與擺動</summary>
+            <div class="details-content">
+                就像翹翹板的平衡點，恆星雖然質量極大，仍會被行星拉扯而產生微小的圓周運動。由於這擺動速度通常只有每秒數公尺（約步行速度），我們需要利用光譜儀捕捉這隱形的脈動。
+            </div>
+        </details>
+    </section>
+
+    <section>
+        <h2>★ 都卜勒效應</h2>
+        <p>19世紀物理學家發現，當波源移動時頻率會位移。接近時波長縮短，遠離時變長。這是天文學量測天體運動的基石。</p>
+        <div class="table-wrapper">
+            <table class="comparison-table">
+                <thead><tr style="background: rgba(0,0,0,0.5);"><th>運動方向</th><th>現象名稱</th><th>光譜偏移</th></tr></thead>
+                <tbody>
+                    <tr class="row-blue"><td>接近地球</td><td>藍移 (Blue Shift)</td><td>波長縮短</td></tr>
+                    <tr class="row-red"><td>遠離地球</td><td>紅移 (Red Shift)</td><td>波長加長</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section>
+        <h2>★ 核心計算公式</h2>
+        <p>天文學家透過譜線位移 $\Delta\lambda$ 推算速度 $v$：</p>
+        <div class="formula-card">$$\displaystyle v = c \cdot \frac{\Delta\lambda}{\lambda}$$</div>
+        <details>
+            <summary>公式參數說明</summary>
+            <div class="details-content">
+                $c$: 光速，$\lambda$: 原始波長。藉由追蹤這規律的位移，我們能得出星系深處隱藏的行星資訊。
+            </div>
+        </details>
+    </section>
+
+    <section>
+        <h2>★ 數據真相：最小質量</h2>
+        <p>追蹤規律的變化，天文學家能計算出：</p>
+        <ul>
+            <li><span class="highlight">軌道週期</span>：擺動循環一次的時間。</li>
+            <li><span class="highlight">質量下限</span>：擺動幅度越大，代表行星越重。</li>
+        </ul>
+        <div class="formula-card">$$\displaystyle M_p \sin i$$</div>
+        <details>
+            <summary>為何是「最小」質量？</summary>
+            <div class="details-content">
+                由於我們無法得知行星軌道面與我們視線的具體夾角 $i$，因此測得的通常是行星可能的「最輕重量」。
+            </div>
+        </details>
+    </section>
+
+    <!-- 返回首頁導覽 -->
+    <div class="back-nav">
+        <a href="index.html" class="back-btn">← 返回展覽首頁</a>
+    </div>
 </div>
 
 <footer>
-    © 2024 地科 117 級 天文股
+    <p>地科 117 級 天文股 製作<br>—— 聽見星系的心跳 ——</p>
 </footer>
 
 <script>
-    // 生成隨機背景星星
-    const starsContainer = document.getElementById('stars');
-    const starCount = 100;
-
-    for (let i = 0; i < starCount; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        
-        const size = Math.random() * 2 + 1 + 'px';
-        star.style.width = size;
-        star.style.height = size;
-        
-        star.style.top = Math.random() * 100 + '%';
-        star.style.left = Math.random() * 100 + '%';
-        
-        star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
-        star.style.animationDelay = Math.random() * 5 + 's';
-        
-        starsContainer.appendChild(star);
+    const bgLayer = document.getElementById('bgLayer');
+    const pulsePeriod = 4.0; 
+    function updatePulse() {
+        const now = Date.now();
+        const pulse = Math.sin((2 * Math.PI * now) / (pulsePeriod * 1000));
+        bgLayer.style.setProperty('--pulse-ratio', (50 + pulse * 30) + '%');
+        requestAnimationFrame(updatePulse);
     }
+    updatePulse();
 </script>
-
 </body>
 </html>
