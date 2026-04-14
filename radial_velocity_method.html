@@ -115,6 +115,26 @@
         .row-blue { background: rgba(0, 100, 255, 0.15); }
         .row-red { background: rgba(255, 50, 50, 0.15); }
 
+        .back-nav {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .back-btn {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 0.9em;
+            border: 1px solid var(--neon-blue);
+            padding: 8px 20px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--neon-blue);
+            color: #000;
+        }
+
         footer { text-align: center; padding: 50px 20px; font-size: 0.85em; color: #777; background: rgba(0, 0, 0, 0.8); }
     </style>
 </head>
@@ -133,7 +153,6 @@
         <p>系外行星探索是一場精密的追蹤。當行星繞行恆星時，兩者實際上都在繞著共同的<span class="highlight">質心</span>旋轉。</p>
         
         <div class="image-box">
-            <!-- 這裡是 GitHub 相對路徑連結 -->
             <img src="Exoplanet_radial_velocity_doppler_spectroscopy_dark.gif" alt="徑向速度法示意圖">
         </div>
         <div style="text-align: center;"><span style="font-size:0.8em; color:#888;">示意圖：恆星與行星的同步擺動</span></div>
@@ -187,10 +206,15 @@
             </div>
         </details>
     </section>
+
+    <!-- 返回首頁導覽 -->
+    <div class="back-nav">
+        <a href="index.html" class="back-btn">← 返回展覽首頁</a>
+    </div>
 </div>
 
 <footer>
-    <p>地科 117 級 天文股 製作<br>—— 傾聽星系的心跳 ——</p>
+    <p>地科 117 級 天文股 製作<br>—— 聽見星系的心跳 ——</p>
 </footer>
 
 <script>
