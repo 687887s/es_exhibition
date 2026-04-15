@@ -4,8 +4,7 @@
     <!-- 
       檔案狀態：草稿 (DRAFT)
       最後修訂：2024年展覽準備版 - 凌日法頁面
-      註解：內容根據地科展教具 PDF 內容編寫。
-      更新：背景改為灰色呼吸燈效果，同步公轉週期。
+      更新：背景呼吸週期獨立化，新增行星大小與公轉速度滑桿控制。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -30,8 +29,8 @@
             --vibrant-gold: #ffcc00;
             --neon-blue: #00d4ff;
             --text-color: #f0f0f0;
-            --bg-color-center: #333333; /* 灰色呼吸燈中心色 */
-            --bg-color-edge: #0a0a0a;   /* 深灰色邊緣 */
+            --bg-color-center: #333333; 
+            --bg-color-edge: #0a0a0a;   
             --pulse-opacity: 1;
         }
 
@@ -46,12 +45,10 @@
             overflow-x: hidden;
         }
 
-        /* 動態背景層：灰色呼吸燈設計 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            /* 從中間亮起的徑向漸層 */
             background: radial-gradient(circle at center, var(--bg-color-center) 0%, var(--bg-color-edge) 100%);
             opacity: var(--pulse-opacity);
             transition: opacity 0.1s linear;
@@ -69,7 +66,7 @@
         .container { width: 92vw; max-width: 600px; margin: 0 auto; padding: 20px 0; }
 
         section {
-            background: rgba(25, 25, 25, 0.85); /* 調整區塊底色以配合灰色背景 */
+            background: rgba(25, 25, 25, 0.85);
             backdrop-filter: blur(15px);
             margin-bottom: 20px;
             padding: 25px 18px;
@@ -83,7 +80,7 @@
 
         .highlight { color: var(--neon-blue); font-weight: bold; }
 
-        /* 繪圖容器 */
+        /* 繪圖與控制項容器 */
         .canvas-container {
             margin: 20px -18px;
             background: #000;
@@ -93,6 +90,49 @@
         }
 
         canvas { display: block; width: 100%; height: auto; }
+
+        /* 控制面板 */
+        .controls {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .control-item:last-child { margin-bottom: 0; }
+
+        .control-label {
+            font-size: 0.85em;
+            color: var(--vibrant-gold);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--vibrant-gold);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--vibrant-gold);
+        }
 
         .formula-card {
             font-size: 1.2em;
@@ -135,11 +175,28 @@
         </p>
         
         <div class="canvas-container">
-            <!-- 即時模擬：行星凌日與光度曲線 -->
             <canvas id="transitCanvas"></canvas>
+            
+            <!-- 控制面板 -->
+            <div class="controls">
+                <div class="control-item">
+                    <div class="control-label">
+                        <span>行星大小 (Size)</span>
+                        <span id="sizeVal">中型</span>
+                    </div>
+                    <input type="range" id="sizeSlider" min="4" max="18" value="8" step="1">
+                </div>
+                <div class="control-item">
+                    <div class="control-label">
+                        <span>公轉速度 (Speed)</span>
+                        <span id="speedVal">正常</span>
+                    </div>
+                    <input type="range" id="speedSlider" min="1" max="10" value="5" step="0.5">
+                </div>
+            </div>
         </div>
         <div style="text-align: center; padding-bottom: 10px;">
-            <span style="font-size:0.8em; color:#888;">即時模擬：行星遮擋造成的「光變曲線」下降</span>
+            <span style="font-size:0.8em; color:#888;">調整滑桿觀察光度曲線的變化</span>
         </div>
 
         <p>
@@ -201,9 +258,20 @@
     const canvas = document.getElementById('transitCanvas');
     const ctx = canvas.getContext('2d');
     const bgLayer = document.getElementById('bgLayer');
+    
+    // 控制項
+    const sizeSlider = document.getElementById('sizeSlider');
+    const speedSlider = document.getElementById('speedSlider');
+    const sizeVal = document.getElementById('sizeVal');
+    const speedVal = document.getElementById('speedVal');
 
-    const period = 5.0; // 週期
-    let points = []; // 儲存光度點
+    // 變數初始化
+    let planetR = parseFloat(sizeSlider.value);
+    let speedMult = parseFloat(speedSlider.value);
+    let points = []; 
+    
+    // 背景呼吸週期變數 (獨立出來)
+    const breathPeriod = 12.0; 
 
     function resize() {
         const width = canvas.clientWidth;
@@ -218,45 +286,57 @@
         const w = canvas.width / window.devicePixelRatio;
         const h = canvas.height / window.devicePixelRatio;
         const time = Date.now() / 1000;
+        
+        // 更新滑桿數值
+        planetR = parseFloat(sizeSlider.value);
+        speedMult = parseFloat(speedSlider.value);
+        
+        // 文字標示更新
+        sizeVal.innerText = planetR < 8 ? "小型" : (planetR > 14 ? "巨型" : "中型");
+        speedVal.innerText = speedMult < 4 ? "緩慢" : (speedMult > 7 ? "極速" : "正常");
+
+        // 行星公轉速度邏輯 (基於滑桿)
+        const period = 15.0 / (speedMult * 0.5); 
         const angle = (2 * Math.PI * time) / period;
         
-        // 行星位置 (X 軸移動)
         const planetX = (w / 2) + Math.cos(angle) * (w * 0.35);
-        const planetZ = Math.sin(angle); // Z 軸，用來判斷是否在前方
+        const planetZ = Math.sin(angle); 
         
-        // 計算亮度下降 (只有在前方時)
+        // 亮度計算：深度由行星面積決定 (r^2)
+        // 假設恆星半徑為 40，則最大掉落約 (18/40)^2 = 20%
         let brightness = 1.0;
-        const isTransiting = (planetZ > 0.8 && Math.abs(planetX - w/2) < 40);
+        const starR = 40;
+        const isTransiting = (planetZ > 0.8 && Math.abs(planetX - w/2) < starR);
         if (isTransiting) {
-            brightness = 0.92; // 亮度掉 8%
+            const depth = (planetR * planetR) / (starR * starR);
+            brightness = 1.0 - depth;
         }
 
-        // 更新數據點
+        // 光度數據點更新
         points.push({ x: w * 0.9, y: brightness });
         if (points.length > 200) points.shift();
-        points.forEach(p => p.x -= 1.5);
+        points.forEach(p => p.x -= 1.8);
 
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
 
         // --- 1. 左側：恆星視圖 ---
         const sX = w * 0.25, sY = h * 0.35;
-        // 恆星光暈
-        const grad = ctx.createRadialGradient(sX, sY, 5, sX, sY, 40);
+        const grad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         grad.addColorStop(0, '#fff');
-        grad.addColorStop(0.3, '#ffcc00');
+        grad.addColorStop(0.4, '#ffcc00');
         grad.addColorStop(1, 'transparent');
         ctx.fillStyle = grad;
-        ctx.beginPath(); ctx.arc(sX, sY, 40, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
-        // 行星 (只有在前方時才畫在恆星上，否則畫在後方或側邊)
+        // 行星繪製
         if (planetZ > 0) {
             ctx.fillStyle = '#000';
             const px = sX + (planetX - w/2) * 0.5;
-            ctx.beginPath(); ctx.arc(px, sY, 8, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px, sY, planetR, 0, Math.PI*2); ctx.fill();
         }
 
-        // --- 2. 右側：光變曲線 ---
+        // --- 2. 右側：光變曲線圖表 ---
         const graphX = w * 0.55, graphY = h * 0.1, graphW = w * 0.4, graphH = h * 0.5;
         ctx.strokeStyle = '#444';
         ctx.lineWidth = 1;
@@ -267,7 +347,8 @@
         ctx.beginPath();
         points.forEach((p, i) => {
             const drawX = graphX + (p.x - (w * 0.55));
-            const drawY = graphY + (1.0 - p.y) * 400 + 20; // 放大變動量
+            // y 軸縮放以顯現亮度掉落深度
+            const drawY = graphY + (1.0 - p.y) * 400 + 20; 
             if (drawX > graphX && drawX < graphX + graphW) {
                 if (i === 0) ctx.moveTo(drawX, drawY);
                 else ctx.lineTo(drawX, drawY);
@@ -277,12 +358,12 @@
 
         ctx.fillStyle = '#888';
         ctx.font = '10px Arial';
-        ctx.fillText('Brightness', graphX + 5, graphY + 15);
+        ctx.fillText('亮度 (Brightness)', graphX + 5, graphY + 15);
 
-        // --- 呼吸燈背景邏輯 ---
-        // 使用 sine 波產生平滑的 0 到 1 的數值，並映射到透明度 0.3 到 1.0
-        const breath = (Math.sin(angle) + 1) / 2;
-        bgLayer.style.setProperty('--pulse-opacity', 0.3 + (breath * 0.7));
+        // --- 背景呼吸燈邏輯 (使用獨立的 breathPeriod) ---
+        const breathAngle = (2 * Math.PI * time) / breathPeriod;
+        const breath = (Math.sin(breathAngle) + 1) / 2;
+        bgLayer.style.setProperty('--pulse-opacity', 0.2 + (breath * 0.8));
 
         requestAnimationFrame(draw);
     }
