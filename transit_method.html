@@ -5,9 +5,9 @@
       檔案狀態：草稿 (DRAFT)
       最後修訂：2024年展覽準備版 - 凌日法頁面
       更新內容：
-      1. 移除模擬器底部間距。
-      2. 優化光變曲線為極平滑 U 型。
-      3. 調整滑桿時暫時高亮行星。
+      1. 採用累積相位計算，解決調整速度時的行星跳躍問題。
+      2. 提高滑桿精細度 (Step: 0.1 / 0.01)。
+      3. 保持平滑 U 型光變曲線與交互高亮功能。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -84,20 +84,22 @@
         .highlight { color: var(--neon-blue); font-weight: bold; }
 
         .canvas-container {
-            margin: 20px -18px 0 -18px; /* 移除底部外邊距 */
+            margin: 20px -18px 0 -18px;
             background: #000;
             position: relative;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
+            line-height: 0;
+            font-size: 0;
         }
 
         canvas { display: block; width: 100%; height: auto; }
 
         .controls {
-            padding: 15px 18px 20px 18px;
-            background: #000; /* 與畫布背景融合 */
+            padding: 15px 18px 25px 18px;
+            background: #000; 
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 0 -18px 20px -18px; /* 確保與 section 邊緣對齊 */
+            margin: 0 -18px 20px -18px;
         }
 
         .control-item {
@@ -127,8 +129,8 @@
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             background: var(--vibrant-gold);
             border-radius: 50%;
             cursor: pointer;
@@ -178,21 +180,21 @@
         <div class="canvas-container">
             <canvas id="transitCanvas"></canvas>
         </div>
-        <!-- 控制面板移至畫布下方並移除間距 -->
+        
         <div class="controls">
             <div class="control-item">
                 <div class="control-label">
                     <span>行星大小 (Planet Size)</span>
-                    <span id="sizeVal">中型</span>
+                    <span id="sizeVal">12.0</span>
                 </div>
-                <input type="range" id="sizeSlider" min="5" max="25" value="12" step="1">
+                <input type="range" id="sizeSlider" min="5" max="25" value="12" step="0.1">
             </div>
             <div class="control-item">
                 <div class="control-label">
                     <span>公轉速度 (Orbital Speed)</span>
-                    <span id="speedVal">正常</span>
+                    <span id="speedVal">5.0</span>
                 </div>
-                <input type="range" id="speedSlider" min="1" max="10" value="5" step="0.5">
+                <input type="range" id="speedSlider" min="0.5" max="10" value="5" step="0.05">
             </div>
         </div>
         <div style="text-align: center; padding-bottom: 10px;">
@@ -233,7 +235,7 @@
         <details>
             <summary>為什麼要用感測器？</summary>
             <div class="details-content">
-                在實際天文觀測中，亮度變化通常只有 <span class="highlight">0.01% 到 1%</span>。這就像是一萬顆燈泡中熄滅了一顆，必須依賴高頻率取樣的電子感測器才能記錄下來。
+                在實際天文觀測中，亮度變化通常只有 <span class="highlight">0.01% 到 1%</span>。必須依賴高頻率取樣的電子感測器才能記錄下來。
             </div>
         </details>
     </section>
@@ -241,7 +243,7 @@
     <section>
         <h2>★ 克卜勒太空望遠鏡的貢獻</h2>
         <p>
-            凌日法是目前發現系外行星數量最多的技術。著名的<span class="highlight">克卜勒 (Kepler) 任務</span>便以此技術發現了數千顆行星，擴展了人類對宇宙生命可能的想像。
+            著名的<span class="highlight">克卜勒 (Kepler) 任務</span>已發現數千顆行星，擴展了人類對宇宙生命可能的想像。
         </p>
     </section>
 
@@ -259,7 +261,6 @@
     const ctx = canvas.getContext('2d');
     const bgLayer = document.getElementById('bgLayer');
     
-    // 控制項連動
     const sizeSlider = document.getElementById('sizeSlider');
     const speedSlider = document.getElementById('speedSlider');
     const sizeVal = document.getElementById('sizeVal');
@@ -272,40 +273,59 @@
     const starR = 60; 
     const breathPeriod = 12.0; 
 
-    // 高亮計時器
-    let highlightTimer = 0;
-    const highlightDuration = 800; // 高亮持續時間 (毫秒)
+    // --- 相位累積邏輯：防止速度調整時發生位置跳躍 ---
+    let lastTimestamp = performance.now();
+    let currentOrbitAngle = 0; // 累積相位
 
-    const triggerHighlight = () => { highlightTimer = Date.now(); };
-    sizeSlider.oninput = triggerHighlight;
-    speedSlider.oninput = triggerHighlight;
+    // --- 高亮邏輯 ---
+    let highlightTimer = 0;
+    const highlightDuration = 800; 
+    let isInteracting = false; 
+
+    const startHighlight = () => { isInteracting = true; };
+    const endHighlight = () => { 
+        isInteracting = false; 
+        highlightTimer = Date.now(); 
+    };
+
+    sizeSlider.addEventListener('pointerdown', startHighlight);
+    speedSlider.addEventListener('pointerdown', startHighlight);
+    window.addEventListener('pointerup', endHighlight);
+    window.addEventListener('pointercancel', endHighlight);
 
     function resize() {
         const width = canvas.clientWidth;
         canvas.width = width * window.devicePixelRatio;
-        canvas.height = (width * 0.58) * window.devicePixelRatio; // 微調高度以去除間距
+        canvas.height = (width * 0.55) * window.devicePixelRatio; 
         ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
     window.addEventListener('resize', resize);
     resize();
 
-    function draw() {
+    function draw(timestamp) {
+        // 計算 Delta Time
+        const dt = (timestamp - lastTimestamp) / 1000;
+        lastTimestamp = timestamp;
+
         const w = canvas.width / window.devicePixelRatio;
         const h = canvas.height / window.devicePixelRatio;
-        const time = Date.now() / 1000;
         
         planetR = parseFloat(sizeSlider.value);
         speedMult = parseFloat(speedSlider.value);
         
-        sizeVal.innerText = planetR < 12 ? "小型" : (planetR > 18 ? "大型" : "中型");
-        speedVal.innerText = speedMult < 4 ? "緩慢" : (speedMult > 7 ? "極速" : "正常");
+        sizeVal.innerText = planetR.toFixed(1);
+        speedVal.innerText = speedMult.toFixed(2);
 
-        const period = 12.0 / (speedMult * 0.5); 
-        const angle = (2 * Math.PI * time) / period;
-        
+        // 基於 Delta Time 更新累積角度，而非基於絕對時間
+        // 這樣調整速度時，角度增加的速度會改變，但起始角度不變
+        const basePeriod = 12.0; 
+        const angularVelocity = (2 * Math.PI * (speedMult * 0.5)) / basePeriod;
+        currentOrbitAngle += angularVelocity * dt;
+        currentOrbitAngle %= (2 * Math.PI); // 防止溢出
+
         const orbitRadius = w * 0.35;
-        const planetX = (w / 2) + Math.cos(angle) * orbitRadius;
-        const planetZ = Math.sin(angle); 
+        const planetX = (w / 2) + Math.cos(currentOrbitAngle) * orbitRadius;
+        const planetZ = Math.sin(currentOrbitAngle); 
         
         const dist = Math.abs(planetX - w/2); 
         const totalContactRadius = starR + planetR; 
@@ -319,7 +339,6 @@
                 if (dist < fullInsideRadius) {
                     brightness = 1.0 - maxDepth;
                 } else {
-                    // 使用平滑曲線 (Cosine) 模擬進入過程，使 U 型底座更平滑
                     const normDist = (dist - fullInsideRadius) / (totalContactRadius - fullInsideRadius);
                     const smoothFactor = (Math.cos(normDist * Math.PI) + 1) / 2;
                     brightness = 1.0 - (maxDepth * smoothFactor);
@@ -334,7 +353,7 @@
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
 
-        // --- 1. 左側：恆星模擬區 ---
+        // --- 1. 恆星視覺 ---
         const sX = w * 0.28, sY = h * 0.45;
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
@@ -343,12 +362,10 @@
         ctx.fillStyle = starGrad;
         ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
-        // 繪製行星
+        // --- 2. 行星與高亮 ---
         if (planetZ > 0) {
             const px = sX + (planetX - w/2) * 0.5;
-            
-            // 判斷是否高亮
-            const isHighlighting = (Date.now() - highlightTimer < highlightDuration);
+            const isHighlighting = isInteracting || (Date.now() - highlightTimer < highlightDuration);
             
             ctx.beginPath(); 
             ctx.arc(px, sY, planetR, 0, Math.PI*2);
@@ -357,18 +374,15 @@
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = 'var(--neon-blue)';
                 ctx.strokeStyle = 'var(--neon-blue)';
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2.5;
                 ctx.stroke();
-            } else {
-                ctx.shadowBlur = 0;
             }
-            
             ctx.fillStyle = '#000';
             ctx.fill();
-            ctx.shadowBlur = 0; // 重設
+            ctx.shadowBlur = 0; 
         }
 
-        // --- 2. 右側：光變曲線圖表 ---
+        // --- 3. 光變曲線 ---
         const graphX = w * 0.55, graphY = h * 0.2, graphW = w * 0.4, graphH = h * 0.5;
         ctx.strokeStyle = '#444';
         ctx.lineWidth = 1;
@@ -391,14 +405,16 @@
         ctx.font = '10px Arial';
         ctx.fillText('亮度 (Brightness)', graphX + 5, graphY + 15);
 
-        // --- 背景呼吸燈邏輯 ---
-        const breathAngle = (2 * Math.PI * time) / breathPeriod;
+        // 背景呼吸燈 (基於絕對時間以保持穩定)
+        const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
         bgLayer.style.setProperty('--pulse-opacity', 0.2 + (breath * 0.8));
 
         requestAnimationFrame(draw);
     }
-    draw();
+    
+    // 啟動動畫循環
+    requestAnimationFrame(draw);
 </script>
 
 </body>
