@@ -5,9 +5,9 @@
       檔案狀態：草稿 (DRAFT)
       最後修訂：2024年展覽準備版 - 凌日法頁面
       更新內容：
-      1. 採用累積相位計算，解決調整速度時的行星跳躍問題。
-      2. 提高滑桿精細度 (Step: 0.1 / 0.01)。
-      3. 保持平滑 U 型光變曲線與交互高亮功能。
+      1. 修正行星消失問題：支援完整 360 度軌道繪製（含背面半透明效果）。
+      2. 確保交互高亮在行星旋轉至任何位置時均有效。
+      3. 繪圖順序優化：後景行星 -> 恆星 -> 前景行星。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -99,7 +99,7 @@
             padding: 15px 18px 15px 18px;
             background: #000; 
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 0 -18px 10px -18px;
+            margin: 0 -18px 5px -18px;
         }
 
         .control-item {
@@ -273,11 +273,11 @@
     const starR = 60; 
     const breathPeriod = 12.0; 
 
-    // --- 相位累積邏輯：防止速度調整時發生位置跳躍 ---
+    // --- 相位累積邏輯 ---
     let lastTimestamp = performance.now();
-    let currentOrbitAngle = 0; // 累積相位
+    let currentOrbitAngle = 0; 
 
-    // --- 高亮邏輯 ---
+    // --- 高亮邏輯改進 ---
     let highlightTimer = 0;
     const highlightDuration = 800; 
     let isInteracting = false; 
@@ -302,8 +302,27 @@
     window.addEventListener('resize', resize);
     resize();
 
+    // 繪製行星的通用函數
+    function drawPlanetInstance(pX, pY, radius, opacity, highlight) {
+        ctx.globalAlpha = opacity;
+        ctx.beginPath(); 
+        ctx.arc(pX, pY, radius, 0, Math.PI*2);
+        
+        if (highlight) {
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = 'var(--neon-blue)';
+            ctx.strokeStyle = 'var(--neon-blue)';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+        }
+        
+        ctx.fillStyle = '#000';
+        ctx.fill();
+        ctx.shadowBlur = 0; 
+        ctx.globalAlpha = 1.0;
+    }
+
     function draw(timestamp) {
-        // 計算 Delta Time
         const dt = (timestamp - lastTimestamp) / 1000;
         lastTimestamp = timestamp;
 
@@ -316,12 +335,10 @@
         sizeVal.innerText = planetR.toFixed(1);
         speedVal.innerText = speedMult.toFixed(2);
 
-        // 基於 Delta Time 更新累積角度，而非基於絕對時間
-        // 這樣調整速度時，角度增加的速度會改變，但起始角度不變
         const basePeriod = 12.0; 
         const angularVelocity = (2 * Math.PI * (speedMult * 0.5)) / basePeriod;
         currentOrbitAngle += angularVelocity * dt;
-        currentOrbitAngle %= (2 * Math.PI); // 防止溢出
+        currentOrbitAngle %= (2 * Math.PI); 
 
         const orbitRadius = w * 0.35;
         const planetX = (w / 2) + Math.cos(currentOrbitAngle) * orbitRadius;
@@ -334,6 +351,7 @@
         let brightness = 1.0;
         const maxDepth = (planetR * planetR) / (starR * starR);
 
+        // 凌日亮度計算 (僅前方)
         if (planetZ > 0) { 
             if (dist < totalContactRadius) {
                 if (dist < fullInsideRadius) {
@@ -353,8 +371,26 @@
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
 
-        // --- 1. 恆星視覺 ---
         const sX = w * 0.28, sY = h * 0.45;
+        const isHighlighting = isInteracting || (Date.now() - highlightTimer < highlightDuration);
+
+        // --- 繪圖順序改進：確保端點銜接自然 ---
+
+        // 1. 繪製後景軌道輔助線 (淡淡的虛線)
+        ctx.strokeStyle = '#222';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.ellipse(sX, sY, orbitRadius * 0.5, 5, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 2. 如果行星在背後 (Z <= 0)，先畫行星
+        const px = sX + (planetX - w/2) * 0.5;
+        if (planetZ <= 0) {
+            drawPlanetInstance(px, sY, planetR, 0.4, isHighlighting);
+        }
+
+        // 3. 繪製恆星 (中間層)
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
         starGrad.addColorStop(0.3, '#ffcc00');
@@ -362,27 +398,12 @@
         ctx.fillStyle = starGrad;
         ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
-        // --- 2. 行星與高亮 ---
+        // 4. 如果行星在前方 (Z > 0)，最後畫行星
         if (planetZ > 0) {
-            const px = sX + (planetX - w/2) * 0.5;
-            const isHighlighting = isInteracting || (Date.now() - highlightTimer < highlightDuration);
-            
-            ctx.beginPath(); 
-            ctx.arc(px, sY, planetR, 0, Math.PI*2);
-            
-            if (isHighlighting) {
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = 'var(--neon-blue)';
-                ctx.strokeStyle = 'var(--neon-blue)';
-                ctx.lineWidth = 2.5;
-                ctx.stroke();
-            }
-            ctx.fillStyle = '#000';
-            ctx.fill();
-            ctx.shadowBlur = 0; 
+            drawPlanetInstance(px, sY, planetR, 1.0, isHighlighting);
         }
 
-        // --- 3. 光變曲線 ---
+        // --- 3. 光變曲線圖表 ---
         const graphX = w * 0.55, graphY = h * 0.2, graphW = w * 0.4, graphH = h * 0.5;
         ctx.strokeStyle = '#444';
         ctx.lineWidth = 1;
@@ -405,7 +426,6 @@
         ctx.font = '10px Arial';
         ctx.fillText('亮度 (Brightness)', graphX + 5, graphY + 15);
 
-        // 背景呼吸燈 (基於絕對時間以保持穩定)
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
         bgLayer.style.setProperty('--pulse-opacity', 0.2 + (breath * 0.8));
@@ -413,7 +433,6 @@
         requestAnimationFrame(draw);
     }
     
-    // 啟動動畫循環
     requestAnimationFrame(draw);
 </script>
 
