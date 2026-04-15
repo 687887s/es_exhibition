@@ -84,7 +84,7 @@
         .highlight { color: var(--neon-blue); font-weight: bold; }
 
         .canvas-container {
-            margin: 20px -18px 0 -18px;
+            margin: 10px -18px 0 -18px;
             background: #000;
             position: relative;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -96,10 +96,10 @@
         canvas { display: block; width: 100%; height: auto; }
 
         .controls {
-            padding: 15px 18px 15px 18px;
+            padding: 5px 18px 5px 18px;
             background: #000; 
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 0 -18px 5px -18px;
+            margin: 0 -18px 0px -18px;
         }
 
         .control-item {
@@ -279,7 +279,7 @@
 
     // --- 高亮邏輯改進 ---
     let highlightTimer = 0;
-    const highlightDuration = 800; 
+    const highlightDuration = 500; 
     let isInteracting = false; 
 
     const startHighlight = () => { isInteracting = true; };
@@ -312,7 +312,7 @@
             ctx.shadowBlur = 15;
             ctx.shadowColor = 'var(--neon-blue)';
             ctx.strokeStyle = 'var(--neon-blue)';
-            ctx.lineWidth = 2.5;
+            ctx.lineWidth = 5;
             ctx.stroke();
         }
         
