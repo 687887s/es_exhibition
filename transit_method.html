@@ -1,1 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <!-- 
+      檔案狀態：草稿 (DRAFT)
+      最後修訂：2024年展覽準備版 - 凌日法頁面
+      註解：內容根據地科展教具 PDF 內容編寫。
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>[草稿] 捕捉宇宙的閃爍：凌日法</title>
+    
+    <!-- MathJax 配置 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    
+    <style>
+        :root {
+            --deep-gold: #4d3300;
+            --vibrant-gold: #ffcc00;
+            --neon-blue: #00d4ff;
+            --text-color: #f0f0f0;
+            --pulse-ratio: 50%; 
+            --bg-color-dark: #1a1a1a;
+            --bg-color-gold: #332200;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+            background: #000;
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 動態背景層：模擬恆星亮度的細微起伏 */
+        .bg-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: linear-gradient(145deg, 
+                var(--bg-color-dark) 0%, 
+                var(--bg-color-dark) calc(var(--pulse-ratio) - 45%), 
+                var(--bg-color-gold) calc(var(--pulse-ratio) + 45%), 
+                var(--bg-color-gold) 100%
+            );
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 30px 4vw;
+            text-align: center;
+            border-bottom: 2px solid var(--vibrant-gold);
+        }
+
+        h1 { color: var(--vibrant-gold); font-size: 1.5em; text-shadow: 0 0 10px rgba(255, 204, 0, 0.4); font-weight: 800; margin: 0; }
+
+        .container { width: 92vw; max-width: 600px; margin: 0 auto; padding: 20px 0; }
+
+        section {
+            background: rgba(30, 25, 10, 0.8);
+            backdrop-filter: blur(15px);
+            margin-bottom: 20px;
+            padding: 25px 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 204, 0, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 { color: var(--vibrant-gold); margin-top: 0; padding-bottom: 12px; display: flex; align-items: center; font-size: 1.3em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        h2::before { content: ""; width: 4px; height: 1.2em; background: var(--vibrant-gold); margin-right: 12px; border-radius: 2px; }
+
+        .highlight { color: var(--neon-blue); font-weight: bold; }
+
+        /* 繪圖容器 */
+        .canvas-container {
+            margin: 20px -18px;
+            background: #000;
+            position: relative;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        canvas { display: block; width: 100%; height: auto; }
+
+        .formula-card {
+            font-size: 1.2em;
+            color: var(--vibrant-gold);
+            text-align: center;
+            margin: 20px -18px;
+            padding: 25px 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 1px solid rgba(255, 204, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 204, 0, 0.2);
+        }
+
+        details { background: rgba(255, 255, 255, 0.05); margin: 20px -18px -25px -18px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        summary { padding: 15px 20px; font-weight: bold; color: var(--vibrant-gold); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; outline: none; }
+        summary::after { content: "↓"; transition: transform 0.3s; }
+        details[open] summary::after { transform: rotate(180deg); }
+        .details-content { padding: 15px 20px; background: rgba(0, 0, 0, 0.3); font-size: 0.95em; color: #ccc; }
+
+        .back-nav { text-align: center; margin: 30px 0; }
+        .back-btn { color: var(--vibrant-gold); text-decoration: none; font-size: 0.9em; border: 1px solid var(--vibrant-gold); padding: 8px 20px; border-radius: 20px; transition: all 0.3s; }
+        .back-btn:hover { background: var(--vibrant-gold); color: #000; }
+
+        footer { text-align: center; padding: 50px 20px; font-size: 0.85em; color: #777; background: rgba(0, 0, 0, 0.8); }
+    </style>
+</head>
+<body>
+
+<div class="bg-layer" id="bgLayer"></div>
+
+<header>
+    <h1>捕捉宇宙的閃爍</h1>
+    <p style="color:#aaa; font-size:0.9em; margin-top:5px;">凌日法：解讀恆星光度的細微變化 [草稿]</p>
+</header>
+
+<div class="container">
+    <section>
+        <h2>★ 什麼是「凌日法」？</h2>
+        <p>
+            想像黑夜中有一盞超亮的探照燈。如果一隻<span class="highlight">小蚊子</span>剛好飛過燈泡正前方，探照燈的亮度會瞬間稍微變暗一點。
+        </p>
+        
+        <div class="canvas-container">
+            <!-- 即時模擬：行星凌日與光度曲線 -->
+            <canvas id="transitCanvas"></canvas>
+        </div>
+        <div style="text-align: center; padding-bottom: 10px;">
+            <span style="font-size:0.8em; color:#888;">即時模擬：行星遮擋造成的「光變曲線」下降</span>
+        </div>
+
+        <p>
+            科學家利用精密的儀器觀察這種亮度變化（即<span class="highlight">光變曲線 Light Curve</span>），便能推算出系外行星的存在與直徑。
+        </p>
+    </section>
+
+    <section>
+        <h2>★ 數據解讀：我們能知道什麼？</h2>
+        <p>凌日法不只是發現行星，它還能告訴我們：</p>
+        <ul>
+            <li><span class="highlight">行星大小</span>：凌日造成的亮度下降「深度」，決定了行星的直徑。</li>
+            <li><span class="highlight">公轉週期</span>：兩次凌日間的時間間隔。</li>
+            <li><span class="highlight">軌道半徑</span>：利用克卜勒第三定律計算。</li>
+        </ul>
+        
+        <details>
+            <summary>物理百科：克卜勒第三定律</summary>
+            <div class="details-content">
+                透過觀測兩次凌日的時間間隔（週期 $T$），我們可以計算軌道半徑 $a$：
+                <div class="formula-card">
+                    $$\displaystyle \frac{a^3}{T^2} = k$$
+                </div>
+                這有助於判斷行星是否位在「適居帶」（Habitable Zone）。
+            </div>
+        </details>
+    </section>
+
+    <section>
+        <h2>★ 教具現場：Arduino 的眼睛</h2>
+        <p>
+            在我們的展示現場，使用燈箱代表恆星，行星模型繞其運動。我們利用 <span class="highlight">Arduino</span> 搭配精密光度感測套件，捕捉肉眼難以察覺的細微閃爍。
+        </p>
+        <details>
+            <summary>為什麼要用感測器？</summary>
+            <div class="details-content">
+                在實際天文觀測中，亮度變化通常只有 <span class="highlight">0.01% 到 1%</span>。這就像是一萬顆燈泡中熄滅了一顆，必須依賴高頻率取樣的電子感測器才能記錄下來。
+            </div>
+        </details>
+    </section>
+
+    <section>
+        <h2>★ 克卜勒太空望遠鏡的貢獻</h2>
+        <p>
+            凌日法是目前發現系外行星數量最多的技術。著名的<span class="highlight">克卜勒 (Kepler) 任務</span>便以此技術發現了數千顆行星，擴展了人類對宇宙生命可能的想像。
+        </p>
+    </section>
+
+    <div class="back-nav">
+        <a href="index.html" class="back-btn">← 返回展覽首頁</a>
+    </div>
+</div>
+
+<footer>
+    <p>地科 117 級 天文股 製作<br>—— 內容狀態：草稿修訂中 ——</p>
+</footer>
+
+<script>
+    const canvas = document.getElementById('transitCanvas');
+    const ctx = canvas.getContext('2d');
+    const bgLayer = document.getElementById('bgLayer');
+
+    const period = 5.0; // 週期
+    let points = []; // 儲存光度點
+
+    function resize() {
+        const width = canvas.clientWidth;
+        canvas.width = width * window.devicePixelRatio;
+        canvas.height = (width * 0.6) * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function draw() {
+        const w = canvas.width / window.devicePixelRatio;
+        const h = canvas.height / window.devicePixelRatio;
+        const time = Date.now() / 1000;
+        const angle = (2 * Math.PI * time) / period;
+        
+        // 行星位置 (X 軸移動)
+        const planetX = (w / 2) + Math.cos(angle) * (w * 0.35);
+        const planetZ = Math.sin(angle); // Z 軸，用來判斷是否在前方
+        
+        // 計算亮度下降 (只有在前方時)
+        let brightness = 1.0;
+        const isTransiting = (planetZ > 0.8 && Math.abs(planetX - w/2) < 40);
+        if (isTransiting) {
+            brightness = 0.92; // 亮度掉 8%
+        }
+
+        // 更新數據點
+        points.push({ x: w * 0.9, y: brightness });
+        if (points.length > 200) points.shift();
+        points.forEach(p => p.x -= 1.5);
+
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, w, h);
+
+        // --- 1. 左側：恆星視圖 ---
+        const sX = w * 0.25, sY = h * 0.35;
+        // 恆星光暈
+        const grad = ctx.createRadialGradient(sX, sY, 5, sX, sY, 40);
+        grad.addColorStop(0, '#fff');
+        grad.addColorStop(0.3, '#ffcc00');
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(sX, sY, 40, 0, Math.PI*2); ctx.fill();
+
+        // 行星 (只有在前方時才畫在恆星上，否則畫在後方或側邊)
+        if (planetZ > 0) {
+            ctx.fillStyle = '#000';
+            const px = sX + (planetX - w/2) * 0.5;
+            ctx.beginPath(); ctx.arc(px, sY, 8, 0, Math.PI*2); ctx.fill();
+        }
+
+        // --- 2. 右側：光變曲線 ---
+        const graphX = w * 0.55, graphY = h * 0.1, graphW = w * 0.4, graphH = h * 0.5;
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(graphX, graphY, graphW, graphH);
+        
+        ctx.strokeStyle = 'var(--vibrant-gold)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        points.forEach((p, i) => {
+            const drawX = graphX + (p.x - (w * 0.55));
+            const drawY = graphY + (1.0 - p.y) * 400 + 20; // 放大變動量
+            if (drawX > graphX && drawX < graphX + graphW) {
+                if (i === 0) ctx.moveTo(drawX, drawY);
+                else ctx.lineTo(drawX, drawY);
+            }
+        });
+        ctx.stroke();
+
+        ctx.fillStyle = '#888';
+        ctx.font = '10px Arial';
+        ctx.fillText('Brightness', graphX + 5, graphY + 15);
+
+        // --- 背景脈動 ---
+        bgLayer.style.setProperty('--pulse-ratio', (50 + (brightness - 1) * 500) + '%');
+
+        requestAnimationFrame(draw);
+    }
+    draw();
+</script>
+
+</body>
+</html>
