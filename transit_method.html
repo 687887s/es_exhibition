@@ -5,6 +5,7 @@
       檔案狀態：草稿 (DRAFT)
       最後修訂：2024年展覽準備版 - 凌日法頁面
       註解：內容根據地科展教具 PDF 內容編寫。
+      更新：背景改為灰色呼吸燈效果，同步公轉週期。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -26,13 +27,12 @@
     
     <style>
         :root {
-            --deep-gold: #4d3300;
             --vibrant-gold: #ffcc00;
             --neon-blue: #00d4ff;
             --text-color: #f0f0f0;
-            --pulse-ratio: 50%; 
-            --bg-color-dark: #1a1a1a;
-            --bg-color-gold: #332200;
+            --bg-color-center: #333333; /* 灰色呼吸燈中心色 */
+            --bg-color-edge: #0a0a0a;   /* 深灰色邊緣 */
+            --pulse-opacity: 1;
         }
 
         body {
@@ -46,17 +46,15 @@
             overflow-x: hidden;
         }
 
-        /* 動態背景層：模擬恆星亮度的細微起伏 */
+        /* 動態背景層：灰色呼吸燈設計 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            background: linear-gradient(145deg, 
-                var(--bg-color-dark) 0%, 
-                var(--bg-color-dark) calc(var(--pulse-ratio) - 45%), 
-                var(--bg-color-gold) calc(var(--pulse-ratio) + 45%), 
-                var(--bg-color-gold) 100%
-            );
+            /* 從中間亮起的徑向漸層 */
+            background: radial-gradient(circle at center, var(--bg-color-center) 0%, var(--bg-color-edge) 100%);
+            opacity: var(--pulse-opacity);
+            transition: opacity 0.1s linear;
         }
 
         header {
@@ -71,13 +69,13 @@
         .container { width: 92vw; max-width: 600px; margin: 0 auto; padding: 20px 0; }
 
         section {
-            background: rgba(30, 25, 10, 0.8);
+            background: rgba(25, 25, 25, 0.85); /* 調整區塊底色以配合灰色背景 */
             backdrop-filter: blur(15px);
             margin-bottom: 20px;
             padding: 25px 18px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 204, 0, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
         }
 
         h2 { color: var(--vibrant-gold); margin-top: 0; padding-bottom: 12px; display: flex; align-items: center; font-size: 1.3em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
@@ -281,8 +279,10 @@
         ctx.font = '10px Arial';
         ctx.fillText('Brightness', graphX + 5, graphY + 15);
 
-        // --- 背景脈動 ---
-        bgLayer.style.setProperty('--pulse-ratio', (50 + (brightness - 1) * 500) + '%');
+        // --- 呼吸燈背景邏輯 ---
+        // 使用 sine 波產生平滑的 0 到 1 的數值，並映射到透明度 0.3 到 1.0
+        const breath = (Math.sin(angle) + 1) / 2;
+        bgLayer.style.setProperty('--pulse-opacity', 0.3 + (breath * 0.7));
 
         requestAnimationFrame(draw);
     }
