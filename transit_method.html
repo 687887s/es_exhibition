@@ -5,9 +5,9 @@
       檔案狀態：草稿 (DRAFT)
       最後修訂：2024年展覽準備版 - 凌日法頁面
       更新內容：
-      1. 恆星視覺放大。
-      2. 光變曲線優化為平滑 U 型（含進入/離開過程）。
-      3. 保持灰色呼吸背景與滑桿控制項。
+      1. 移除模擬器底部間距。
+      2. 優化光變曲線為極平滑 U 型。
+      3. 調整滑桿時暫時高亮行星。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -84,20 +84,20 @@
         .highlight { color: var(--neon-blue); font-weight: bold; }
 
         .canvas-container {
-            margin: 20px -18px;
+            margin: 20px -18px 0 -18px; /* 移除底部外邊距 */
             background: #000;
             position: relative;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
         }
 
         canvas { display: block; width: 100%; height: auto; }
 
         .controls {
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            margin-top: 10px;
+            padding: 15px 18px 20px 18px;
+            background: #000; /* 與畫布背景融合 */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 0 -18px 20px -18px; /* 確保與 section 邊緣對齊 */
         }
 
         .control-item {
@@ -120,7 +120,7 @@
             -webkit-appearance: none;
             width: 100%;
             height: 6px;
-            background: #333;
+            background: #222;
             border-radius: 3px;
             outline: none;
         }
@@ -177,22 +177,22 @@
         
         <div class="canvas-container">
             <canvas id="transitCanvas"></canvas>
-            
-            <div class="controls">
-                <div class="control-item">
-                    <div class="control-label">
-                        <span>行星大小 (Planet Size)</span>
-                        <span id="sizeVal">中型</span>
-                    </div>
-                    <input type="range" id="sizeSlider" min="5" max="25" value="12" step="1">
+        </div>
+        <!-- 控制面板移至畫布下方並移除間距 -->
+        <div class="controls">
+            <div class="control-item">
+                <div class="control-label">
+                    <span>行星大小 (Planet Size)</span>
+                    <span id="sizeVal">中型</span>
                 </div>
-                <div class="control-item">
-                    <div class="control-label">
-                        <span>公轉速度 (Orbital Speed)</span>
-                        <span id="speedVal">正常</span>
-                    </div>
-                    <input type="range" id="speedSlider" min="1" max="10" value="5" step="0.5">
+                <input type="range" id="sizeSlider" min="5" max="25" value="12" step="1">
+            </div>
+            <div class="control-item">
+                <div class="control-label">
+                    <span>公轉速度 (Orbital Speed)</span>
+                    <span id="speedVal">正常</span>
                 </div>
+                <input type="range" id="speedSlider" min="1" max="10" value="5" step="0.5">
             </div>
         </div>
         <div style="text-align: center; padding-bottom: 10px;">
@@ -269,13 +269,21 @@
     let planetR = parseFloat(sizeSlider.value);
     let speedMult = parseFloat(speedSlider.value);
     let points = []; 
-    const starR = 60; // 放大恆星
+    const starR = 60; 
     const breathPeriod = 12.0; 
+
+    // 高亮計時器
+    let highlightTimer = 0;
+    const highlightDuration = 800; // 高亮持續時間 (毫秒)
+
+    const triggerHighlight = () => { highlightTimer = Date.now(); };
+    sizeSlider.oninput = triggerHighlight;
+    speedSlider.oninput = triggerHighlight;
 
     function resize() {
         const width = canvas.clientWidth;
         canvas.width = width * window.devicePixelRatio;
-        canvas.height = (width * 0.65) * window.devicePixelRatio;
+        canvas.height = (width * 0.58) * window.devicePixelRatio; // 微調高度以去除間距
         ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
     window.addEventListener('resize', resize);
@@ -286,14 +294,12 @@
         const h = canvas.height / window.devicePixelRatio;
         const time = Date.now() / 1000;
         
-        // 即時讀取滑桿數值
         planetR = parseFloat(sizeSlider.value);
         speedMult = parseFloat(speedSlider.value);
         
         sizeVal.innerText = planetR < 12 ? "小型" : (planetR > 18 ? "大型" : "中型");
         speedVal.innerText = speedMult < 4 ? "緩慢" : (speedMult > 7 ? "極速" : "正常");
 
-        // 軌道邏輯
         const period = 12.0 / (speedMult * 0.5); 
         const angle = (2 * Math.PI * time) / period;
         
@@ -301,39 +307,35 @@
         const planetX = (w / 2) + Math.cos(angle) * orbitRadius;
         const planetZ = Math.sin(angle); 
         
-        // --- 核心改進：U 型光度計算 ---
-        const dist = Math.abs(planetX - w/2); // 行星中心與恆星中心的水準距離
-        const totalContactRadius = starR + planetR; // 開始進入邊緣的距離
-        const fullInsideRadius = starR - planetR;   // 完全進入盤面的距離
+        const dist = Math.abs(planetX - w/2); 
+        const totalContactRadius = starR + planetR; 
+        const fullInsideRadius = starR - planetR;   
         
         let brightness = 1.0;
         const maxDepth = (planetR * planetR) / (starR * starR);
 
-        if (planetZ > 0) { // 只在恆星前方時發生凌日
+        if (planetZ > 0) { 
             if (dist < totalContactRadius) {
                 if (dist < fullInsideRadius) {
-                    // 完全在盤面內
                     brightness = 1.0 - maxDepth;
                 } else {
-                    // 進入/離開過程 (Ingress/Egress)
-                    // 使用平滑插值模擬圓形遮擋的 U 型坡度
-                    const ratio = (totalContactRadius - dist) / (totalContactRadius - fullInsideRadius);
-                    brightness = 1.0 - (maxDepth * ratio);
+                    // 使用平滑曲線 (Cosine) 模擬進入過程，使 U 型底座更平滑
+                    const normDist = (dist - fullInsideRadius) / (totalContactRadius - fullInsideRadius);
+                    const smoothFactor = (Math.cos(normDist * Math.PI) + 1) / 2;
+                    brightness = 1.0 - (maxDepth * smoothFactor);
                 }
             }
         }
 
-        // 光度數據點更新 (從右側湧入)
         points.push({ x: w * 0.9, y: brightness });
         if (points.length > 250) points.shift();
-        points.forEach(p => p.x -= 1.8);
+        points.forEach(p => p.x -= 2.0);
 
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
 
         // --- 1. 左側：恆星模擬區 ---
-        const sX = w * 0.28, sY = h * 0.35;
-        // 繪製恆星發光
+        const sX = w * 0.28, sY = h * 0.45;
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
         starGrad.addColorStop(0.3, '#ffcc00');
@@ -341,16 +343,33 @@
         ctx.fillStyle = starGrad;
         ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
-        // 繪製行星 (若在前方則為黑色，模擬剪影)
+        // 繪製行星
         if (planetZ > 0) {
-            ctx.fillStyle = '#000';
-            // 將軌道投影到恆星高度
             const px = sX + (planetX - w/2) * 0.5;
-            ctx.beginPath(); ctx.arc(px, sY, planetR, 0, Math.PI*2); ctx.fill();
+            
+            // 判斷是否高亮
+            const isHighlighting = (Date.now() - highlightTimer < highlightDuration);
+            
+            ctx.beginPath(); 
+            ctx.arc(px, sY, planetR, 0, Math.PI*2);
+            
+            if (isHighlighting) {
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'var(--neon-blue)';
+                ctx.strokeStyle = 'var(--neon-blue)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            } else {
+                ctx.shadowBlur = 0;
+            }
+            
+            ctx.fillStyle = '#000';
+            ctx.fill();
+            ctx.shadowBlur = 0; // 重設
         }
 
         // --- 2. 右側：光變曲線圖表 ---
-        const graphX = w * 0.55, graphY = h * 0.1, graphW = w * 0.4, graphH = h * 0.5;
+        const graphX = w * 0.55, graphY = h * 0.2, graphW = w * 0.4, graphH = h * 0.5;
         ctx.strokeStyle = '#444';
         ctx.lineWidth = 1;
         ctx.strokeRect(graphX, graphY, graphW, graphH);
@@ -360,7 +379,6 @@
         ctx.beginPath();
         points.forEach((p, i) => {
             const drawX = graphX + (p.x - (w * 0.55));
-            // y 軸縮放：將亮度掉落深度顯著化
             const drawY = graphY + (1.0 - p.y) * 500 + 30; 
             if (drawX > graphX && drawX < graphX + graphW) {
                 if (i === 0) ctx.moveTo(drawX, drawY);
