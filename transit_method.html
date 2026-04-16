@@ -5,10 +5,9 @@
       檔案狀態：草稿 (DRAFT)
       最後修訂：2024年展覽準備版 - 凌日法頁面
       更新內容：
-      1. 修復高亮誤觸問題：修正判斷條件，僅在結束滑桿交互時啟動高亮倒數。
-      2. 修正 Canvas 高亮色彩解析：改用常數色彩字串。
-      3. 同步軌道虛線：高亮時顯示霓虹藍軌道。
-      4. 累積相位邏輯：解決變速時的行星瞬移跳躍。
+      1. 高亮衰減優化：高亮不再直接消失，而是透過強度 (Intensity) 平滑衰減。
+      2. 修復高亮誤觸問題：僅在結束滑桿交互時啟動衰減。
+      3. 同步軌道虛線：虛線透明度隨高亮強度同步變化。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -85,7 +84,7 @@
         .highlight { color: var(--neon-blue); font-weight: bold; }
 
         .canvas-container {
-            margin: 10px -18px 0 -18px;
+            margin: 0px -18px 0 -18px;
             background: #000;
             position: relative;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -97,10 +96,10 @@
         canvas { display: block; width: 100%; height: auto; }
 
         .controls {
-            padding: 15px 18px 15px 18px;
+            padding: 5px 18px 5px 18px;
             background: #000; 
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 0 -18px 10px -18px;
+            margin: 0 -18px 0px -18px;
         }
 
         .control-item {
@@ -267,8 +266,8 @@
     const sizeVal = document.getElementById('sizeVal');
     const speedVal = document.getElementById('speedVal');
 
-    // 直接定義顏色字串，避免 Canvas 無法解析 CSS 變數的問題
-    const COLOR_NEON_BLUE = '#00d4ff';
+    // 顏色定義 (用於 Canvas 繪圖)
+    const RGB_NEON_BLUE = '0, 212, 255'; // 對應 #00d4ff
     const COLOR_VIBRANT_GOLD = '#ffcc00';
 
     // 模擬核心變數
@@ -278,19 +277,17 @@
     const starR = 60; 
     const breathPeriod = 12.0; 
 
-    // 相位累積變數：確保變速時行星不瞬移
+    // 相位累積變數
     let lastTimestamp = performance.now();
     let currentOrbitAngle = 0; 
 
-    // 高亮邏輯變數
+    // 高亮衰減邏輯變數
     let highlightTimer = 0;
-    const highlightDuration = 800; 
+    const highlightDuration = 800; // 衰減持續時間 (ms)
     let isInteracting = false; 
 
-    // --- 修改後的交互邏輯 ---
     const startHighlight = () => { isInteracting = true; };
     const endHighlight = () => { 
-        // 修正：只有當先前有觸發交互時，才啟動消失倒數
         if (isInteracting) {
             isInteracting = false; 
             highlightTimer = Date.now(); 
@@ -299,7 +296,6 @@
 
     sizeSlider.addEventListener('pointerdown', startHighlight);
     speedSlider.addEventListener('pointerdown', startHighlight);
-    // 在全域監聽放開，確保滑出滑桿也能正確結束
     window.addEventListener('pointerup', endHighlight);
     window.addEventListener('pointercancel', endHighlight);
 
@@ -312,17 +308,17 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // 繪製行星的封裝函數
-    function drawPlanetInstance(pX, pY, radius, opacity, highlight) {
+    // 繪製行星函數，增加強度 (intensity) 參數
+    function drawPlanetInstance(pX, pY, radius, opacity, intensity) {
         ctx.save();
         ctx.globalAlpha = opacity;
         ctx.beginPath(); 
         ctx.arc(pX, pY, radius, 0, Math.PI*2);
         
-        if (highlight) {
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = COLOR_NEON_BLUE;
-            ctx.strokeStyle = COLOR_NEON_BLUE;
+        if (intensity > 0) {
+            ctx.shadowBlur = 15 * intensity;
+            ctx.shadowColor = `rgba(${RGB_NEON_BLUE}, ${intensity})`;
+            ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${intensity})`;
             ctx.lineWidth = 2.5;
             ctx.stroke();
         }
@@ -360,7 +356,6 @@
         let brightness = 1.0;
         const maxDepth = (planetR * planetR) / (starR * starR);
 
-        // U 型光度計算 (僅前方)
         if (planetZ > 0) { 
             if (dist < totalContactRadius) {
                 if (dist < fullInsideRadius) {
@@ -381,13 +376,22 @@
         ctx.fillRect(0, 0, w, h);
 
         const sX = w * 0.28, sY = h * 0.45;
-        const isHighlighting = isInteracting || (Date.now() - highlightTimer < highlightDuration);
 
-        // 1. 軌道虛線繪製 (隨高亮狀態變色)
+        // --- 計算高亮強度 (Intensity: 1.0 -> 0.0) ---
+        let hIntensity = 0;
+        if (isInteracting) {
+            hIntensity = 1.0;
+        } else {
+            const elapsed = Date.now() - highlightTimer;
+            if (elapsed < highlightDuration) {
+                hIntensity = 1.0 - (elapsed / highlightDuration);
+            }
+        }
+
+        // 1. 軌道虛線繪製 (透明度隨強度衰減)
         ctx.save();
-        if (isHighlighting) {
-            ctx.strokeStyle = COLOR_NEON_BLUE;
-            ctx.globalAlpha = 0.4;
+        if (hIntensity > 0) {
+            ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${0.1 + hIntensity * 0.3})`; // 基礎透明度 0.1 + 衰減
             ctx.lineWidth = 1;
             ctx.setLineDash([5, 5]);
         } else {
@@ -404,7 +408,7 @@
 
         // 2. 後景行星 (Z <= 0)
         if (planetZ <= 0) {
-            drawPlanetInstance(px, sY, planetR, 0.4, isHighlighting);
+            drawPlanetInstance(px, sY, planetR, 0.4, hIntensity);
         }
 
         // 3. 恆星視覺繪製
@@ -417,7 +421,7 @@
 
         // 4. 前景行星 (Z > 0)
         if (planetZ > 0) {
-            drawPlanetInstance(px, sY, planetR, 1.0, isHighlighting);
+            drawPlanetInstance(px, sY, planetR, 1.0, hIntensity);
         }
 
         // 5. 光變曲線圖表
