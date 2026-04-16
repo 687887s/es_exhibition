@@ -5,9 +5,9 @@
       檔案狀態：草稿 (DRAFT)
       最後修訂：2024年展覽準備版 - 凌日法頁面
       更新內容：
-      1. 模擬排版重構：改為上下排列（恆星在上，曲線在下）。
-      2. 密集化 X 軸：調慢曲線捲動速度，增加數據密度。
-      3. 高亮衰減與軌道同步邏輯維持不變。
+      1. 橫向擴展：增加軌道半徑 (orbitRadius) 使其填滿寬度。
+      2. 縱向緊湊化：降低畫布高寬比並縮小組件間距。
+      3. 維持平滑衰減高亮與累積相位變速邏輯。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -59,14 +59,14 @@
 
         header {
             background: rgba(0, 0, 0, 0.85);
-            padding: 30px 4vw;
+            padding: 25px 4vw;
             text-align: center;
             border-bottom: 2px solid var(--vibrant-gold);
         }
 
         h1 { color: var(--vibrant-gold); font-size: 1.5em; text-shadow: 0 0 10px rgba(255, 204, 0, 0.4); font-weight: 800; margin: 0; }
 
-        .container { width: 92vw; max-width: 600px; margin: 0 auto; padding: 20px 0; }
+        .container { width: 92vw; max-width: 600px; margin: 0 auto; padding: 15px 0; }
 
         section {
             background: rgba(25, 25, 25, 0.85);
@@ -84,7 +84,7 @@
         .highlight { color: var(--neon-blue); font-weight: bold; }
 
         .canvas-container {
-            margin: 0px -18px 0 -18px;
+            margin: 0 -18px;
             background: #000;
             position: relative;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -96,7 +96,7 @@
         canvas { display: block; width: 100%; height: auto; }
 
         .controls {
-            padding: 5px 18px 5px 18px;
+            padding: 0px 18px;
             background: #000; 
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin: 0 -18px 0px -18px;
@@ -105,8 +105,8 @@
         .control-item {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 6px;
+            margin-bottom: 12px;
         }
 
         .control-item:last-child { margin-bottom: 0; }
@@ -134,7 +134,7 @@
             background: var(--vibrant-gold);
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 0 12px var(--vibrant-gold);
+            box-shadow: 0 0 10px var(--vibrant-gold);
         }
 
         .formula-card {
@@ -178,7 +178,6 @@
         </p>
         
         <div class="canvas-container">
-            <!-- 模擬視窗：上下佈局重構 -->
             <canvas id="transitCanvas"></canvas>
         </div>
         
@@ -198,8 +197,8 @@
                 <input type="range" id="speedSlider" min="0.5" max="10" value="5" step="0.05">
             </div>
         </div>
-        <div style="text-align: center; padding-bottom: 10px;">
-            <span style="font-size:0.8em; color:#888;">調整滑桿：觀察 U 型「光變曲線」的深度與寬度</span>
+        <div style="text-align: center; padding-bottom: 5px;">
+            <span style="font-size:0.8em; color:#888;">調整滑桿觀察 U 型光變曲線</span>
         </div>
 
         <p>
@@ -213,7 +212,6 @@
         <ul>
             <li><span class="highlight">行星大小</span>：凌日造成的亮度下降「深度」，決定了行星的直徑。</li>
             <li><span class="highlight">公轉週期</span>：兩次凌日間的時間間隔。</li>
-            <li><span class="highlight">軌道半徑</span>：利用克卜勒第三定律計算。</li>
         </ul>
         
         <details>
@@ -223,7 +221,6 @@
                 <div class="formula-card">
                     $$\displaystyle \frac{a^3}{T^2} = k$$
                 </div>
-                這有助於判斷行星是否位在「適居帶」（Habitable Zone）。
             </div>
         </details>
     </section>
@@ -232,19 +229,6 @@
         <h2>★ 教具現場：Arduino 的眼睛</h2>
         <p>
             在我們的展示現場，使用燈箱代表恆星，行星模型繞其運動。我們利用 <span class="highlight">Arduino</span> 搭配精密光度感測套件，捕捉肉眼難以察覺的細微閃爍。
-        </p>
-        <details>
-            <summary>為什麼要用感測器？</summary>
-            <div class="details-content">
-                在實際天文觀測中，亮度變化通常只有 <span class="highlight">0.01% 到 1%</span>。必須依賴高頻率取樣的電子感測器才能記錄下來。
-            </div>
-        </details>
-    </section>
-
-    <section>
-        <h2>★ 克卜勒太空望遠鏡的貢獻</h2>
-        <p>
-            著名的<span class="highlight">克卜勒 (Kepler) 任務</span>已發現數千顆行星，擴展了人類對宇宙生命可能的想像。
         </p>
     </section>
 
@@ -301,9 +285,9 @@
 
     function resize() {
         const width = canvas.clientWidth;
-        // 增加高度比例以容納上下佈局
+        // 降低高度比例 (從 0.95 降至 0.75)
         canvas.width = width * window.devicePixelRatio;
-        canvas.height = (width * 0.95) * window.devicePixelRatio; 
+        canvas.height = (width * 0.75) * window.devicePixelRatio; 
         ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
     window.addEventListener('resize', resize);
@@ -345,8 +329,8 @@
         currentOrbitAngle += angularVelocity * dt;
         currentOrbitAngle %= (2 * Math.PI); 
 
-        // 調整軌道視覺寬度 (上下佈局後可以更寬)
-        const orbitRadius = w * 0.4;
+        // 擴展軌道視覺寬度 (從 0.4 增至 0.46，填得更滿)
+        const orbitRadius = w * 0.46;
         const planetX = (w / 2) + Math.cos(currentOrbitAngle) * orbitRadius;
         const planetZ = Math.sin(currentOrbitAngle); 
         
@@ -369,18 +353,16 @@
             }
         }
 
-        // --- 密集化曲線更新 ---
+        // --- 密集化數據流 ---
         points.push({ x: w * 0.9, y: brightness });
-        // 增加存儲容量以容納更密集的點
         if (points.length > 500) points.shift();
-        // 調慢捲動速度讓點更密集
         points.forEach(p => p.x -= 1.2);
 
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
 
-        // --- 上半部：恆星模擬區 ---
-        const sX = w / 2, sY = h * 0.3; // 置中
+        // --- 上半部：恆星模擬區 (壓縮間距) ---
+        const sX = w / 2, sY = h * 0.28; 
         let hIntensity = 0;
         if (isInteracting) {
             hIntensity = 1.0;
@@ -403,7 +385,7 @@
             ctx.setLineDash([3, 3]);
         }
         ctx.beginPath();
-        ctx.ellipse(sX, sY, orbitRadius * 0.5, 8, 0, 0, Math.PI * 2);
+        ctx.ellipse(sX, sY, orbitRadius * 0.5, 6, 0, 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
 
@@ -423,8 +405,8 @@
         // 前景行星
         if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity);
 
-        // --- 下半部：光變曲線圖表 ---
-        const graphX = w * 0.1, graphY = h * 0.6, graphW = w * 0.8, graphH = h * 0.3;
+        // --- 下半部：光變曲線圖表 (壓縮間距) ---
+        const graphX = w * 0.05, graphY = h * 0.55, graphW = w * 0.9, graphH = h * 0.35;
         ctx.strokeStyle = '#444';
         ctx.lineWidth = 1;
         ctx.strokeRect(graphX, graphY, graphW, graphH);
@@ -433,9 +415,8 @@
         ctx.lineWidth = 1.8;
         ctx.beginPath();
         points.forEach((p, i) => {
-            // 計算在圖表中的 X 位置 (密集縮放)
-            const drawX = graphX + (p.x - (w * 0.1));
-            const drawY = graphY + (1.0 - p.y) * 450 + 40; 
+            const drawX = graphX + (p.x - (w * 0.05));
+            const drawY = graphY + (1.0 - p.y) * 400 + 40; 
             if (drawX > graphX && drawX < graphX + graphW) {
                 if (i === 0) ctx.moveTo(drawX, drawY);
                 else ctx.lineTo(drawX, drawY);
