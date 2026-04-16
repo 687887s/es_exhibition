@@ -5,9 +5,8 @@
       檔案狀態：草稿 (DRAFT)
       最後修訂：2024年展覽準備版 - 凌日法頁面
       更新內容：
-      1. 橫向擴展：增加軌道半徑 (orbitRadius) 使其填滿寬度。
-      2. 縱向緊湊化：降低畫布高寬比並縮小組件間距。
-      3. 維持平滑衰減高亮與累積相位變速邏輯。
+      1. 優化高亮消失邏輯：新增「滯留時間 (Hold)」與「反向指數衰減 (Ease-in decay)」。
+      2. 維持垂直佈局、密集光變曲線、以及累積相位軌道邏輯。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -174,7 +173,7 @@
     <section>
         <h2>★ 什麼是「凌日法」？</h2>
         <p>
-            想像黑夜中有一盞超亮的探照燈。如果一隻<span class="highlight">小蚊子</span>剛好飛過燈泡正前方，探照燈的亮度會隨著它進入與離開的過程，呈現平滑的下降與回升。
+            想像黑夜中有一盞超亮的探照燈。如果有一隻<span class="highlight">小蚊子</span>飛過燈泡正前方，亮度會呈現平滑的下降與回升。
         </p>
         
         <div class="canvas-container">
@@ -189,7 +188,7 @@
                 </div>
                 <input type="range" id="sizeSlider" min="5" max="25" value="12" step="0.1">
             </div>
-            <div class="control-item", style="margin:0px 0px 20px 0px">
+            <div class="control-item" style="margin:0px 0px 20px 0px">
                 <div class="control-label">
                     <span>公轉速度 (Orbital Speed)</span>
                     <span id="speedVal">5.0</span>
@@ -200,36 +199,24 @@
         <div style="text-align: center; padding-bottom: 5px;">
             <span style="font-size:0.8em; color:#888;">調整滑桿觀察 U 型光變曲線</span>
         </div>
-
-        <p>
-            科學家利用精密的儀器觀察這種亮度變化（即<span class="highlight">光變曲線 Light Curve</span>），便能推算出系外行星的存在與直徑。
-        </p>
     </section>
 
     <section>
         <h2>★ 數據解讀：我們能知道什麼？</h2>
-        <p>凌日法不只是發現行星，它還能告訴我們：</p>
         <ul>
-            <li><span class="highlight">行星大小</span>：凌日造成的亮度下降「深度」，決定了行星的直徑。</li>
+            <li><span class="highlight">行星大小</span>：凌日造成的亮度下降「深度」。</li>
             <li><span class="highlight">公轉週期</span>：兩次凌日間的時間間隔。</li>
         </ul>
         
         <details>
             <summary>物理百科：克卜勒第三定律</summary>
             <div class="details-content">
-                透過觀測兩次凌日的時間間隔（週期 $T$），我們可以計算軌道半徑 $a$：
+                透過週期 $T$，我們可以計算軌道半徑 $a$：
                 <div class="formula-card">
                     $$\displaystyle \frac{a^3}{T^2} = k$$
                 </div>
             </div>
         </details>
-    </section>
-
-    <section>
-        <h2>★ 教具現場：Arduino 的眼睛</h2>
-        <p>
-            在我們的展示現場，使用燈箱代表恆星，行星模型繞其運動。我們利用 <span class="highlight">Arduino</span> 搭配精密光度感測套件，捕捉肉眼難以察覺的細微閃爍。
-        </p>
     </section>
 
     <div class="back-nav">
@@ -265,9 +252,10 @@
     let lastTimestamp = performance.now();
     let currentOrbitAngle = 0; 
 
-    // 高亮衰減
+    // --- 高亮控制核心變數 ---
     let highlightTimer = 0;
-    const highlightDuration = 800; 
+    const HOLD_DURATION = 500;       // 滑桿放開後，維持全亮的時間 (ms)
+    const DECAY_DURATION = 800;      // 開始衰減後的總時長 (ms)
     let isInteracting = false; 
 
     const startHighlight = () => { isInteracting = true; };
@@ -285,7 +273,6 @@
 
     function resize() {
         const width = canvas.clientWidth;
-        // 降低高度比例 (從 0.95 降至 0.75)
         canvas.width = width * window.devicePixelRatio;
         canvas.height = (width * 0.75) * window.devicePixelRatio; 
         ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
@@ -329,7 +316,6 @@
         currentOrbitAngle += angularVelocity * dt;
         currentOrbitAngle %= (2 * Math.PI); 
 
-        // 擴展軌道視覺寬度 (從 0.4 增至 0.46，填得更滿)
         const orbitRadius = w * 0.46;
         const planetX = (w / 2) + Math.cos(currentOrbitAngle) * orbitRadius;
         const planetZ = Math.sin(currentOrbitAngle); 
@@ -353,7 +339,6 @@
             }
         }
 
-        // --- 密集化數據流 ---
         points.push({ x: w * 0.9, y: brightness });
         if (points.length > 500) points.shift();
         points.forEach(p => p.x -= 1.2);
@@ -361,19 +346,25 @@
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
 
-        // --- 上半部：恆星模擬區 (壓縮間距) ---
         const sX = w / 2, sY = h * 0.28; 
+
+        // --- 核心優化：計算高亮強度 (含 Hold 與 反指數衰減) ---
         let hIntensity = 0;
         if (isInteracting) {
             hIntensity = 1.0;
         } else {
             const elapsed = Date.now() - highlightTimer;
-            if (elapsed < highlightDuration) {
-                hIntensity = 1.0 - (elapsed / highlightDuration);
+            if (elapsed < HOLD_DURATION) {
+                hIntensity = 1.0; // 滯留期：維持全亮
+            } else if (elapsed < HOLD_DURATION + DECAY_DURATION) {
+                // 衰減期：計算衰減進度 (0 到 1)
+                const decayProgress = (elapsed - HOLD_DURATION) / DECAY_DURATION;
+                // 反向指數曲線 (Ease-in): 1 - x^3
+                hIntensity = 1 - Math.pow(decayProgress, 3);
             }
         }
 
-        // 軌道虛線
+        // 1. 軌道虛線
         ctx.save();
         if (hIntensity > 0) {
             ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${0.1 + hIntensity * 0.3})`;
@@ -391,10 +382,10 @@
 
         const px = sX + (planetX - w/2) * 0.5;
 
-        // 後景行星
+        // 2. 後景行星
         if (planetZ <= 0) drawPlanetInstance(px, sY, planetR, 0.4, hIntensity);
 
-        // 恆星
+        // 3. 恆星
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
         starGrad.addColorStop(0.3, '#ffcc00');
@@ -402,10 +393,10 @@
         ctx.fillStyle = starGrad;
         ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
-        // 前景行星
+        // 4. 前景行星
         if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity);
 
-        // --- 下半部：光變曲線圖表 (壓縮間距) ---
+        // 5. 光變曲線圖表
         const graphX = w * 0.05, graphY = h * 0.55, graphW = w * 0.9, graphH = h * 0.35;
         ctx.strokeStyle = '#444';
         ctx.lineWidth = 1;
@@ -431,7 +422,6 @@
         ctx.fillText('時間 (Time) →', graphX + graphW, graphY + graphH + 15);
         ctx.textAlign = 'left';
 
-        // 背景呼吸燈
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
         bgLayer.style.setProperty('--pulse-opacity', 0.2 + (breath * 0.8));
