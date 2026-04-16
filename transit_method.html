@@ -5,9 +5,9 @@
       檔案狀態：草稿 (DRAFT)
       最後修訂：2024年展覽準備版 - 凌日法頁面
       更新內容：
-      1. 高亮衰減優化：高亮不再直接消失，而是透過強度 (Intensity) 平滑衰減。
-      2. 修復高亮誤觸問題：僅在結束滑桿交互時啟動衰減。
-      3. 同步軌道虛線：虛線透明度隨高亮強度同步變化。
+      1. 模擬排版重構：改為上下排列（恆星在上，曲線在下）。
+      2. 密集化 X 軸：調慢曲線捲動速度，增加數據密度。
+      3. 高亮衰減與軌道同步邏輯維持不變。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -178,6 +178,7 @@
         </p>
         
         <div class="canvas-container">
+            <!-- 模擬視窗：上下佈局重構 -->
             <canvas id="transitCanvas"></canvas>
         </div>
         
@@ -266,8 +267,7 @@
     const sizeVal = document.getElementById('sizeVal');
     const speedVal = document.getElementById('speedVal');
 
-    // 顏色定義 (用於 Canvas 繪圖)
-    const RGB_NEON_BLUE = '0, 212, 255'; // 對應 #00d4ff
+    const RGB_NEON_BLUE = '0, 212, 255'; 
     const COLOR_VIBRANT_GOLD = '#ffcc00';
 
     // 模擬核心變數
@@ -277,13 +277,13 @@
     const starR = 60; 
     const breathPeriod = 12.0; 
 
-    // 相位累積變數
+    // 相位累積
     let lastTimestamp = performance.now();
     let currentOrbitAngle = 0; 
 
-    // 高亮衰減邏輯變數
+    // 高亮衰減
     let highlightTimer = 0;
-    const highlightDuration = 800; // 衰減持續時間 (ms)
+    const highlightDuration = 800; 
     let isInteracting = false; 
 
     const startHighlight = () => { isInteracting = true; };
@@ -301,14 +301,14 @@
 
     function resize() {
         const width = canvas.clientWidth;
+        // 增加高度比例以容納上下佈局
         canvas.width = width * window.devicePixelRatio;
-        canvas.height = (width * 0.55) * window.devicePixelRatio; 
+        canvas.height = (width * 0.95) * window.devicePixelRatio; 
         ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
     window.addEventListener('resize', resize);
     resize();
 
-    // 繪製行星函數，增加強度 (intensity) 參數
     function drawPlanetInstance(pX, pY, radius, opacity, intensity) {
         ctx.save();
         ctx.globalAlpha = opacity;
@@ -345,7 +345,8 @@
         currentOrbitAngle += angularVelocity * dt;
         currentOrbitAngle %= (2 * Math.PI); 
 
-        const orbitRadius = w * 0.35;
+        // 調整軌道視覺寬度 (上下佈局後可以更寬)
+        const orbitRadius = w * 0.4;
         const planetX = (w / 2) + Math.cos(currentOrbitAngle) * orbitRadius;
         const planetZ = Math.sin(currentOrbitAngle); 
         
@@ -368,16 +369,18 @@
             }
         }
 
+        // --- 密集化曲線更新 ---
         points.push({ x: w * 0.9, y: brightness });
-        if (points.length > 250) points.shift();
-        points.forEach(p => p.x -= 2.0);
+        // 增加存儲容量以容納更密集的點
+        if (points.length > 500) points.shift();
+        // 調慢捲動速度讓點更密集
+        points.forEach(p => p.x -= 1.2);
 
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
 
-        const sX = w * 0.28, sY = h * 0.45;
-
-        // --- 計算高亮強度 (Intensity: 1.0 -> 0.0) ---
+        // --- 上半部：恆星模擬區 ---
+        const sX = w / 2, sY = h * 0.3; // 置中
         let hIntensity = 0;
         if (isInteracting) {
             hIntensity = 1.0;
@@ -388,10 +391,10 @@
             }
         }
 
-        // 1. 軌道虛線繪製 (透明度隨強度衰減)
+        // 軌道虛線
         ctx.save();
         if (hIntensity > 0) {
-            ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${0.1 + hIntensity * 0.3})`; // 基礎透明度 0.1 + 衰減
+            ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${0.1 + hIntensity * 0.3})`;
             ctx.lineWidth = 1;
             ctx.setLineDash([5, 5]);
         } else {
@@ -400,18 +403,16 @@
             ctx.setLineDash([3, 3]);
         }
         ctx.beginPath();
-        ctx.ellipse(sX, sY, orbitRadius * 0.5, 5, 0, 0, Math.PI * 2);
+        ctx.ellipse(sX, sY, orbitRadius * 0.5, 8, 0, 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
 
         const px = sX + (planetX - w/2) * 0.5;
 
-        // 2. 後景行星 (Z <= 0)
-        if (planetZ <= 0) {
-            drawPlanetInstance(px, sY, planetR, 0.4, hIntensity);
-        }
+        // 後景行星
+        if (planetZ <= 0) drawPlanetInstance(px, sY, planetR, 0.4, hIntensity);
 
-        // 3. 恆星視覺繪製
+        // 恆星
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
         starGrad.addColorStop(0.3, '#ffcc00');
@@ -419,23 +420,22 @@
         ctx.fillStyle = starGrad;
         ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
-        // 4. 前景行星 (Z > 0)
-        if (planetZ > 0) {
-            drawPlanetInstance(px, sY, planetR, 1.0, hIntensity);
-        }
+        // 前景行星
+        if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity);
 
-        // 5. 光變曲線圖表
-        const graphX = w * 0.55, graphY = h * 0.2, graphW = w * 0.4, graphH = h * 0.5;
+        // --- 下半部：光變曲線圖表 ---
+        const graphX = w * 0.1, graphY = h * 0.6, graphW = w * 0.8, graphH = h * 0.3;
         ctx.strokeStyle = '#444';
         ctx.lineWidth = 1;
         ctx.strokeRect(graphX, graphY, graphW, graphH);
         
         ctx.strokeStyle = COLOR_VIBRANT_GOLD;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.8;
         ctx.beginPath();
         points.forEach((p, i) => {
-            const drawX = graphX + (p.x - (w * 0.55));
-            const drawY = graphY + (1.0 - p.y) * 500 + 30; 
+            // 計算在圖表中的 X 位置 (密集縮放)
+            const drawX = graphX + (p.x - (w * 0.1));
+            const drawY = graphY + (1.0 - p.y) * 450 + 40; 
             if (drawX > graphX && drawX < graphX + graphW) {
                 if (i === 0) ctx.moveTo(drawX, drawY);
                 else ctx.lineTo(drawX, drawY);
@@ -446,8 +446,11 @@
         ctx.fillStyle = '#888';
         ctx.font = '10px Arial';
         ctx.fillText('亮度 (Brightness)', graphX + 5, graphY + 15);
+        ctx.textAlign = 'right';
+        ctx.fillText('時間 (Time) →', graphX + graphW, graphY + graphH + 15);
+        ctx.textAlign = 'left';
 
-        // 背景呼吸燈邏輯
+        // 背景呼吸燈
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
         bgLayer.style.setProperty('--pulse-opacity', 0.2 + (breath * 0.8));
