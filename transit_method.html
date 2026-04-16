@@ -5,9 +5,10 @@
       檔案狀態：草稿 (DRAFT)
       最後修訂：2024年展覽準備版 - 凌日法頁面
       更新內容：
-      1. 修正高亮顏色問題：Canvas API 無法解析 CSS 變數，已改用直接色彩宣告。
-      2. 同步軌道虛線：虛線現在會跟隨高亮狀態顯示/消失。
-      3. 保持 360 度完整軌道與累積相位變速邏輯。
+      1. 修復高亮誤觸問題：修正判斷條件，僅在結束滑桿交互時啟動高亮倒數。
+      2. 修正 Canvas 高亮色彩解析：改用常數色彩字串。
+      3. 同步軌道虛線：高亮時顯示霓虹藍軌道。
+      4. 累積相位邏輯：解決變速時的行星瞬移跳躍。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -96,7 +97,7 @@
         canvas { display: block; width: 100%; height: auto; }
 
         .controls {
-            padding: 5px 18px 5px 18px;
+            padding: 15px 18px 15px 18px;
             background: #000; 
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin: 0 -18px 10px -18px;
@@ -266,7 +267,7 @@
     const sizeVal = document.getElementById('sizeVal');
     const speedVal = document.getElementById('speedVal');
 
-    // 顏色常數 (Canvas 無法直接解析 var()，改用直接色彩數值)
+    // 直接定義顏色字串，避免 Canvas 無法解析 CSS 變數的問題
     const COLOR_NEON_BLUE = '#00d4ff';
     const COLOR_VIBRANT_GOLD = '#ffcc00';
 
@@ -277,23 +278,28 @@
     const starR = 60; 
     const breathPeriod = 12.0; 
 
-    // 相位累積
+    // 相位累積變數：確保變速時行星不瞬移
     let lastTimestamp = performance.now();
     let currentOrbitAngle = 0; 
 
-    // 高亮狀態
+    // 高亮邏輯變數
     let highlightTimer = 0;
     const highlightDuration = 800; 
     let isInteracting = false; 
 
+    // --- 修改後的交互邏輯 ---
     const startHighlight = () => { isInteracting = true; };
     const endHighlight = () => { 
-        isInteracting = false; 
-        highlightTimer = Date.now(); 
+        // 修正：只有當先前有觸發交互時，才啟動消失倒數
+        if (isInteracting) {
+            isInteracting = false; 
+            highlightTimer = Date.now(); 
+        }
     };
 
     sizeSlider.addEventListener('pointerdown', startHighlight);
     speedSlider.addEventListener('pointerdown', startHighlight);
+    // 在全域監聽放開，確保滑出滑桿也能正確結束
     window.addEventListener('pointerup', endHighlight);
     window.addEventListener('pointercancel', endHighlight);
 
@@ -306,25 +312,24 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // 繪製行星函數
+    // 繪製行星的封裝函數
     function drawPlanetInstance(pX, pY, radius, opacity, highlight) {
+        ctx.save();
         ctx.globalAlpha = opacity;
         ctx.beginPath(); 
         ctx.arc(pX, pY, radius, 0, Math.PI*2);
         
         if (highlight) {
-            ctx.save();
             ctx.shadowBlur = 15;
             ctx.shadowColor = COLOR_NEON_BLUE;
             ctx.strokeStyle = COLOR_NEON_BLUE;
             ctx.lineWidth = 2.5;
             ctx.stroke();
-            ctx.restore();
         }
         
         ctx.fillStyle = '#000';
         ctx.fill();
-        ctx.globalAlpha = 1.0;
+        ctx.restore();
     }
 
     function draw(timestamp) {
@@ -355,6 +360,7 @@
         let brightness = 1.0;
         const maxDepth = (planetR * planetR) / (starR * starR);
 
+        // U 型光度計算 (僅前方)
         if (planetZ > 0) { 
             if (dist < totalContactRadius) {
                 if (dist < fullInsideRadius) {
@@ -377,28 +383,22 @@
         const sX = w * 0.28, sY = h * 0.45;
         const isHighlighting = isInteracting || (Date.now() - highlightTimer < highlightDuration);
 
-        // --- 1. 軌道虛線 (隨高亮同步) ---
+        // 1. 軌道虛線繪製 (隨高亮狀態變色)
+        ctx.save();
         if (isHighlighting) {
-            ctx.save();
             ctx.strokeStyle = COLOR_NEON_BLUE;
+            ctx.globalAlpha = 0.4;
             ctx.lineWidth = 1;
             ctx.setLineDash([5, 5]);
-            ctx.globalAlpha = 0.3;
-            ctx.beginPath();
-            // 繪製行星運行的投影軌道（扁平橢圓）
-            ctx.ellipse(sX, sY, orbitRadius * 0.5, 5, 0, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.restore();
         } else {
-            // 非高亮時顯示極淡的灰色參考線
-            ctx.save();
             ctx.strokeStyle = '#222';
+            ctx.globalAlpha = 0.5;
             ctx.setLineDash([3, 3]);
-            ctx.beginPath();
-            ctx.ellipse(sX, sY, orbitRadius * 0.5, 5, 0, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.restore();
         }
+        ctx.beginPath();
+        ctx.ellipse(sX, sY, orbitRadius * 0.5, 5, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
 
         const px = sX + (planetX - w/2) * 0.5;
 
@@ -407,7 +407,7 @@
             drawPlanetInstance(px, sY, planetR, 0.4, isHighlighting);
         }
 
-        // 3. 恆星
+        // 3. 恆星視覺繪製
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
         starGrad.addColorStop(0.3, '#ffcc00');
@@ -420,7 +420,7 @@
             drawPlanetInstance(px, sY, planetR, 1.0, isHighlighting);
         }
 
-        // --- 3. 光變曲線 ---
+        // 5. 光變曲線圖表
         const graphX = w * 0.55, graphY = h * 0.2, graphW = w * 0.4, graphH = h * 0.5;
         ctx.strokeStyle = '#444';
         ctx.lineWidth = 1;
@@ -443,6 +443,7 @@
         ctx.font = '10px Arial';
         ctx.fillText('亮度 (Brightness)', graphX + 5, graphY + 15);
 
+        // 背景呼吸燈邏輯
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
         bgLayer.style.setProperty('--pulse-opacity', 0.2 + (breath * 0.8));
