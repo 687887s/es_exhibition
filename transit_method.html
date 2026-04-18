@@ -2,12 +2,12 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Viewport-Aware Interaction)
+      檔案狀態：正式稿 (Tech Edition - Precision Mascot & Black Hole Fix)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 嚴格視窗邊界限制：跳躍範圍隨捲動位置動態計算，避開頂部 Banner。
-      2. 修正歸位動畫：先開黑洞，外星人才從黑洞中探頭現身。
-      3. 層級優化：活動狀態外星人置於 z-index 5000。
+      1. 黑洞脫離外星人結構，固定在原位。
+      2. 重寫座標轉換邏輯：確保前兩次點擊留在「目前看得到」的畫面中，且避開 Banner。
+      3. 歸位順序修正：先開黑洞，外星人才從深處出現。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -70,7 +70,7 @@
                         linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.04));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
-            z-index: 6000;
+            z-index: 7000;
         }
 
         header {
@@ -107,9 +107,8 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 活動狀態層級最高，必須高於 Banner 的 3000 */
         .pixel-mascot.active {
-            z-index: 5000 !important;
+            z-index: 6000 !important; /* 超越所有元素 */
         }
 
         @keyframes idle-jump-flip {
@@ -160,7 +159,7 @@
             95% { transform: scaleY(0.1); }
         }
 
-        /* 黑洞特效 - 層級調低一點，確保外星人探頭時在其上方 */
+        /* 黑洞特效 - 獨立定位 */
         .black-hole {
             position: absolute;
             width: 56px;
@@ -168,9 +167,7 @@
             background: #000;
             border-radius: 50%;
             box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff;
-            z-index: 4999;
-            left: -12px;
-            top: 14px;
+            z-index: 5;
             transform: scale(0);
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
@@ -343,129 +340,84 @@
     <h1>捕捉宇宙的閃爍</h1>
     <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">TRANSIT_METHOD_ANALYSIS_UNIT_117</p>
     
-    <div class="pixel-mascot" style="right: 20px; top: 10px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
-        <div class="mascot-body">
-            <div class="mascot-eyes"></div>
-        </div>
+    <div class="pixel-mascot" id="mascot-header" style="right: 20px; top: 10px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
+        <div class="mascot-body"><div class="mascot-eyes"></div></div>
         <div class="mascot-label">HUB_SENTRY</div>
-        <div class="black-hole"></div>
     </div>
+    <!-- 黑洞與外星人同級 -->
+    <div class="black-hole" id="bh-header" style="right: 8px; top: 24px;"></div>
 </header>
 
 <div class="container">
-    <!-- Section 1 -->
     <section>
-        <div class="pixel-mascot" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotStep(this)">
-            <div class="mascot-body" style="background: var(--vibrant-gold);">
-                <div class="mascot-eyes"></div>
-            </div>
+        <div class="pixel-mascot" id="mascot-s1" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotStep(this)">
+            <div class="mascot-body" style="background: var(--vibrant-gold);"><div class="mascot-eyes"></div></div>
             <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">UNIT_ALPHA</div>
-            <div class="black-hole"></div>
         </div>
+        <div class="black-hole" id="bh-s1" style="left: 8px; top: 6px;"></div>
 
         <div class="image-placeholder">[ Image of 凌日法示意圖 ]</div>
         <h2>什麼是「凌日法」？</h2>
-        <p>
-            想像在黑夜中有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，你會發現探照燈的亮度瞬間稍微變暗。
-        </p>
-        <p>
-            這種光度變化繪出的曲線稱為<span class="highlight">「光變曲線」(Light Curve)</span>。它是目前發現系外行星數量最多的技術。
-        </p>
-        
+        <p>想像在黑夜中有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，你會發現探照燈的亮度瞬間稍微變暗。</p>
+        <p>這種光度變化繪出的曲線稱為<span class="highlight">「光變曲線」(Light Curve)</span>。</p>
         <div class="image-placeholder">[ Image of 系外行星 WASP-96b 凌日測得的光變曲線 ]</div>
-
-        <div class="canvas-container">
-            <canvas id="transitCanvas"></canvas>
-        </div>
-        
+        <div class="canvas-container"><canvas id="transitCanvas"></canvas></div>
         <div class="controls">
             <div class="control-item">
-                <div class="control-label">
-                    <span>SYS_OBJECT_SIZE</span>
-                    <span id="sizeVal" style="color:white">12.0</span>
-                </div>
+                <div class="control-label"><span>SYS_OBJECT_SIZE</span><span id="sizeVal" style="color:white">12.0</span></div>
                 <input type="range" id="sizeSlider" min="5" max="25" value="12" step="0.1">
             </div>
             <div class="control-item">
-                <div class="control-label">
-                    <span>SYS_ORBIT_VEL</span>
-                    <span id="speedVal" style="color:white">5.00</span>
-                </div>
+                <div class="control-label"><span>SYS_ORBIT_VEL</span><span id="speedVal" style="color:white">5.00</span></div>
                 <input type="range" id="speedSlider" min="0.5" max="10" value="5" step="0.05">
             </div>
         </div>
     </section>
 
-    <!-- Section 2 -->
     <section>
-        <div class="pixel-mascot" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
-            <div class="mascot-body">
-                <div class="mascot-eyes"></div>
-            </div>
+        <div class="pixel-mascot" id="mascot-s2" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
+            <div class="mascot-body"><div class="mascot-eyes"></div></div>
             <div class="mascot-label">UNIT_BETA</div>
-            <div class="black-hole"></div>
         </div>
+        <div class="black-hole" id="bh-s2" style="right: 18px; top: 6px;"></div>
 
         <h2>數據資訊分析</h2>
-        
         <p><strong>1. 偵測行星存在</strong></p>
         <p>觀測到週期性的下降「坑洞」即確認凌日現象。</p>
-
         <p><strong>2. 幾何尺寸計算</strong></p>
-        <p>行星遮擋比例決定了坑的深度。公式：</p>
-        <div class="formula-card">
-            $$\text{Depth} = \left(\frac{R_{planet}}{R_{star}}\right)^2$$
-        </div>
-        
+        <div class="formula-card">$$\text{Depth} = \left(\frac{R_{planet}}{R_{star}}\right)^2$$</div>
         <div class="image-placeholder">[ Image of TRAPPIST-1 不同大小行星的光變曲線對比 ]</div>
-
         <p><strong>3. 軌道力學推演</strong></p>
-        <p>依週期 $T$ 計算軌道半徑 $a$，判斷是否位於<span class="highlight">適居帶 (Habitable Zone)</span>。</p>
-
+        <p>依週期 $T$ 計算軌道半徑 $a$。</p>
         <p><strong>4. 大氣光譜分析</strong></p>
-        <p>恆星光穿過行星大氣邊緣，化學分子會吸收特定波長。分析<span class="highlight">「光譜指紋」</span>即可解析大氣組成。</p>
-        
         <div class="image-placeholder">[ Image of 透過凌日法探測系外行星大氣原理圖 ]</div>
     </section>
 
-    <!-- Section 3 -->
     <section>
-        <div class="pixel-mascot" style="left: 50%; margin-left: -16px; animation: peek-slide 2s infinite alternate ease-in-out;" onclick="mascotStep(this)">
-            <div class="mascot-body" style="background: #fff;">
-                <div class="mascot-eyes"></div>
-            </div>
+        <div class="pixel-mascot" id="mascot-s3" style="left: 50%; margin-left: -16px; animation: peek-slide 2s infinite alternate ease-in-out;" onclick="mascotStep(this)">
+            <div class="mascot-body" style="background: #fff;"><div class="mascot-eyes"></div></div>
             <div class="mascot-label" style="color:#fff; border-color:#fff">UNIT_GAMMA</div>
-            <div class="black-hole"></div>
         </div>
+        <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -28px; top: 6px;"></div>
 
         <h2>ARDUINO 探測系統</h2>
-        <p>
-            教具使用高亮度燈箱模擬恆星，行星模型進行公轉。透過 <span class="highlight">Arduino</span> 與精密光度感測器，執行高頻率數據採樣（Sampling）。
-        </p>
+        <p>透過 <span class="highlight">Arduino</span> 與精密光度感測器捕捉細微電壓變化。</p>
         <details>
             <summary>SYSTEM_LOG: SENSITIVITY_0.01%</summary>
-            <div class="details-content">
-                實際觀測變幅僅為 0.01%。系統透過優化演算法，捕捉細微電壓變化並即時轉譯為數位光變曲線。
-            </div>
+            <div class="details-content">實際觀測變幅僅為 0.01%。</div>
         </details>
     </section>
 
-    <div class="back-nav">
-        <a href="index.html" class="back-btn">Return to Sector 0</a>
-    </div>
+    <div class="back-nav"><a href="index.html" class="back-btn">Return to Sector 0</a></div>
 </div>
 
-<footer>
-    [ TERMINAL_STATUS: ACTIVE ]<br>
-    EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.117
-</footer>
+<footer>EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.117</footer>
 
 <script>
     const canvas = document.getElementById('transitCanvas');
     const ctx = canvas.getContext('2d');
     const bgLayer = document.getElementById('bgLayer');
     const headerEl = document.getElementById('mainHeader');
-    
     const sizeSlider = document.getElementById('sizeSlider');
     const speedSlider = document.getElementById('speedSlider');
     const sizeVal = document.getElementById('sizeVal');
@@ -473,76 +425,48 @@
 
     const RGB_NEON_BLUE = '0, 242, 255'; 
     const COLOR_VIBRANT_GOLD = '#ffcc00';
-
-    let lastTimestamp = performance.now();
-    let currentOrbitAngle = 0; 
-    let points = []; 
-    const starR = 60; 
-    const breathPeriod = 6.0; 
-    let highlightTimer = 0;
-    const HOLD_DURATION = 500;       
-    const DECAY_DURATION = 800;      
-    let isInteracting = false; 
+    let lastTimestamp = performance.now(), currentOrbitAngle = 0, points = [], starR = 60, breathPeriod = 6.0; 
+    let highlightTimer = 0, HOLD_DURATION = 500, DECAY_DURATION = 800, isInteracting = false; 
 
     const startHighlight = () => { isInteracting = true; };
-    const endHighlight = () => { 
-        if (isInteracting) {
-            isInteracting = false; 
-            highlightTimer = Date.now(); 
-        }
-    };
+    const endHighlight = () => { if (isInteracting) { isInteracting = false; highlightTimer = Date.now(); }};
 
-    sizeSlider.addEventListener('pointerdown', startHighlight);
-    speedSlider.addEventListener('pointerdown', startHighlight);
     sizeSlider.addEventListener('input', startHighlight); 
     speedSlider.addEventListener('input', startHighlight);
     window.addEventListener('pointerup', endHighlight);
-    window.addEventListener('pointercancel', endHighlight);
     sizeSlider.addEventListener('change', endHighlight);
-    speedSlider.addEventListener('change', endHighlight);
 
     function initIdleBehaviors() {
-        const mascots = document.querySelectorAll('.pixel-mascot');
-        mascots.forEach(el => {
+        document.querySelectorAll('.pixel-mascot').forEach(el => {
             const triggerNext = () => {
-                const delay = 4000 + Math.random() * 6000;
                 setTimeout(() => {
-                    const step = parseInt(el.dataset.step || '0');
-                    const isMoving = el.dataset.moving === 'true';
-                    if (step === 0 && !isMoving) {
-                        const actionType = Math.random() > 0.5 ? 'jump' : 'color';
-                        if (actionType === 'jump') {
-                            el.classList.add('idle-jump');
-                            setTimeout(() => el.classList.remove('idle-jump'), 800);
-                        } else {
-                            el.classList.add('idle-color');
-                            setTimeout(() => el.classList.remove('idle-color'), 2000);
-                        }
+                    if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') {
+                        const action = Math.random() > 0.5 ? 'idle-jump' : 'idle-color';
+                        el.classList.add(action);
+                        setTimeout(() => el.classList.remove(action), action === 'idle-jump' ? 800 : 2000);
                     }
                     triggerNext();
-                }, delay);
+                }, 4000 + Math.random() * 6000);
             };
             triggerNext();
         });
     }
 
-    // --- 步進式互動邏輯 (修正螢幕範圍與黑洞順序) ---
+    // --- 精確座標轉換與步進互動 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
-        
-        let step = parseInt(el.dataset.step || '0');
         el.dataset.moving = 'true';
         el.classList.add('active'); 
-        
-        const headerHeight = headerEl.offsetHeight;
 
-        // 初始化：固定當前座標
+        const headerHeight = headerEl.offsetHeight;
+        let step = parseInt(el.dataset.step || '0');
+
         if (step === 0) {
+            // 第一次點擊：捕捉初始位置
             const rect = el.getBoundingClientRect();
             const parentRect = el.offsetParent.getBoundingClientRect();
             el.dataset.homeX = rect.left - parentRect.left;
             el.dataset.homeY = rect.top - parentRect.top;
-            
             el.style.transition = "none";
             el.style.animation = "none";
             el.style.left = el.dataset.homeX + 'px';
@@ -555,61 +479,52 @@
         el.dataset.step = step;
 
         if (step <= 2) {
-            // 第一、二次跳躍：確保在「可見視窗」中心安全區域內，並考慮捲動偏移
+            // 第一、二次跳躍：嚴格限制在當前可見螢幕內（避開 Banner）
             const scrollY = window.scrollY;
-            const viewportH = window.innerHeight;
-            const viewportW = window.innerWidth;
-            const padding = 80;
+            const viewW = window.innerWidth;
+            const viewH = window.innerHeight;
+            const pad = 60;
 
-            // 計算全域目標 Y (避開 Banner)
-            const minY = scrollY + headerHeight + padding;
-            const maxY = scrollY + viewportH - padding;
-            const targetGlobalY = minY + Math.random() * (maxY - minY);
-            
-            // 計算全域目標 X
-            const targetGlobalX = padding + Math.random() * (viewportW - padding * 2);
+            // 目標全域 Y (螢幕內的 Y)
+            const targetVisibleY = scrollY + headerHeight + pad + Math.random() * (viewH - headerHeight - pad * 2);
+            const targetVisibleX = pad + Math.random() * (viewW - pad * 2);
 
-            // 轉換為相對於原位 (left/top) 的 translate 數值
-            // el.getBoundingClientRect().top 是相對於視窗，el.style.top 是相對於父層
-            const elRect = el.getBoundingClientRect();
-            const tx = targetGlobalX - elRect.left;
-            const ty = targetGlobalY - (elRect.top + scrollY);
-            
-            const rot = (Math.random() - 0.5) * 45;
+            // 轉換為相對 translate: (全域目標 - 元素絕對家位置)
+            const tx = targetVisibleX - parseFloat(el.style.left);
+            const ty = targetVisibleY - parseFloat(el.style.top);
             
             el.style.transition = "transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
-            el.style.transform = `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(1.1)`;
+            el.style.transform = `translate(${tx}px, ${ty}px) rotate(${ (Math.random()-0.5)*40 }deg) scale(1.1)`;
             
             setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
         } 
         else if (step === 3) {
             // 第三次：逃離螢幕
-            const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
-            const escapeY = (Math.random() - 0.5) * window.innerHeight;
-            
-            el.style.transition = "transform 1.4s ease-in, opacity 0.6s ease-in";
-            el.style.transform = `translate(${escapeX}px, ${escapeY}px) rotate(360deg) scale(0.1)`;
+            const escX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
+            el.style.transition = "transform 1.4s ease-in, opacity 0.5s ease-in";
+            el.style.transform = `translate(${escX}px, 0px) rotate(360deg) scale(0.1)`;
             el.style.opacity = "0";
             
             await new Promise(r => setTimeout(r, 1600));
 
-            // --- 歸位序列：先開洞，再探頭 ---
-            const bh = el.querySelector('.black-hole');
-            // 瞬間移回原位下方並維持隱身
+            // --- 歸位：黑洞出現在原位 ---
+            const bhId = el.id.replace('mascot', 'bh');
+            const bh = document.getElementById(bhId);
+            
+            // 瞬間把隱形的外星人搬回黑洞下方（原位座標）
             el.style.transition = "none";
             el.style.transform = "translate(0, 45px)"; 
-            el.offsetHeight; // 重繪
+            el.offsetHeight;
 
-            bh.classList.add('visible'); // 開啟黑洞
+            bh.classList.add('visible'); 
             await new Promise(r => setTimeout(r, 800));
 
-            // 外星人從黑洞深處現身並探頭
+            // 探頭左右看
             el.style.opacity = "1";
-            el.style.transition = "transform 1.0s cubic-bezier(0.2, 0.8, 0.2, 1)";
+            el.style.transition = "transform 1s cubic-bezier(0.2, 0.8, 0.2, 1)";
             el.style.transform = "translate(0, 10px)"; 
-            await new Promise(r => setTimeout(r, 1200));
+            await new Promise(r => setTimeout(r, 1100));
             
-            // 左右觀望
             el.style.transform = "translate(0, 10px) rotate(-15deg)";
             await new Promise(r => setTimeout(r, 500));
             el.style.transform = "translate(0, 10px) rotate(15deg)";
@@ -626,13 +541,8 @@
             el.style.transform = "translate(0, 0)"; 
             
             setTimeout(() => {
-                el.style.transition = "";
-                el.style.left = ""; 
-                el.style.top = "";
-                el.style.animation = ""; 
-                el.classList.remove('active');
-                el.dataset.step = '0';
-                el.dataset.moving = 'false';
+                el.style.transition = ""; el.style.left = ""; el.style.top = ""; el.style.animation = ""; 
+                el.classList.remove('active'); el.dataset.step = '0'; el.dataset.moving = 'false';
             }, 600);
         }
     }
@@ -668,87 +578,71 @@
         lastTimestamp = timestamp;
         const w = canvas.width / window.devicePixelRatio;
         const h = canvas.height / window.devicePixelRatio;
-        let planetR = parseFloat(sizeSlider.value);
-        let speedMult = parseFloat(speedSlider.value);
-        sizeVal.innerText = planetR.toFixed(1);
-        speedVal.innerText = speedMult.toFixed(2);
+        let pR = parseFloat(sizeSlider.value), sM = parseFloat(speedSlider.value);
+        sizeVal.innerText = pR.toFixed(1); speedVal.innerText = sM.toFixed(2);
 
-        const angularVelocity = (2 * Math.PI * (speedMult * 0.5)) / 12.0;
-        currentOrbitAngle += angularVelocity * dt;
+        currentOrbitAngle += (2 * Math.PI * (sM * 0.5)) / 12.0 * dt;
         currentOrbitAngle %= (2 * Math.PI); 
 
-        const orbitRadius = w * 0.45;
-        const planetX = (w / 2) + Math.cos(currentOrbitAngle) * orbitRadius;
-        const planetZ = Math.sin(currentOrbitAngle); 
-        const dist = Math.abs(planetX - w/2); 
-        
+        const orbitR = w * 0.45;
+        const pX = (w / 2) + Math.cos(currentOrbitAngle) * orbitR;
+        const pZ = Math.sin(currentOrbitAngle); 
+        const dist = Math.abs(pX - w/2); 
         let brightness = 1.0;
-        const maxDepth = (planetR * planetR) / (starR * starR);
-        let inTransit = false;
+        const maxDepth = (pR * pR) / (starR * starR);
+        let inT = false;
 
-        if (planetZ > 0) { 
-            if (dist < starR + planetR) {
-                inTransit = true;
-                if (dist < starR - planetR) { brightness = 1.0 - maxDepth; } 
-                else {
-                    const normDist = (dist - (starR - planetR)) / ((starR + planetR) - (starR - planetR));
-                    brightness = 1.0 - (maxDepth * (Math.cos(normDist * Math.PI) + 1) / 2);
-                }
+        if (pZ > 0 && dist < starR + pR) {
+            inT = true;
+            if (dist < starR - pR) { brightness = 1.0 - maxDepth; } 
+            else {
+                const nD = (dist - (starR - pR)) / ((starR + pR) - (starR - pR));
+                brightness = 1.0 - (maxDepth * (Math.cos(nD * Math.PI) + 1) / 2);
             }
         }
-
         points.push({ x: w * 0.95, y: brightness });
         if (points.length > 600) points.shift();
         points.forEach(p => p.x -= 1.4);
 
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
         const sX = w / 2, sY = h * 0.3; 
-
         ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)'; ctx.strokeRect(10, 10, w - 20, h - 20);
-        ctx.fillStyle = inTransit ? '#ff4400' : 'rgba(0, 242, 255, 0.7)';
-        ctx.font = '10px monospace';
-        ctx.fillText(inTransit ? '>> EVENT: TRANSIT_ACTIVE' : '>> STATUS: SCANNING_FIELD', 20, 25);
+        ctx.fillStyle = inT ? '#ff4400' : 'rgba(0, 242, 255, 0.7)'; ctx.font = '10px monospace';
+        ctx.fillText(inT ? '>> EVENT: TRANSIT_ACTIVE' : '>> STATUS: SCANNING_FIELD', 20, 25);
 
-        let hIntensity = 0;
-        if (isInteracting) { hIntensity = 1.0; } 
+        let hI = 0;
+        if (isInteracting) { hI = 1.0; } 
         else {
-            const elapsed = Date.now() - highlightTimer;
-            if (elapsed < HOLD_DURATION) { hIntensity = 1.0; } 
-            else if (elapsed < HOLD_DURATION + DECAY_DURATION) {
-                hIntensity = 1 - Math.pow((elapsed - HOLD_DURATION) / DECAY_DURATION, 3);
+            const elap = Date.now() - highlightTimer;
+            if (elap < HOLD_DURATION) { hI = 1.0; } 
+            else if (elap < HOLD_DURATION + DECAY_DURATION) {
+                hI = 1 - Math.pow((elap - HOLD_DURATION) / DECAY_DURATION, 3);
             }
         }
-
         ctx.save();
-        ctx.strokeStyle = hIntensity > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.3 + hIntensity * 0.4})` : 'rgba(0, 242, 255, 0.15)';
+        ctx.strokeStyle = hI > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.3 + hI * 0.4})` : 'rgba(0, 242, 255, 0.15)';
         ctx.setLineDash([5, 5]); ctx.beginPath();
-        ctx.ellipse(sX, sY, orbitRadius * 0.5, 6, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+        ctx.ellipse(sX, sY, orbitR * 0.5, 6, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
 
-        const px = sX + (planetX - w/2) * 0.5;
-        if (planetZ <= 0) drawPlanetInstance(px, sY, planetR, 0.3, hIntensity, false);
+        const px_v = sX + (pX - w/2) * 0.5;
+        if (pZ <= 0) drawPlanetInstance(px_v, sY, pR, 0.3, hI, false);
+        const sG = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
+        sG.addColorStop(0, '#fff'); sG.addColorStop(0.3, '#ffcc00'); sG.addColorStop(1, 'transparent');
+        ctx.fillStyle = sG; ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
+        if (pZ > 0) drawPlanetInstance(px_v, sY, pR, 1.0, hI, inT);
 
-        const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
-        starGrad.addColorStop(0, '#fff'); starGrad.addColorStop(0.3, '#ffcc00'); starGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = starGrad; ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
-
-        if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity, inTransit);
-
-        const graphX = w * 0.05, graphY = h * 0.6, graphW = w * 0.9, graphH = h * 0.3;
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)'; ctx.strokeRect(graphX, graphY, graphW, graphH);
+        const gX = w * 0.05, gY = h * 0.6, gW = w * 0.9, gH = h * 0.3;
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)'; ctx.strokeRect(gX, gY, gW, gH);
         ctx.strokeStyle = COLOR_VIBRANT_GOLD; ctx.lineWidth = 2.5; ctx.shadowBlur = 10; ctx.shadowColor = COLOR_VIBRANT_GOLD;
         ctx.beginPath();
         points.forEach((p, i) => {
-            const drawX = graphX + (p.x - (w * 0.05));
-            const drawY = graphY + (1.0 - p.y) * 450 + 35; 
-            if (drawX > graphX && drawX < graphX + graphW) {
-                if (i === 0) ctx.moveTo(drawX, drawY); else ctx.lineTo(drawX, drawY);
-            }
+            const dX = gX + (p.x - (w * 0.05));
+            const dY = gY + (1.0 - p.y) * 450 + 35; 
+            if (dX > gX && dX < gX + gW) { if (i === 0) ctx.moveTo(dX, dY); else ctx.lineTo(dX, dY); }
         });
         ctx.stroke(); ctx.shadowBlur = 0;
-
-        const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
-        bgLayer.style.setProperty('--pulse-opacity', 0.15 + ((Math.sin(breathAngle) + 1) / 2 * 0.95));
-
+        const bA = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
+        bgLayer.style.setProperty('--pulse-opacity', 0.15 + ((Math.sin(bA) + 1) / 2 * 0.95));
         requestAnimationFrame(draw);
     }
     
