@@ -2,12 +2,13 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - High Contrast)
+      檔案狀態：正式稿 (Tech Edition - Pixel Mascot & Sticky UI)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 強化像素格線感：增加格線厚度與對比。
-      2. 增強背景呼吸：擴大透明度變化範圍 (0.1 - 1.0)。
-      3. 降低區塊背景透明度：使背景動效更易穿透。
+      1. 標題鎖定頂部 (Sticky Header)。
+      2. 每個區塊加入不同動作的像素外星人 (Mascot Units)。
+      3. 強化背景像素格線感與呼吸燈對比。
+      4. 提升區塊透明度，強化層次感。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -33,7 +34,7 @@
             --neon-blue: #00f2ff;
             --tech-cyan: rgba(0, 242, 255, 0.6);
             --text-color: #e0faff;
-            --bg-deep: #020508;
+            --bg-deep: #010408;
             --pulse-opacity: 1;
         }
 
@@ -48,16 +49,16 @@
             overflow-x: hidden;
         }
 
-        /* 數位網格背景 - 像素感強化版 */
+        /* 數位網格背景 - 強力像素感 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
             background: 
-                linear-gradient(rgba(0, 242, 255, 0.2) 2px, transparent 2px),
-                linear-gradient(90deg, rgba(0, 242, 255, 0.2) 2px, transparent 2px),
-                radial-gradient(circle at center, #1e4b7a 0%, #020508 100%);
-            background-size: 40px 40px, 40px 40px, 100% 100%;
+                linear-gradient(rgba(0, 242, 255, 0.25) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.25) 2px, transparent 2px),
+                radial-gradient(circle at center, #235a91 0%, #010408 100%);
+            background-size: 30px 30px, 30px 30px, 100% 100%;
             opacity: var(--pulse-opacity);
             transition: opacity 0.05s ease-out;
         }
@@ -67,77 +68,78 @@
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
                         linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.04));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
-            z-index: 100;
+            z-index: 3000;
         }
 
+        /* 固定式標題 */
         header {
-            background: rgba(5, 10, 16, 0.95);
-            padding: 30px 4vw;
+            position: sticky;
+            top: 0;
+            z-index: 2000;
+            background: rgba(5, 10, 16, 0.92);
+            backdrop-filter: blur(10px);
+            padding: 15px 4vw;
             text-align: center;
             border-bottom: 2px solid var(--neon-blue);
-            box-shadow: 0 0 35px rgba(0, 242, 255, 0.4);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
         }
 
         h1 { 
             color: var(--neon-blue); 
-            font-size: 1.6em; 
-            text-shadow: 0 0 15px rgba(0, 242, 255, 0.6); 
+            font-size: 1.4em; 
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.6); 
             font-weight: 900; 
             margin: 0; 
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
-        .pixel-alien {
+        /* 像素外星人元件基礎 */
+        .pixel-mascot {
             position: absolute;
-            right: 20px;
-            bottom: 10px;
-            width: 30px;
-            height: 25px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: alien-bounce 0.6s infinite alternate;
+            width: 24px;
+            height: 20px;
+            z-index: 10;
         }
-
-        .alien-body {
-            width: 20px;
-            height: 15px;
+        .mascot-body {
+            width: 100%;
+            height: 100%;
             background: var(--neon-blue);
             box-shadow: 
                 -4px 4px 0 var(--neon-blue), 
                 4px 4px 0 var(--neon-blue),
                 -8px 8px 0 var(--neon-blue),
                 8px 8px 0 var(--neon-blue),
-                0 4px 0 #000;
-            position: relative;
+                0 4px 0 #000; /* 眼睛 */
         }
-
-        .alien-label {
-            font-size: 8px;
+        .mascot-label {
+            font-size: 7px;
             font-family: monospace;
             color: var(--neon-blue);
-            margin-top: 5px;
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
             opacity: 0.8;
         }
 
-        @keyframes alien-bounce {
-            from { transform: translateY(0) scaleX(1); }
-            to { transform: translateY(-8px) scaleX(1.1); }
-        }
+        /* 動作動畫變體 */
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+        @keyframes pulse-scale { from { transform: scale(1); } to { transform: scale(1.3); } }
+        @keyframes slide-rot { from { transform: translateX(-10px) rotate(0); } to { transform: translateX(10px) rotate(10deg); } }
+        @keyframes float-diag { 0% { transform: translate(0,0); } 50% { transform: translate(15px, -5px); } 100% { transform: translate(0,0); } }
 
-        .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 20px 0; }
+        .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 15px 0; }
 
-        /* 區塊背景透明度提高 (0.85 -> 0.65) */
+        /* 提高透明度 (0.65 -> 0.45) */
         section {
-            background: rgba(10, 20, 30, 0.65);
-            backdrop-filter: blur(12px);
-            margin-bottom: 30px;
+            background: rgba(10, 20, 30, 0.45);
+            backdrop-filter: blur(8px);
+            margin-bottom: 40px;
             padding: 30px 20px;
             border: 1px solid var(--tech-cyan);
             position: relative;
@@ -156,33 +158,30 @@
         h2 { 
             color: var(--vibrant-gold); 
             margin-top: 0; 
-            font-size: 1.3em; 
+            font-size: 1.25em; 
             display: flex; 
             align-items: center;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
-        h2::before { content: "[ "; color: var(--neon-blue); margin-right: 8px; }
-        h2::after { content: " ]"; color: var(--neon-blue); margin-left: 8px; }
+        h2::before { content: ">> "; color: var(--neon-blue); font-family: monospace; }
 
-        .highlight { color: var(--neon-blue); font-family: "Courier New", Courier, monospace; font-weight: bold; }
+        .highlight { color: var(--neon-blue); font-family: monospace; font-weight: bold; }
 
         .image-placeholder {
-            background: rgba(0, 242, 255, 0.08);
-            border: 1px solid rgba(0, 242, 255, 0.3);
+            background: rgba(0, 242, 255, 0.12);
+            border: 1px dashed rgba(0, 242, 255, 0.4);
             margin: 20px 0;
-            padding: 60px 20px;
+            padding: 50px 20px;
             text-align: center;
-            color: var(--tech-cyan);
-            font-size: 0.8em;
+            color: var(--neon-blue);
+            font-size: 0.75em;
             text-transform: uppercase;
             letter-spacing: 2px;
-            position: relative;
         }
 
         .canvas-container {
             margin: 20px -20px;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.85);
             position: relative;
             border-top: 1px solid var(--tech-cyan);
             border-bottom: 1px solid var(--tech-cyan);
@@ -194,7 +193,7 @@
 
         .controls {
             padding: 20px;
-            background: rgba(6, 14, 22, 0.8); 
+            background: rgba(6, 14, 22, 0.9); 
             border-bottom: 1px solid var(--tech-cyan);
             margin: 0 -20px 20px -20px;
         }
@@ -217,15 +216,15 @@
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
-            height: 4px;
+            height: 3px;
             background: #1a3040;
             outline: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 12px;
-            height: 24px;
+            width: 10px;
+            height: 20px;
             background: var(--neon-blue);
             border: 1px solid white;
             cursor: pointer;
@@ -233,16 +232,16 @@
         }
 
         .formula-card {
-            font-size: 1.1em;
+            font-size: 1.05em;
             color: var(--vibrant-gold);
             text-align: center;
             margin: 20px 0;
-            padding: 25px 15px;
-            background: rgba(0, 242, 255, 0.1);
-            border: 1px solid rgba(0, 242, 255, 0.3);
+            padding: 20px 15px;
+            background: rgba(0, 242, 255, 0.15);
+            border: 1px solid var(--tech-cyan);
         }
 
-        details { background: rgba(0, 0, 0, 0.4); margin: 25px -20px -30px -20px; border-top: 1px solid var(--tech-cyan); }
+        details { background: rgba(0, 0, 0, 0.5); margin: 25px -20px -30px -20px; border-top: 1px solid var(--tech-cyan); }
         summary { padding: 15px 20px; font-weight: bold; color: var(--neon-blue); cursor: pointer; display: flex; justify-content: space-between; font-family: monospace; }
 
         .back-nav { text-align: center; margin: 40px 0; }
@@ -251,13 +250,14 @@
             text-decoration: none; 
             font-size: 0.9em; 
             border: 1px solid var(--neon-blue); 
-            padding: 12px 30px; 
+            padding: 15px 35px; 
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             transition: all 0.3s;
             font-family: monospace;
+            background: rgba(0, 242, 255, 0.05);
         }
-        .back-btn:hover { background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 15px var(--neon-blue); }
+        .back-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 20px var(--neon-blue); }
 
         footer { 
             text-align: center; 
@@ -265,8 +265,9 @@
             font-size: 0.7em; 
             color: #446688; 
             background: #010305; 
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             font-family: monospace;
+            border-top: 1px solid rgba(0, 242, 255, 0.1);
         }
     </style>
 </head>
@@ -276,26 +277,33 @@
 
 <header>
     <h1>捕捉宇宙的閃爍</h1>
-    <p style="color:var(--tech-cyan); font-size:0.8em; margin-top:5px; font-family: monospace;">[ TRANSIT_METHOD_ANALYSIS_UNIT_117 ]</p>
+    <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">TRANSIT_METHOD_ANALYSIS_UNIT_117</p>
     
-    <div class="pixel-alien">
-        <div class="alien-body"></div>
-        <div class="alien-label">UNIT_01</div>
+    <!-- Header Mascot -->
+    <div class="pixel-mascot" style="right: 15px; top: 15px; animation: bounce 0.6s infinite alternate;">
+        <div class="mascot-body"></div>
+        <div class="mascot-label" style="color:white">CMD_CENTER</div>
     </div>
 </header>
 
 <div class="container">
+    <!-- Section 1 -->
     <section>
+        <div class="pixel-mascot" style="left: -10px; top: -10px; animation: pulse-scale 1.5s infinite alternate;">
+            <div class="mascot-body" style="background: var(--vibrant-gold);"></div>
+            <div class="mascot-label" style="color:var(--vibrant-gold)">UNIT_ALPHA</div>
+        </div>
+
         <div class="image-placeholder">[ Image of 凌日法示意圖 ]</div>
         <h2>什麼是「凌日法」？</h2>
         <p>
-            想像一下，在黑夜中有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，雖然你看不清蚊子，但你會發現探照燈的亮度瞬間稍微變暗了一點點。
+            想像在黑夜中有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，你會發現探照燈的亮度瞬間稍微變暗。
         </p>
         <p>
-            這種光度隨時間變化所繪出的曲線稱為<span class="highlight">「光變曲線」(Light Curve)</span>。科學家發現，凌日法是目前發現系外行星數量最多的技術。它不僅能偵測行星，還能讓我們精確測量行星的直徑。
+            這種光度變化繪出的曲線稱為<span class="highlight">「光變曲線」(Light Curve)</span>。它是目前發現系外行星數量最多的技術。
         </p>
         
-        <div class="image-placeholder">[ Image of 系外行星 WASP-96b 透過凌日法測得的光變曲線 ]</div>
+        <div class="image-placeholder">[ Image of 系外行星 WASP-96b 凌日測得的光變曲線 ]</div>
 
         <div class="canvas-container">
             <canvas id="transitCanvas"></canvas>
@@ -304,14 +312,14 @@
         <div class="controls">
             <div class="control-item">
                 <div class="control-label">
-                    <span>OBJECT_SIZE_SCALE</span>
+                    <span>SYS_OBJECT_SIZE</span>
                     <span id="sizeVal" style="color:white">12.0</span>
                 </div>
                 <input type="range" id="sizeSlider" min="5" max="25" value="12" step="0.1">
             </div>
             <div class="control-item">
                 <div class="control-label">
-                    <span>ORBITAL_VELOCITY</span>
+                    <span>SYS_ORBIT_VEL</span>
                     <span id="speedVal" style="color:white">5.00</span>
                 </div>
                 <input type="range" id="speedSlider" min="0.5" max="10" value="5" step="0.05">
@@ -319,50 +327,62 @@
         </div>
     </section>
 
+    <!-- Section 2 -->
     <section>
+        <div class="pixel-mascot" style="right: 10px; top: -10px; animation: slide-rot 1s infinite alternate;">
+            <div class="mascot-body"></div>
+            <div class="mascot-label">UNIT_BETA</div>
+        </div>
+
         <h2>數據資訊分析</h2>
         
         <p><strong>1. 偵測行星存在</strong></p>
-        <p>當觀測到的光度曲線出現週期性的下降「坑洞」，即確認行星凌日現象。</p>
+        <p>觀測到週期性的下降「坑洞」即確認凌日現象。</p>
 
         <p><strong>2. 幾何尺寸計算</strong></p>
-        <p>行星遮擋面積與恆星面積的比例決定了下降深度。透過公式可回推行星半徑：</p>
+        <p>行星遮擋比例決定了坑的深度。公式：</p>
         <div class="formula-card">
             $$\text{Depth} = \left(\frac{R_{planet}}{R_{star}}\right)^2$$
         </div>
         
-        <div class="image-placeholder">[ Image of TRAPPIST-1 系統兩顆不同大小行星的光變曲線對比 ]</div>
+        <div class="image-placeholder">[ Image of TRAPPIST-1 不同大小行星的光變曲線對比 ]</div>
 
         <p><strong>3. 軌道力學推演</strong></p>
-        <p>根據兩次凌日時間間隔（週期 $T$），依克卜勒第三定律計算軌道半徑 $a$，判斷是否位於<span class="highlight">適居帶 (Habitable Zone)</span>。</p>
+        <p>依週期 $T$ 計算軌道半徑 $a$，判斷是否位於<span class="highlight">適居帶 (Habitable Zone)</span>。</p>
 
-        <p><strong>4. 大氣成分光譜分析</strong></p>
-        <p>恆星光穿過行星邊緣大氣時，化學分子（如 $H_2O, O_2, CH_4$）會吸收特定顏色。分析此<span class="highlight">「光譜指紋」</span>即可解析大氣組成。</p>
+        <p><strong>4. 大氣光譜分析</strong></p>
+        <p>恆星光穿過行星大氣邊緣，化學分子會吸收特定波長。分析<span class="highlight">「光譜指紋」</span>即可解析大氣組成。</p>
         
         <div class="image-placeholder">[ Image of 透過凌日法探測系外行星大氣原理圖 ]</div>
     </section>
 
+    <!-- Section 3 -->
     <section>
+        <div class="pixel-mascot" style="left: -10px; bottom: 20px; animation: float-diag 2s infinite ease-in-out;">
+            <div class="mascot-body" style="background: white; border: 1px solid var(--neon-blue);"></div>
+            <div class="mascot-label" style="color:white">UNIT_GAMMA</div>
+        </div>
+
         <h2>ARDUINO 探測系統</h2>
         <p>
-            教具使用高亮度燈箱模擬恆星，行星模型進行公轉。透過 <span class="highlight">Arduino</span> 搭配精密光度感測器，執行高頻率數據採樣（Sampling）。
+            教具使用高亮度燈箱模擬恆星，行星模型進行公轉。透過 <span class="highlight">Arduino</span> 與精密光度感測器，執行高頻率數據採樣（Sampling）。
         </p>
         <details>
-            <summary>SYSTEM_LOG: 0.01% SENSITIVITY</summary>
+            <summary>SYSTEM_LOG: SENSITIVITY_0.01%</summary>
             <div class="details-content">
-                實際觀測中凌日變幅僅為 0.01% - 1%。本系統透過 Arduino 優化運算法，捕捉細微電壓變化並即時轉譯為數位化光變曲線。
+                實際觀測變幅僅為 0.01%。系統透過優化演算法，捕捉細微電壓變化並即時轉譯為數位光變曲線。
             </div>
         </details>
     </section>
 
     <div class="back-nav">
-        <a href="index.html" class="back-btn">Exit to Main Interface</a>
+        <a href="index.html" class="back-btn">Return to Sector 0</a>
     </div>
 </div>
 
 <footer>
-    EST. 2024 EARTH SCIENCE EXHIBITION<br>
-    ASTRO_DEPT_UNIT.117 // LISTENING TO STELLAR PULSE
+    [ TERMINAL_STATUS: READY ]<br>
+    EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.117
 </footer>
 
 <script>
@@ -382,7 +402,7 @@
     let speedMult = parseFloat(speedSlider.value);
     let points = []; 
     const starR = 60; 
-    const breathPeriod = 6.0; // 稍微調快呼吸，增加存在感
+    const breathPeriod = 6.0; 
 
     let lastTimestamp = performance.now();
     let currentOrbitAngle = 0; 
@@ -419,8 +439,7 @@
         ctx.globalAlpha = opacity;
         
         if (intensity > 0.5) {
-            ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${intensity * 0.5})`;
-            ctx.setLineDash([]);
+            ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${intensity * 0.6})`;
             ctx.strokeRect(pX - radius - 5, pY - radius - 5, radius*2 + 10, radius*2 + 10);
         }
 
@@ -428,10 +447,10 @@
         ctx.arc(pX, pY, radius, 0, Math.PI*2);
         
         if (intensity > 0) {
-            ctx.shadowBlur = 20 * intensity;
+            ctx.shadowBlur = 25 * intensity;
             ctx.shadowColor = `rgba(${RGB_NEON_BLUE}, ${intensity})`;
             ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${intensity})`;
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 2.5;
             ctx.stroke();
         }
         
@@ -491,14 +510,12 @@
 
         const sX = w / 2, sY = h * 0.3; 
 
-        // HUD
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.15)';
-        ctx.lineWidth = 1;
+        // HUD Decorations
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)';
         ctx.strokeRect(10, 10, w - 20, h - 20);
-        
-        ctx.fillStyle = inTransit ? '#ff3300' : 'rgba(0, 242, 255, 0.6)';
+        ctx.fillStyle = inTransit ? '#ff4400' : 'rgba(0, 242, 255, 0.7)';
         ctx.font = '10px monospace';
-        ctx.fillText(inTransit ? '>> EVENT: TRANSIT_DETECTED' : '>> STATUS: SCANNING_SYSTEM', 20, 25);
+        ctx.fillText(inTransit ? '>> EVENT: TRANSIT_ACTIVE' : '>> STATUS: SCANNING_FIELD', 20, 25);
 
         let hIntensity = 0;
         if (isInteracting) {
@@ -515,7 +532,7 @@
 
         // 軌道虛線
         ctx.save();
-        ctx.strokeStyle = hIntensity > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.2 + hIntensity * 0.4})` : 'rgba(0, 242, 255, 0.1)';
+        ctx.strokeStyle = hIntensity > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.3 + hIntensity * 0.4})` : 'rgba(0, 242, 255, 0.15)';
         ctx.setLineDash([5, 5]);
         ctx.beginPath();
         ctx.ellipse(sX, sY, orbitRadius * 0.5, 6, 0, 0, Math.PI * 2);
@@ -528,20 +545,20 @@
         // 恆星
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
-        starGrad.addColorStop(0.3, '#ffdd00');
+        starGrad.addColorStop(0.3, '#ffcc00');
         starGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = starGrad;
         ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
         if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity, inTransit);
 
-        // 下半部：光變曲線
+        // 光變曲線
         const graphX = w * 0.05, graphY = h * 0.6, graphW = w * 0.9, graphH = h * 0.3;
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.3)';
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)';
         ctx.strokeRect(graphX, graphY, graphW, graphH);
         
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.12)';
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.15)';
         for(let i=1; i<4; i++) {
             ctx.moveTo(graphX, graphY + graphH * i / 4);
             ctx.lineTo(graphX + graphW, graphY + graphH * i / 4);
@@ -549,8 +566,8 @@
         ctx.stroke();
 
         ctx.strokeStyle = COLOR_VIBRANT_GOLD;
-        ctx.lineWidth = 2;
-        ctx.shadowBlur = 8;
+        ctx.lineWidth = 2.5;
+        ctx.shadowBlur = 10;
         ctx.shadowColor = COLOR_VIBRANT_GOLD;
         ctx.beginPath();
         points.forEach((p, i) => {
@@ -564,10 +581,10 @@
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // 背景呼吸燈強化 (範圍提升至 0.1 - 1.0)
+        // 背景呼吸燈強化 (0.1 - 1.1)
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
-        bgLayer.style.setProperty('--pulse-opacity', 0.1 + (breath * 0.9));
+        bgLayer.style.setProperty('--pulse-opacity', 0.1 + (breath * 1.0));
 
         requestAnimationFrame(draw);
     }
