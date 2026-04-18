@@ -2,12 +2,12 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Fixed Interaction & Peeking)
+      檔案狀態：正式稿 (Tech Edition - Black Hole & Boundary Fixed)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 修正歸位動畫：外星人先隱身，待黑洞開啟後才從深處出現探頭。
-      2. 限制跳躍範圍：前兩次點擊嚴格限制在可見螢幕內（避開 Header）。
-      3. 步進互動：點擊兩次跳躍，第三次逃跑。
+      1. 修正歸位動畫：外星人先隱身，黑洞開啟後才從深處出現。
+      2. 嚴格邊界控制：前兩次點擊限制在視窗安全區域內，避開 Header。
+      3. 完整歸位序列：黑洞生成 -> 探頭 -> 左右觀望 -> 跳出歸位。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -73,6 +73,7 @@
             z-index: 4000;
         }
 
+        /* 固定式標題 */
         header {
             position: sticky;
             top: 0;
@@ -82,7 +83,7 @@
             padding: 15px 4vw;
             text-align: center;
             border-bottom: 2px solid var(--neon-blue);
-            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.5);
+            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
         }
 
         h1 { 
@@ -102,13 +103,13 @@
             z-index: 10; 
             top: -24px; 
             cursor: pointer;
-            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
             filter: drop-shadow(0 0 10px var(--neon-blue));
             -webkit-tap-highlight-color: transparent;
         }
 
         .pixel-mascot.active {
-            z-index: 5000;
+            z-index: 5000; /* 活動時在最上層，甚至高過標題 */
         }
 
         .mascot-body {
@@ -145,22 +146,23 @@
             95% { transform: scaleY(0.1); }
         }
 
-        /* 黑洞特效 */
+        /* 黑洞特效 - 移到外層或調整 z-index 確保可見 */
         .black-hole {
             position: absolute;
-            width: 50px;
-            height: 15px;
+            width: 54px;
+            height: 16px;
             background: #000;
             border-radius: 50%;
-            box-shadow: 0 0 20px 2px var(--neon-blue);
+            box-shadow: 0 0 20px 4px var(--neon-blue), inset 0 0 10px #fff;
             z-index: -1;
-            left: -9px;
-            top: 12px;
+            left: -11px;
+            top: 14px;
             transform: scale(0);
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
+            opacity: 0;
         }
-        .black-hole.visible { transform: scale(1); }
+        .black-hole.visible { transform: scale(1); opacity: 1; }
 
         .mascot-label {
             font-size: 9px;
@@ -479,7 +481,7 @@
         }
     };
 
-    // --- 強化版外星人互動邏輯 ---
+    // --- 強化版步進式外星人互動 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
         
@@ -489,7 +491,7 @@
         
         const headerHeight = headerEl.offsetHeight;
 
-        // 第一次點擊：捕捉原位並固定
+        // 初始化：固定當前座標
         if (step === 0) {
             const rect = el.getBoundingClientRect();
             const parentRect = el.offsetParent.getBoundingClientRect();
@@ -508,69 +510,68 @@
         el.dataset.step = step;
 
         if (step <= 2) {
-            // 修正：計算相對於 Viewport 的安全跳躍區域，確保不跳出螢幕且不進入 Header
-            // 安全邊距 40px
-            const safeWidth = window.innerWidth - 80;
-            const safeHeight = window.innerHeight - headerHeight - 120;
+            // 第一、二次跳躍：嚴格計算螢幕內的隨機座標
+            // 計算安全寬度與高度（避開 Header 與底邊）
+            const padding = 60;
+            const safeWidth = window.innerWidth - padding * 2;
+            const safeHeight = window.innerHeight - headerHeight - padding * 2;
             
-            // 目標座標 (相對於 Viewport)
-            const targetX_VP = 40 + Math.random() * safeWidth;
-            const targetY_VP = headerHeight + 40 + Math.random() * safeHeight;
+            const targetGlobalX = padding + Math.random() * safeWidth;
+            const targetGlobalY = headerHeight + padding + Math.random() * safeHeight;
 
-            // 轉換為相對於原位 (left/top) 的 translate 值
+            // 轉換為相對於原位 (left/top) 的 translate 數值
             const rect = el.getBoundingClientRect();
-            const tx = targetX_VP - rect.left;
-            const ty = targetY_VP - rect.top;
+            const tx = targetGlobalX - rect.left;
+            const ty = targetGlobalY - rect.top;
             const rot = (Math.random() - 0.5) * 45;
             
-            el.style.transition = "transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)";
+            el.style.transition = "transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
             el.style.transform = `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(1.1)`;
             
-            setTimeout(() => { el.dataset.moving = 'false'; }, 1250);
+            setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
         } 
         else if (step === 3) {
-            // 1. 逃離螢幕：衝向遠方並隱身
-            const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.4;
+            // 第三次：逃離螢幕
+            const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
             const escapeY = (Math.random() - 0.5) * window.innerHeight;
             
-            el.style.transition = "transform 1.4s ease-in, opacity 0.8s ease-in";
+            el.style.transition = "transform 1.4s ease-in, opacity 0.6s ease-in";
             el.style.transform = `translate(${escapeX}px, ${escapeY}px) rotate(360deg) scale(0.1)`;
             el.style.opacity = "0";
             
-            await new Promise(r => setTimeout(r, 1500));
+            await new Promise(r => setTimeout(r, 1600));
 
-            // 2. 啟動歸位動畫：黑洞先出現
+            // --- 歸位序列展示 ---
             const bh = el.querySelector('.black-hole');
-            // 先將外星人瞬移回原位下方，但保持隱身
+            // 瞬間移回原位正下方（仍隱身）
             el.style.transition = "none";
-            el.style.transform = "translate(0, 40px)"; 
-            bh.classList.add('visible');
+            el.style.transform = "translate(0, 45px)"; 
+            bh.classList.add('visible'); // 開啟黑洞
             await new Promise(r => setTimeout(r, 800));
 
-            // 3. 外星人現身並從黑洞探頭
+            // 探頭左右看
             el.style.opacity = "1";
             el.style.transition = "transform 1.0s cubic-bezier(0.2, 0.8, 0.2, 1)";
-            el.style.transform = "translate(0, 10px)"; // 探出頭
-            await new Promise(r => setTimeout(r, 1100));
+            el.style.transform = "translate(0, 10px)"; // 露出頭
+            await new Promise(r => setTimeout(r, 1200));
             
-            // 左右觀望
             el.style.transform = "translate(0, 10px) rotate(-15deg)";
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 600));
             el.style.transform = "translate(0, 10px) rotate(15deg)";
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 600));
             el.style.transform = "translate(0, 10px) rotate(0deg)";
-            await new Promise(r => setTimeout(r, 300));
+            await new Promise(r => setTimeout(r, 400));
 
-            // 4. 跳出黑洞歸位
+            // 跳出歸位
             el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            el.style.transform = "translate(0, -15px)"; // 跳
+            el.style.transform = "translate(0, -18px)"; // 奮力一跳
             await new Promise(r => setTimeout(r, 300));
             
-            bh.classList.remove('visible'); // 洞關
-            el.style.transform = "translate(0, 0)"; // 落
+            bh.classList.remove('visible'); // 關閉黑洞
+            el.style.transform = "translate(0, 0)"; // 落地
             
             setTimeout(() => {
-                // 重設一切屬性回 CSS 預設
+                // 恢復 CSS 預設屬性
                 el.style.transition = "";
                 el.style.left = ""; 
                 el.style.top = "";
