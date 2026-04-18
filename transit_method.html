@@ -2,13 +2,12 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Pixel Mascot & Layout Fixed)
+      檔案狀態：正式稿 (Tech Edition - Interactive Mascots)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 外星人改為「區塊後方探頭」模式，增加像素眼睛。
-      2. 解決外星人被裁切與遮擋內容的問題。
-      3. 標題固定頂部，增加背景層次。
-      4. 強化背景像素網格與呼吸燈亮度。
+      1. 點擊外星人觸發「隨機亂跑」互動，隨後自動歸位。
+      2. 保持「區塊探頭」佈局，增加像素眼睛。
+      3. 強化互動視覺回饋與背景呼吸燈。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -49,7 +48,7 @@
             overflow-x: hidden;
         }
 
-        /* 數位網格背景 - 強力像素感 */
+        /* 數位網格背景 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -74,7 +73,6 @@
             z-index: 4000;
         }
 
-        /* 固定式標題 */
         header {
             position: sticky;
             top: 0;
@@ -84,7 +82,7 @@
             padding: 15px 4vw;
             text-align: center;
             border-bottom: 2px solid var(--neon-blue);
-            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.5);
+            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
         }
 
         h1 { 
@@ -96,14 +94,24 @@
             letter-spacing: 3px;
         }
 
-        /* 像素外星人 - 改良版 */
+        /* 像素外星人 */
         .pixel-mascot {
             position: absolute;
             width: 32px;
             height: 24px;
-            z-index: -1; /* 放在區塊後方 */
-            top: -24px; /* 探頭位置 */
+            z-index: 10; 
+            top: -24px; 
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             filter: drop-shadow(0 0 8px var(--neon-blue));
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 亂跑狀態：取消原有動畫 */
+        .pixel-mascot.running {
+            animation: none !important;
+            z-index: 100;
+            filter: drop-shadow(0 0 15px var(--neon-blue)) hue-rotate(90deg);
         }
 
         .mascot-body {
@@ -111,7 +119,6 @@
             height: 100%;
             background: var(--neon-blue);
             position: relative;
-            /* 像素風格造型 */
             box-shadow: 
                 -4px 4px 0 var(--neon-blue), 
                 4px 4px 0 var(--neon-blue),
@@ -119,7 +126,6 @@
                 8px 8px 0 var(--neon-blue);
         }
 
-        /* 眼睛元素 */
         .mascot-eyes {
             position: absolute;
             top: 4px;
@@ -154,23 +160,21 @@
             padding: 1px 4px;
             border: 1px solid var(--neon-blue);
             white-space: nowrap;
+            pointer-events: none;
         }
 
-        /* 動畫變體 */
         @keyframes peek-bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
         @keyframes peek-slide { 0% { transform: translateX(-10px); } 100% { transform: translateX(10px); } }
 
         .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 40px 0 20px 0; }
 
-        /* 區塊容器 - 移除 clip-path 以免裁切到外部的外星人 */
         section {
             background: rgba(10, 20, 30, 0.45);
             backdrop-filter: blur(8px);
-            margin-bottom: 60px; /* 增加間距給探頭外星人 */
+            margin-bottom: 60px; 
             padding: 30px 20px;
             border: 1px solid var(--tech-cyan);
             position: relative;
-            /* 視覺上的斜角效果改用 linear-gradient 模擬背景，避免裁切子元素 */
             box-shadow: 4px 4px 0px var(--tech-cyan);
         }
 
@@ -307,12 +311,20 @@
 <header>
     <h1>捕捉宇宙的閃爍</h1>
     <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">TRANSIT_METHOD_ANALYSIS_UNIT_117</p>
+    
+    <!-- Header Mascot -->
+    <div class="pixel-mascot" style="right: 20px; top: 10px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotRun(this)">
+        <div class="mascot-body">
+            <div class="mascot-eyes"></div>
+        </div>
+        <div class="mascot-label">HUB_SENTRY</div>
+    </div>
 </header>
 
 <div class="container">
     <!-- Section 1 -->
     <section>
-        <div class="pixel-mascot" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;">
+        <div class="pixel-mascot" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotRun(this)">
             <div class="mascot-body" style="background: var(--vibrant-gold);">
                 <div class="mascot-eyes"></div>
             </div>
@@ -354,7 +366,7 @@
 
     <!-- Section 2 -->
     <section>
-        <div class="pixel-mascot" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;">
+        <div class="pixel-mascot" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotRun(this)">
             <div class="mascot-body">
                 <div class="mascot-eyes"></div>
             </div>
@@ -385,7 +397,7 @@
 
     <!-- Section 3 -->
     <section>
-        <div class="pixel-mascot" style="left: 50%; margin-left: -16px; animation: peek-slide 2s infinite alternate ease-in-out;">
+        <div class="pixel-mascot" style="left: 50%; margin-left: -16px; animation: peek-slide 2s infinite alternate ease-in-out;" onclick="mascotRun(this)">
             <div class="mascot-body" style="background: #fff;">
                 <div class="mascot-eyes"></div>
             </div>
@@ -399,7 +411,7 @@
         <details>
             <summary>SYSTEM_LOG: SENSITIVITY_0.01%</summary>
             <div class="details-content">
-                實際觀測變幅僅為 0.01%。系統透過優化演算法，捕捉細維電壓變化並即時轉譯為數位光變曲線。
+                實際觀測變幅僅為 0.01%。系統透過優化演算法，捕捉細微電壓變化並即時轉譯為數位光變曲線。
             </div>
         </details>
     </section>
@@ -448,6 +460,35 @@
             highlightTimer = Date.now(); 
         }
     };
+
+    // --- 外星人亂跑互動邏輯 ---
+    function mascotRun(el) {
+        if (el.classList.contains('running')) return;
+        
+        el.classList.add('running');
+        let count = 0;
+        const totalSteps = 15;
+        
+        const runInterval = setInterval(() => {
+            // 在畫面上隨機跳動 (範圍 -150px 到 150px)
+            const rx = (Math.random() - 0.5) * 300;
+            const ry = (Math.random() - 0.5) * 300;
+            const rot = (Math.random() - 0.5) * 60; // 隨機旋轉角度
+            
+            el.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg)`;
+            count++;
+            
+            if (count >= totalSteps) {
+                clearInterval(runInterval);
+                // 歸位
+                el.style.transform = 'translate(0, 0) rotate(0deg)';
+                // 等待平滑動畫結束後移除 running class
+                setTimeout(() => {
+                    el.classList.remove('running');
+                }, 500);
+            }
+        }, 200);
+    }
 
     sizeSlider.addEventListener('pointerdown', startHighlight);
     speedSlider.addEventListener('pointerdown', startHighlight);
@@ -610,7 +651,7 @@
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // 背景呼吸燈強化 (0.1 - 1.1)
+        // 背景呼吸燈強化
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
         bgLayer.style.setProperty('--pulse-opacity', 0.15 + (breath * 0.95));
