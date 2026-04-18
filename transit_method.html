@@ -3,7 +3,7 @@
 <head>
     <!-- 
       檔案狀態：正式稿 (Final Draft)
-      最後修訂：根據地科展教具 PDF 完整內容重製
+      最後修訂：根據地科展教具 PDF 完整內容重製，並預留圖片位
       保留功能：垂直佈局模擬器、累積相位變速邏輯、Hold+Ease-in 衰減高亮
     -->
     <meta charset="UTF-8">
@@ -80,8 +80,19 @@
 
         .highlight { color: var(--neon-blue); font-weight: bold; }
 
+        .image-placeholder {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed #444;
+            border-radius: 10px;
+            margin: 15px 0;
+            padding: 40px 20px;
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+        }
+
         .canvas-container {
-            margin: 0 -18px;
+            margin: 15px -18px;
             background: #000;
             position: relative;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -136,11 +147,11 @@
             font-size: 1.1em;
             color: var(--vibrant-gold);
             text-align: center;
-            margin: 15px -18px;
+            margin: 15px 0;
             padding: 20px 15px;
             background: rgba(0, 0, 0, 0.4);
-            border-top: 1px solid rgba(255, 204, 0, 0.2);
-            border-bottom: 1px solid rgba(255, 204, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 204, 0, 0.2);
         }
 
         details { background: rgba(255, 255, 255, 0.05); margin: 20px -18px -25px -18px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
@@ -167,14 +178,17 @@
 
 <div class="container">
     <section>
+        <div class="image-placeholder"></div>
         <h2>★ 什麼是「凌日法」？</h2>
         <p>
             想像一下，在黑夜中有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，雖然你看不清蚊子，但你會發現探照燈的亮度瞬間稍微變暗了一點點。
         </p>
         <p>
-            這種光度隨時間變化所繪出的曲線稱為<span class="highlight">「光變曲線」(Light Curve)</span>。它是目前發現系外行星數量最多的技術，如著名的克卜勒太空望遠鏡（Kepler）便以此發現了數千顆行星。
+            這種光度隨時間變化所繪出的曲線的專業術語叫做<span class="highlight">「光變曲線」(Light Curve)</span>。科學家發現，凌日法是目前發現系外行星數量最多的技術（著名的克卜勒太空望遠鏡 Kepler 就以此發現了數千顆行星）。它不僅能偵測行星，還能讓我們測量行星的直徑。
         </p>
         
+        <div class="image-placeholder"></div>
+
         <div class="canvas-container">
             <canvas id="transitCanvas"></canvas>
         </div>
@@ -196,7 +210,7 @@
             </div>
         </div>
         <div style="text-align: center; padding-bottom: 5px;">
-            <span style="font-size:0.8em; color:#888;">調整滑桿：親自模擬系外行星（如 WASP-96b）的凌日觀測</span>
+            <span style="font-size:0.8em; color:#888;">調整滑桿：親自模擬系外行星的凌日觀測</span>
         </div>
     </section>
 
@@ -204,19 +218,23 @@
         <h2>★ 透過凌日法能得到什麼資訊？</h2>
         
         <p><strong>1. 有東西經過嗎？</strong></p>
-        <p>當觀測到的光度曲線突然掉下去一個「坑」，就代表行星正在經過恆星前方。</p>
+        <p>當我們觀測到的光度曲線突然掉下去一個「坑」，就代表行星正在經過恆星前方。</p>
 
         <p><strong>2. 它是巨無霸還是小不點？</strong></p>
-        <p>行星遮擋的面積與恆星總面積的比例，決定了光度下降的「深度」。行星越大，坑就越深。公式如下：</p>
+        <p>行星越大，遮住的光就越多，光度曲線掉下去的「坑」就越深。行星遮擋的面積與恆星總面積的比例，決定了光度下降的「深度」。公式如下：</p>
         <div class="formula-card">
             $$\displaystyle \text{亮度下降比例} = \left(\frac{\text{行星半徑}}{\text{恆星半徑}}\right)^2$$
         </div>
+        
+        <div class="image-placeholder"></div>
 
         <p><strong>3. 它跑得有多快？</strong></p>
-        <p>如果「坑」出現得很頻繁，代表公轉速度快。根據克卜勒第三定律，我們能從時間間隔計算軌道半徑，進而判斷行星是否位在<span class="highlight">適居帶</span>。</p>
+        <p>如果這個「坑」出現得很頻繁，代表這顆行星公轉速度很快。根據克卜勒第三定律，我們能從兩次凌日的時間間隔計算出行星的軌道半徑。這對判斷行星是否位在<span class="highlight">適居帶</span>（生命可能存在的區域）至關重要。</p>
 
         <p><strong>4. 它的大氣層有什麼？</strong></p>
-        <p>當恆星光穿過行星邊緣的大氣層時，化學分子（如水蒸氣、氧氣或甲烷）會吸收特定顏色的光。分析這道<span class="highlight">「光譜指紋」</span>，就能確定大氣成分。</p>
+        <p>當行星經過恆星前方時，恆星發出的光會穿過行星邊緣的大氣層。大氣中的化學分子（例如水蒸氣、氧氣、甚至甲烷）會吸收特定顏色的光。分析這道<span class="highlight">「光譜指紋」</span>，就能確定大氣成分。</p>
+        
+        <div class="image-placeholder"></div>
     </section>
 
     <section>
@@ -260,7 +278,7 @@
     const starR = 60; 
     const breathPeriod = 12.0; 
 
-    // 相位累積：確保變速時不跳躍
+    // 相位累積
     let lastTimestamp = performance.now();
     let currentOrbitAngle = 0; 
 
@@ -339,7 +357,6 @@
         let brightness = 1.0;
         const maxDepth = (planetR * planetR) / (starR * starR);
 
-        // U 型光變曲線計算
         if (planetZ > 0) { 
             if (dist < totalContactRadius) {
                 if (dist < fullInsideRadius) {
@@ -352,7 +369,6 @@
             }
         }
 
-        // 密集數據點更新
         points.push({ x: w * 0.9, y: brightness });
         if (points.length > 500) points.shift();
         points.forEach(p => p.x -= 1.2);
@@ -362,7 +378,6 @@
 
         const sX = w / 2, sY = h * 0.28; 
 
-        // 計算高亮強度
         let hIntensity = 0;
         if (isInteracting) {
             hIntensity = 1.0;
@@ -376,7 +391,6 @@
             }
         }
 
-        // 軌道虛線
         ctx.save();
         if (hIntensity > 0) {
             ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${0.1 + hIntensity * 0.3})`;
@@ -393,11 +407,8 @@
         ctx.restore();
 
         const px = sX + (planetX - w/2) * 0.5;
-
-        // 後景行星
         if (planetZ <= 0) drawPlanetInstance(px, sY, planetR, 0.4, hIntensity);
 
-        // 恆星視覺
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
         starGrad.addColorStop(0.3, '#ffcc00');
@@ -405,10 +416,8 @@
         ctx.fillStyle = starGrad;
         ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
-        // 前景行星
         if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity);
 
-        // 下半部：密集光變曲線
         const graphX = w * 0.05, graphY = h * 0.55, graphW = w * 0.9, graphH = h * 0.35;
         ctx.strokeStyle = '#444';
         ctx.lineWidth = 1;
@@ -434,7 +443,6 @@
         ctx.fillText('時間 (Time) →', graphX + graphW, graphY + graphH + 15);
         ctx.textAlign = 'left';
 
-        // 背景呼吸燈
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
         bgLayer.style.setProperty('--pulse-opacity', 0.2 + (breath * 0.8));
