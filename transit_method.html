@@ -2,13 +2,13 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Pixel Mascot & Sticky UI)
+      檔案狀態：正式稿 (Tech Edition - Pixel Mascot & Layout Fixed)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 標題鎖定頂部 (Sticky Header)。
-      2. 每個區塊加入不同動作的像素外星人 (Mascot Units)。
-      3. 強化背景像素格線感與呼吸燈對比。
-      4. 提升區塊透明度，強化層次感。
+      1. 外星人改為「區塊後方探頭」模式，增加像素眼睛。
+      2. 解決外星人被裁切與遮擋內容的問題。
+      3. 標題固定頂部，增加背景層次。
+      4. 強化背景像素網格與呼吸燈亮度。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -60,7 +60,6 @@
                 radial-gradient(circle at center, #235a91 0%, #010408 100%);
             background-size: 30px 30px, 30px 30px, 100% 100%;
             opacity: var(--pulse-opacity);
-            transition: opacity 0.05s ease-out;
         }
 
         /* 掃描線效果 */
@@ -72,78 +71,107 @@
                         linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.04));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
-            z-index: 3000;
+            z-index: 4000;
         }
 
         /* 固定式標題 */
         header {
             position: sticky;
             top: 0;
-            z-index: 2000;
-            background: rgba(5, 10, 16, 0.92);
+            z-index: 3000;
+            background: rgba(5, 10, 16, 0.95);
             backdrop-filter: blur(10px);
             padding: 15px 4vw;
             text-align: center;
             border-bottom: 2px solid var(--neon-blue);
-            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
+            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.5);
         }
 
         h1 { 
             color: var(--neon-blue); 
             font-size: 1.4em; 
-            text-shadow: 0 0 10px rgba(0, 242, 255, 0.6); 
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.8); 
             font-weight: 900; 
             margin: 0; 
             letter-spacing: 3px;
         }
 
-        /* 像素外星人元件基礎 */
+        /* 像素外星人 - 改良版 */
         .pixel-mascot {
             position: absolute;
-            width: 24px;
-            height: 20px;
-            z-index: 10;
+            width: 32px;
+            height: 24px;
+            z-index: -1; /* 放在區塊後方 */
+            top: -24px; /* 探頭位置 */
+            filter: drop-shadow(0 0 8px var(--neon-blue));
         }
+
         .mascot-body {
             width: 100%;
             height: 100%;
             background: var(--neon-blue);
+            position: relative;
+            /* 像素風格造型 */
             box-shadow: 
                 -4px 4px 0 var(--neon-blue), 
                 4px 4px 0 var(--neon-blue),
                 -8px 8px 0 var(--neon-blue),
-                8px 8px 0 var(--neon-blue),
-                0 4px 0 #000; /* 眼睛 */
+                8px 8px 0 var(--neon-blue);
         }
+
+        /* 眼睛元素 */
+        .mascot-eyes {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            height: 4px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .mascot-eyes::before, .mascot-eyes::after {
+            content: "";
+            width: 4px;
+            height: 4px;
+            background: #000;
+            animation: eye-blink 3s infinite;
+        }
+
+        @keyframes eye-blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
         .mascot-label {
-            font-size: 7px;
+            font-size: 9px;
             font-family: monospace;
             color: var(--neon-blue);
             position: absolute;
-            bottom: -15px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 1px 4px;
+            border: 1px solid var(--neon-blue);
             white-space: nowrap;
-            opacity: 0.8;
         }
 
-        /* 動作動畫變體 */
-        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-        @keyframes pulse-scale { from { transform: scale(1); } to { transform: scale(1.3); } }
-        @keyframes slide-rot { from { transform: translateX(-10px) rotate(0); } to { transform: translateX(10px) rotate(10deg); } }
-        @keyframes float-diag { 0% { transform: translate(0,0); } 50% { transform: translate(15px, -5px); } 100% { transform: translate(0,0); } }
+        /* 動畫變體 */
+        @keyframes peek-bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+        @keyframes peek-slide { 0% { transform: translateX(-10px); } 100% { transform: translateX(10px); } }
 
-        .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 15px 0; }
+        .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 40px 0 20px 0; }
 
-        /* 提高透明度 (0.65 -> 0.45) */
+        /* 區塊容器 - 移除 clip-path 以免裁切到外部的外星人 */
         section {
             background: rgba(10, 20, 30, 0.45);
             backdrop-filter: blur(8px);
-            margin-bottom: 40px;
+            margin-bottom: 60px; /* 增加間距給探頭外星人 */
             padding: 30px 20px;
             border: 1px solid var(--tech-cyan);
             position: relative;
-            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+            /* 視覺上的斜角效果改用 linear-gradient 模擬背景，避免裁切子元素 */
+            box-shadow: 4px 4px 0px var(--tech-cyan);
         }
 
         section::before {
@@ -153,6 +181,7 @@
             width: 15px; height: 15px;
             border-top: 3px solid var(--neon-blue);
             border-left: 3px solid var(--neon-blue);
+            z-index: 2;
         }
 
         h2 { 
@@ -163,12 +192,12 @@
             align-items: center;
             text-transform: uppercase;
         }
-        h2::before { content: ">> "; color: var(--neon-blue); font-family: monospace; }
+        h2::before { content: ">> "; color: var(--neon-blue); font-family: monospace; margin-right: 5px; }
 
         .highlight { color: var(--neon-blue); font-family: monospace; font-weight: bold; }
 
         .image-placeholder {
-            background: rgba(0, 242, 255, 0.12);
+            background: rgba(0, 242, 255, 0.1);
             border: 1px dashed rgba(0, 242, 255, 0.4);
             margin: 20px 0;
             padding: 50px 20px;
@@ -262,12 +291,12 @@
         footer { 
             text-align: center; 
             padding: 60px 20px; 
-            font-size: 0.7em; 
+            font-size: 0.75em; 
             color: #446688; 
             background: #010305; 
             letter-spacing: 4px;
             font-family: monospace;
-            border-top: 1px solid rgba(0, 242, 255, 0.1);
+            border-top: 1px solid rgba(0, 242, 255, 0.2);
         }
     </style>
 </head>
@@ -278,20 +307,16 @@
 <header>
     <h1>捕捉宇宙的閃爍</h1>
     <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">TRANSIT_METHOD_ANALYSIS_UNIT_117</p>
-    
-    <!-- Header Mascot -->
-    <div class="pixel-mascot" style="right: 15px; top: 15px; animation: bounce 0.6s infinite alternate;">
-        <div class="mascot-body"></div>
-        <div class="mascot-label" style="color:white">CMD_CENTER</div>
-    </div>
 </header>
 
 <div class="container">
     <!-- Section 1 -->
     <section>
-        <div class="pixel-mascot" style="left: -10px; top: -10px; animation: pulse-scale 1.5s infinite alternate;">
-            <div class="mascot-body" style="background: var(--vibrant-gold);"></div>
-            <div class="mascot-label" style="color:var(--vibrant-gold)">UNIT_ALPHA</div>
+        <div class="pixel-mascot" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;">
+            <div class="mascot-body" style="background: var(--vibrant-gold);">
+                <div class="mascot-eyes"></div>
+            </div>
+            <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">UNIT_ALPHA</div>
         </div>
 
         <div class="image-placeholder">[ Image of 凌日法示意圖 ]</div>
@@ -329,8 +354,10 @@
 
     <!-- Section 2 -->
     <section>
-        <div class="pixel-mascot" style="right: 10px; top: -10px; animation: slide-rot 1s infinite alternate;">
-            <div class="mascot-body"></div>
+        <div class="pixel-mascot" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;">
+            <div class="mascot-body">
+                <div class="mascot-eyes"></div>
+            </div>
             <div class="mascot-label">UNIT_BETA</div>
         </div>
 
@@ -358,9 +385,11 @@
 
     <!-- Section 3 -->
     <section>
-        <div class="pixel-mascot" style="left: -10px; bottom: 20px; animation: float-diag 2s infinite ease-in-out;">
-            <div class="mascot-body" style="background: white; border: 1px solid var(--neon-blue);"></div>
-            <div class="mascot-label" style="color:white">UNIT_GAMMA</div>
+        <div class="pixel-mascot" style="left: 50%; margin-left: -16px; animation: peek-slide 2s infinite alternate ease-in-out;">
+            <div class="mascot-body" style="background: #fff;">
+                <div class="mascot-eyes"></div>
+            </div>
+            <div class="mascot-label" style="color:#fff; border-color:#fff">UNIT_GAMMA</div>
         </div>
 
         <h2>ARDUINO 探測系統</h2>
@@ -370,7 +399,7 @@
         <details>
             <summary>SYSTEM_LOG: SENSITIVITY_0.01%</summary>
             <div class="details-content">
-                實際觀測變幅僅為 0.01%。系統透過優化演算法，捕捉細微電壓變化並即時轉譯為數位光變曲線。
+                實際觀測變幅僅為 0.01%。系統透過優化演算法，捕捉細維電壓變化並即時轉譯為數位光變曲線。
             </div>
         </details>
     </section>
@@ -381,7 +410,7 @@
 </div>
 
 <footer>
-    [ TERMINAL_STATUS: READY ]<br>
+    [ TERMINAL_STATUS: ACTIVE ]<br>
     EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.117
 </footer>
 
@@ -584,7 +613,7 @@
         // 背景呼吸燈強化 (0.1 - 1.1)
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
-        bgLayer.style.setProperty('--pulse-opacity', 0.1 + (breath * 1.0));
+        bgLayer.style.setProperty('--pulse-opacity', 0.15 + (breath * 0.95));
 
         requestAnimationFrame(draw);
     }
