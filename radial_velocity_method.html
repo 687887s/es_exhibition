@@ -2,13 +2,14 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：全架構校正版 (Radial Velocity - Final Integration)
+      檔案狀態：物理精確對齊版 (Radial Velocity - Physical Phase Calibration)
       風格：科技、未來主義風格 (Doppler Theme)
       修正項目：
-      1. 同步高亮邏輯：調整滑桿時行星產生霓虹高光回饋。
-      2. 內容正確性：恢復徑向速度法專屬內容 (51 Pegasi b)，移除 Arduino。
-      3. 嚴格邊界：外星人活動範圍限於 [區塊寬度] ∩ [上下 Banner 之間的可見區]。
-      4. 歸位序列：黑洞定點開啟，外星人由洞內現身，解決居中與位移問題。
+      1. 物理相位校正：紅/藍移在左右端點最強（徑向速度最大），中心點為零。
+      2. 質量聯動：行星質量同時影響擺動振幅與都卜勒訊號強度。
+      3. 移除行星：僅顯示恆星，模擬「看不見行星」的偵測情境。
+      4. 歸位修復：使用原位備份邏輯，確保 Banner 與居中外星人精確歸位。
+      5. 內容恢復：恢復三區塊架構與圖片預留位，移除 Arduino 描述。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -20,7 +21,7 @@
     <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <style>
-        /* 全域重設，確保結構穩定 */
+        /* 全域結構穩定 */
         * { box-sizing: border-box; }
         
         :root {
@@ -34,7 +35,7 @@
             background: var(--bg-deep); color: var(--text-color); line-height: 1.6; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden;
         }
 
-        /* 10s 週期紅藍移背景 */
+        /* 獨立氛圍背景：10s 固定週期 */
         .bg-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background-image: 
@@ -44,13 +45,11 @@
             background-size: 30px 30px, 30px 30px, 100% 100%;
         }
 
-        /* 掃描線層級最高 */
         body::after {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%); background-size: 100% 4px; pointer-events: none; z-index: 7000;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%); background-size: 100% 4px; pointer-events: none; z-index: 7000;
         }
 
-        /* 頂部固定 Banner */
         header {
             position: sticky; top: 0; z-index: 4000; background: rgba(5, 10, 16, 0.95); backdrop-filter: blur(10px);
             padding: 15px 4vw; text-align: center; border-bottom: 2px solid var(--neon-blue); box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
@@ -59,9 +58,8 @@
 
         .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 40px 0 20px 0; position: relative; }
 
-        /* 內容區塊結構 */
         section {
-            background: rgba(10, 20, 30, 0.65); backdrop-filter: blur(8px); margin-bottom: 80px; padding: 35px 25px;
+            background: rgba(10, 20, 30, 0.7); backdrop-filter: blur(8px); margin-bottom: 80px; padding: 35px 25px;
             border: 1px solid var(--tech-cyan); position: relative; box-shadow: 4px 4px 0px var(--tech-cyan);
         }
         section::before { content: ""; position: absolute; top: 0; left: 0; width: 15px; height: 15px; border-top: 3px solid var(--neon-blue); border-left: 3px solid var(--neon-blue); }
@@ -69,17 +67,14 @@
         h2 { color: var(--vibrant-gold); margin-top: 0; font-size: 1.3em; display: flex; align-items: center; text-transform: uppercase; }
         h2::before { content: ">> "; color: var(--neon-blue); font-family: monospace; margin-right: 5px; }
 
-        /* 圖片預留位 */
         .image-placeholder {
-            background: rgba(0, 242, 255, 0.1); border: 1px dashed rgba(0, 242, 255, 0.4); margin: 25px 0;
+            background: rgba(0, 242, 255, 0.08); border: 1px dashed rgba(0, 242, 255, 0.4); margin: 25px 0;
             padding: 60px 20px; text-align: center; color: var(--neon-blue); font-size: 0.8em; text-transform: uppercase; letter-spacing: 2px;
         }
 
-        /* 模擬器容器 */
-        .canvas-container { margin: 25px -25px; background: rgba(0, 0, 0, 0.85); position: relative; border-top: 1px solid var(--tech-cyan); border-bottom: 1px solid var(--tech-cyan); overflow: hidden; line-height: 0; }
+        .canvas-container { margin: 25px -25px; background: rgba(0, 0, 0, 0.95); position: relative; border-top: 1px solid var(--tech-cyan); border-bottom: 1px solid var(--tech-cyan); overflow: hidden; line-height: 0; }
         canvas { display: block; width: 100%; height: auto; }
 
-        /* 控制面板 */
         .controls { padding: 25px; background: rgba(6, 14, 22, 0.9); border-bottom: 1px solid var(--tech-cyan); margin: 0 -25px -35px -25px; }
         .control-item { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
         .control-label { font-size: 0.85em; color: var(--neon-blue); display: flex; justify-content: space-between; font-family: monospace; }
@@ -103,7 +98,6 @@
         .mascot-body::after { content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 4px; height: 10px; background: var(--neon-blue); animation: ant-p 0.5s infinite alternate; }
         @keyframes ant-p { from { height: 5px; opacity: 0.6; } to { height: 12px; opacity: 1; } }
 
-        /* 黑洞 */
         .black-hole {
             position: absolute; width: 64px; height: 20px; background: #000; border-radius: 50%;
             box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff; z-index: 5;
@@ -149,7 +143,7 @@
 </header>
 
 <div class="container">
-    <!-- Section 1: 都卜勒效應原理 -->
+    <!-- Section 1 -->
     <section id="s1">
         <div class="pixel-mascot" id="mascot-s1" style="left: 20px;" onclick="mascotStep(this)">
             <div class="mascot-body" style="background: var(--vibrant-gold);"><div class="mascot-eyes"></div></div>
@@ -158,27 +152,27 @@
         <div class="black-hole" id="bh-s1" style="left: 6px; top: 6px;"></div>
 
         <h2>什麼是「徑向速度法」？</h2>
-        <p>系外行星探索是一場精密的追蹤。當行星繞行恆星時，兩者實際上都在繞著共同的<span class="highlight">質心</span>旋轉。這就像是救護車經過時聲音頻率的變化：開過來時聲音變尖，開走時聲音變低。</p>
+        <p>系外行星探索是一場精密的追蹤。當行星繞行恆星時，兩者實際上都在繞著共同的<span class="highlight">質心</span>旋轉。這就像是救護車經過時聲音頻率的變化：靠近時聲音尖銳，遠離時低沉。</p>
         
-        <div class="image-placeholder">[ Image of 救護車與鴨子游水的都卜勒效應示意圖 ]</div>
+        <div class="image-placeholder">[ Image of 救護車與鴨子游水的都卜勒效應原理示意圖 ]</div>
 
-        <p>對星光來說，移動改變的是<span class="highlight">「顏色」</span>：靠近我們時光波變密，偏向藍色（藍移）；遠離時變稀疏，偏向紅色（紅移）。</p>
+        <p>對星光來說，移動改變的是<span class="highlight">「顏色」</span>：靠近我們時光波壓縮，偏向藍色（藍移）；遠離時拉伸，偏向紅色（紅移）。</p>
 
         <div class="canvas-container"><canvas id="wobbleCanvas"></canvas></div>
         
         <div class="controls">
             <div class="control-item">
-                <div class="control-label"><span>行星質量 (PLANET_MASS)</span><span id="massVal" style="color:white">5.0</span></div>
+                <div class="control-label"><span>行星質量 (影響都卜勒位移強度)</span><span id="massVal" style="color:white">5.0</span></div>
                 <input type="range" id="massSlider" min="1" max="15" value="5" step="0.1">
             </div>
             <div class="control-item">
-                <div class="control-label"><span>公轉速度 (ORBIT_VELOCITY)</span><span id="speedVal" style="color:white">3.00</span></div>
+                <div class="control-label"><span>公轉速度 (影響色偏頻率)</span><span id="speedVal" style="color:white">3.00</span></div>
                 <input type="range" id="speedSlider" min="0.5" max="10" value="3" step="0.1">
             </div>
         </div>
     </section>
     
-    <!-- Section 2: 星際雙人舞與紅藍移 -->
+    <!-- Section 2 -->
     <section id="s2">
         <div class="pixel-mascot" id="mascot-s2" style="right: 20px;" onclick="mascotStep(this)">
             <div class="mascot-body"><div class="mascot-eyes"></div></div>
@@ -187,18 +181,18 @@
         <div class="black-hole" id="bh-s2" style="right: 6px; top: 6px;"></div>
         
         <h2>宇宙偵探：星際雙人舞</h2>
-        <p>引力是互相的。當行星拉動恆星產生規律的「來回晃動」時，光譜線就會同步產生偏移。即使我們看不見行星，也能藉此計算出行星質量的下限值：</p>
+        <p>引力是互相的。當行星拉動恆星產生規轉時，光譜線就會同步偏移。我們藉此計算行星質量的下限值：</p>
 
         <div class="formula-card">$$M_p \sin i$$</div>
 
-        <div class="image-placeholder">[ Image of 恆星與行星繞質心公轉示意圖 ]</div>
+        <div class="image-placeholder">[ Image of 恆星與行星繞共同質心公轉示意圖 ]</div>
         
         <p>我們透過精密的光譜儀分析恆星的<span class="highlight">「光譜指紋」</span>，即使這晃動速度只有每秒數公尺，依然無所遁形。</p>
 
-        <div class="image-placeholder">[ Image of 紅移與藍移光譜線偏移對比圖 ]</div>
+        <div class="image-placeholder">[ Image of 吸收線隨恆星晃動而同步偏移的對比圖 ]</div>
     </section>
 
-    <!-- Section 3: 51 Pegasi b 里程碑 -->
+    <!-- Section 3 -->
     <section id="s3">
         <div class="pixel-mascot" id="mascot-s3" style="left: 50%; margin-left: -18px;" onclick="mascotStep(this)">
             <div class="mascot-body" style="background: #fff;"><div class="mascot-eyes"></div></div>
@@ -207,13 +201,13 @@
         <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -32px; top: 6px;"></div>
 
         <h2>發現的里程碑：51 Pegasi b</h2>
-        <p>1995 年，天文學家利用徑向速度法發現了第一顆繞行類太陽恆星的系外行星 —— <span class="highlight">51 Pegasi b</span>。這項發現徹底改變了我們對行星系統形成的認知，並獲得了 2019 年諾貝爾物理學獎。</p>
+        <p>1995 年，天文學家利用徑向速度法發現了第一顆繞行類太陽恆星的系外行星 —— <span class="highlight">51 Pegasi b</span>。這項發現獲得了 2019 年諾貝爾物理學獎。</p>
         
-        <div class="image-placeholder">[ Image of 51 Pegasi b 藝術想像圖 ]</div>
+        <div class="image-placeholder">[ Image of 51 Pegasi b 藝術想像圖與光譜發現數據 ]</div>
 
-        <p>目前這項技術對於偵測離恆星較近、質量較大的行星（如熱木星）特別有效，是目前地面望遠鏡主要的偵測手段之一。</p>
+        <p>目前這項技術對於偵測離恆星較近、質量較大的行星（如熱木星）特別有效，是目前尋找系外行星的核心手段。</p>
         
-        <div class="image-placeholder">[ Image of 大型地面望遠鏡觀測現場模擬圖 ]</div>
+        <div class="image-placeholder">[ Image of 大型地面望遠鏡觀測現場與高解析度光譜儀 ]</div>
     </section>
 
     <div class="back-nav"><a href="index.html" class="back-btn">Return to Sector 0</a></div>
@@ -227,18 +221,15 @@
     const mSld = document.getElementById('massSlider'), sSld = document.getElementById('speedSlider');
     const mVal = document.getElementById('massVal'), sVal = document.getElementById('speedVal');
 
-    const RGB_NEON_BLUE = '0, 242, 255', COLOR_GOLD = '#ffcc00';
-    let lastT = performance.now(), angle = 0, starR = 50, planetR = 12;
-    // 高亮同步邏輯變數
-    let highlightTimer = 0, isInteracting = false;
+    let lastT = performance.now(), angle = 0, starR = 55;
 
     // --- 嚴格邊界與 Viewport Delta 歸位邏輯 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
         el.dataset.moving = 'true'; el.classList.add('active'); 
         
-        const vh = window.innerHeight, vw = window.innerWidth;
         const hh = headerEl.offsetHeight, fh = footerEl.offsetHeight;
+        const vh = window.innerHeight, vw = window.innerWidth;
         const parentBlock = el.closest('section') || document.body;
         const blockRect = parentBlock.getBoundingClientRect();
         
@@ -287,11 +278,9 @@
             el.style.opacity = "1";
             el.style.transition = "transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1)";
             el.style.transform = "translate(0, 12px)"; await new Promise(r => setTimeout(r, 1200));
-            
             el.style.transform = "translate(0, 12px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
             el.style.transform = "translate(0, 12px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
             el.style.transform = "translate(0, 12px) rotate(0deg)"; await new Promise(r => setTimeout(r, 300));
-
             el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
             el.style.transform = "translate(0, -15px)"; await new Promise(r => setTimeout(r, 300));
             
@@ -304,79 +293,91 @@
         }
     }
 
-    // --- 模擬器繪製與高光同步 ---
+    // --- 模擬器繪製：物理相位全同步 (Radial Velocity Physics Sync) ---
     function draw(timestamp) {
         const dt = (timestamp - lastT) / 1000; lastT = timestamp;
         const w = canvas.width / window.devicePixelRatio, h = canvas.height / window.devicePixelRatio;
         const mS = parseFloat(mSld.value), sS = parseFloat(sSld.value);
         mVal.innerText = mS.toFixed(1); sVal.innerText = sS.toFixed(2);
+        
+        // 1. 背景獨立氛圍
+        const bgShift = Math.sin(2 * Math.PI * (timestamp / 10000)); 
+        bgL.style.setProperty('--pulse-ratio', (50 + bgShift * 38) + '%');
+
+        // 2. 更新物理相位
         angle += sS * dt;
         
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
-        const cX = w / 2, cY = h * 0.4, oR = w * 0.35, wA = mS * 2.5;
-        const pX = cX + Math.cos(angle) * oR, pZ = Math.sin(angle), sX = cX - Math.cos(angle) * wA, dV = Math.sin(angle);
+        const cX = w / 2, cY = h * 0.45;
         
-        const shift = Math.sin(2 * Math.PI * (timestamp / 1000) / 10.0);
-        bgL.style.setProperty('--pulse-ratio', (50 + shift * 35) + '%');
+        // --- 物理對齊核心修正 ---
+        // 恆星位置 (X軸)：使用 cos(angle)，最右為 cos(0)=1，最左為 cos(pi)=-1
+        const wobbleAmp = mS * 3.2;
+        const sX = cX + Math.cos(angle) * wobbleAmp; 
+        
+        // 都卜勒速度分量 (Radial Velocity)：
+        // 依照物理要求，在最左及最右端點最強力。
+        // 當 X 為正極大(最右)，速度向量最直接對向/背向觀察者。
+        // 我們讓：
+        // 右端點 (cos=1) -> 紅移 (Receding)
+        // 左端點 (cos=-1) -> 藍移 (Approaching)
+        // 中心點 (cos=0) -> 速度垂直於視線 -> 無位移
+        const dopplerVel = Math.cos(angle); 
+        
+        // 訊號強度受行星質量影響：質量越大，色偏與位移越劇烈
+        const massFactor = (mS / 15.0); 
+        const signalIntensity = dopplerVel * massFactor;
 
+        // 3. 恆星色相同步
+        const starGrad = ctx.createRadialGradient(sX, cY, 5, sX, cY, starR); 
+        // 色相偏移：45(黃) -> 增加為藍色，減少為紅色
+        // 注意：signalIntensity 為正(右端)時減色相變紅，為負(左端)時加色相變藍
+        const shiftHue = -signalIntensity * 35; 
+        starGrad.addColorStop(0, '#fff'); 
+        starGrad.addColorStop(0.3, `hsl(${45 + shiftHue}, 100%, 50%)`); 
+        starGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = starGrad; ctx.beginPath(); ctx.arc(sX, cY, starR, 0, Math.PI*2); ctx.fill();
+
+        // 4. HUD 狀態同步
         ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)'; ctx.strokeRect(10, 10, w - 20, h - 20);
-        ctx.fillStyle = Math.abs(dV) > 0.8 ? (dV > 0 ? '#ff4400' : '#0088ff') : 'rgba(0, 242, 255, 0.6)';
-        ctx.font = '10px monospace'; ctx.fillText(dV > 0 ? '>> REDSHIFT (AWAY)' : '>> BLUESHIFT (NEAR)', 20, 25);
-
-        // 高光強度計算 (同步凌日法邏輯)
-        let hI = isInteracting ? 1.0 : (Date.now()-highlightTimer < 1300 ? 1 - Math.pow(((Date.now()-highlightTimer-500)/800), 3) : 0);
-        if(!isInteracting && Date.now()-highlightTimer < 500) hI = 1.0;
-
-        const sG = ctx.createRadialGradient(sX, cY, 5, sX, cY, starR); sG.addColorStop(0, '#fff'); sG.addColorStop(0.3, `hsl(${45 - dV*20}, 100%, 50%)`); sG.addColorStop(1, 'transparent');
-        
-        // 繪製後方星體
-        if (pZ < 0) { 
-            ctx.fillStyle = '#111'; 
-            ctx.beginPath(); ctx.arc(pX, cY, planetR, 0, Math.PI*2); ctx.fill(); 
+        ctx.font = '10px monospace';
+        if (Math.abs(dopplerVel) > 0.1) {
+            // dopplerVel > 0 (右端) 為紅移，dopplerVel < 0 (左端) 為藍移
+            const isRed = dopplerVel > 0;
+            ctx.fillStyle = isRed ? '#ff3300' : '#00aaff';
+            ctx.fillText(isRed ? '>> STATUS: REDSHIFT (MOVING AWAY)' : '>> STATUS: BLUESHIFT (APPROACHING)', 20, 25);
+        } else {
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.fillText('>> STATUS: ZERO_RADIAL_VELOCITY', 20, 25);
         }
 
-        // 繪製恆星
-        ctx.fillStyle = sG; ctx.beginPath(); ctx.arc(sX, cY, starR, 0, Math.PI*2); ctx.fill();
-
-        // 繪製前方星體 (包含高光同步)
-        if (pZ >= 0) {
-            ctx.save();
-            ctx.beginPath(); ctx.arc(pX, cY, planetR, 0, Math.PI*2);
-            ctx.fillStyle = '#000';
-            if (hI > 0) {
-                // 視覺高光特效
-                ctx.shadowBlur = 20 * hI;
-                ctx.shadowColor = `rgba(${RGB_NEON_BLUE}, ${hI})`;
-                ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${hI})`;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                // 同步追蹤框
-                ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${hI * 0.6})`;
-                ctx.strokeRect(pX - planetR - 5, cY - planetR - 5, planetR * 2 + 10, planetR * 2 + 10);
-            }
-            ctx.fill();
-            ctx.restore();
-        }
-
-        // 光譜分析條
-        const sX_l = w * 0.1, sY_l = h * 0.8, sW_l = w * 0.8, sH_l = 30;
-        const rb = ctx.createLinearGradient(sX_l, 0, sX_l + sW_l, 0); rb.addColorStop(0, '#f00'); rb.addColorStop(0.5, '#0f0'); rb.addColorStop(1, '#00f');
+        // 5. 光譜分析條全同步 (左藍右紅)
+        const sX_l = w * 0.1, sY_l = h * 0.82, sW_l = w * 0.8, sH_l = 32;
+        const rb = ctx.createLinearGradient(sX_l, 0, sX_l + sW_l, 0); 
+        rb.addColorStop(0, '#00f'); rb.addColorStop(0.5, '#0f0'); rb.addColorStop(1, '#f00');
         ctx.fillStyle = rb; ctx.fillRect(sX_l, sY_l, sW_l, sH_l);
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-        [0.2, 0.35, 0.5, 0.7, 0.85].forEach(p => { const lx = sX_l + p * sW_l + dV * 30; if (lx > sX_l && lx < sX_l + sW_l) { ctx.beginPath(); ctx.moveTo(lx, sY_l); ctx.lineTo(lx, sY_l + sH_l); ctx.stroke(); }});
+        
+        // 吸收線偏移：
+        // 藍移 (signalIntensity 負，恆星在左端) -> lx 應變小（向左移）
+        // 紅移 (signalIntensity 正，恆星在右端) -> lx 應變大（向右移）
+        const lineOffset = signalIntensity * 55; 
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
+        [0.2, 0.35, 0.5, 0.7, 0.85].forEach(p => { 
+            const lx = sX_l + p * sW_l + lineOffset; 
+            if (lx > sX_l && lx < sX_l + sW_l) { 
+                ctx.beginPath(); ctx.moveTo(lx, sY_l); ctx.lineTo(lx, sY_l + sH_l); ctx.stroke(); 
+            }
+        });
+        
+        ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = '9px monospace'; ctx.fillText('DOPPLER_CALIBRATED_SYNC', sX_l, sY_l - 8);
         
         requestAnimationFrame(draw);
     }
 
-    // 滑桿互動監聽 (高光觸發)
-    mSld.oninput = () => isInteracting = true; 
-    sSld.oninput = () => isInteracting = true; 
-    window.onpointerup = () => { if(isInteracting) { isInteracting = false; highlightTimer = Date.now(); }};
-
-    function resize() { const width = canvas.clientWidth; canvas.width = width * window.devicePixelRatio; canvas.height = (width * 0.9) * window.devicePixelRatio; ctx.scale(window.devicePixelRatio, window.devicePixelRatio); }
+    function resize() { const width = canvas.clientWidth; canvas.width = width * window.devicePixelRatio; canvas.height = (width * 0.95) * window.devicePixelRatio; ctx.scale(window.devicePixelRatio, window.devicePixelRatio); }
     window.onresize = resize; resize(); requestAnimationFrame(draw);
     
-    // 閒置行為初始化
+    // 初始化外星人閒置行為
     document.querySelectorAll('.pixel-mascot').forEach(el => { 
         const t = () => { setTimeout(() => { 
             if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') { 
