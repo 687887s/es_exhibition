@@ -2,13 +2,12 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Strict Boundary & Black Hole Fix)
+      檔案狀態：正式稿 (Tech Edition - Final Boundary & Layer Fix)
       風格：科技、未來主義風格 (Doppler Theme)
       修訂內容：
-      1. 嚴格邊界控制：外星人僅在「可見視窗」且「區塊寬度內」移動，絕對避開上下 Banner。
-      2. 歸位動畫修正：外星人先隱身，黑洞開後由深處探頭。
-      3. 波形追蹤者升級：加入雙像素眼睛。
-      4. 背景優化：10秒週期紅藍移漸變，無亮度呼吸。
+      1. 嚴格邊界邏輯：偵測 Block 寬度與 Banner 高度，確保外星人始終在可見內容區。
+      2. 歸位動畫修正：先現黑洞，外星人後從中探頭現身。
+      3. 波形追蹤者：加入雙像素眼睛與 10s 紅藍移背景。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -58,23 +57,20 @@
             width: 100%; height: 100%; background: var(--neon-blue); position: relative;
             box-shadow: -4px 4px 0 var(--neon-blue), 4px 4px 0 var(--neon-blue), -8px 4px 0 var(--neon-blue), 8px 4px 0 var(--neon-blue), 0 -4px 0 var(--neon-blue);
         }
-        /* 天線 */
         .mascot-body::after { content: ""; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 4px; height: 8px; background: var(--neon-blue); animation: ant 0.5s infinite alternate; }
         @keyframes ant { from { height: 4px; } to { height: 10px; } }
 
-        /* 雙像素眼睛 */
         .mascot-eyes { position: absolute; top: 4px; left: 4px; right: 4px; height: 5px; display: flex; justify-content: space-around; z-index: 2; }
-        .mascot-eyes::before, .mascot-eyes::after { content: ""; width: 5px; height: 5px; background: #000; animation: blink 4s infinite; }
+        .mascot-eyes::before, .mascot-eyes::after { content: ""; width: 5px; height: 5px; background: #000; border-radius: 1px; animation: blink 4s infinite; }
         @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
 
         @keyframes idle-f { 0% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-40px) rotate(180deg) scale(1.1); } 100% { transform: translateY(0) rotate(360deg) scale(1); } }
         .pixel-mascot.idle-jump { animation: idle-f 0.8s ease-in-out !important; }
         .pixel-mascot.idle-color .mascot-body { filter: hue-rotate(180deg) brightness(1.3); transition: filter 0.5s; }
 
-        /* 黑洞 - 調高 z-index 確保位於前景但低於外星人 */
         .black-hole {
             position: absolute; width: 64px; height: 18px; background: #000; border-radius: 50%;
-            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff; z-index: 5500;
+            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff; z-index: 5;
             transform: scale(0); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; opacity: 0;
         }
         .black-hole.visible { transform: scale(1); opacity: 1; }
@@ -160,7 +156,7 @@
     const mVal = document.getElementById('massVal'), sVal = document.getElementById('speedVal');
     let lastT = performance.now(), angle = 0, starR = 50, planetR = 12;
 
-    // --- 嚴格邊界互動邏輯 ---
+    // --- 改進後的嚴格邊界邏輯 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
         el.dataset.moving = 'true'; el.classList.add('active'); 
@@ -170,65 +166,93 @@
         const vw = window.innerWidth;
         const hh = headerEl.offsetHeight;
         const fh = footerEl.offsetHeight;
+        
+        // 偵測所屬區塊
         const parentBlock = el.closest('section') || document.querySelector('section');
         const blockRect = parentBlock.getBoundingClientRect();
         
         let step = parseInt(el.dataset.step || '0');
 
+        // 初始化：記錄原始絕對位置
         if (step === 0) {
-            const r = el.getBoundingClientRect(), pR = el.offsetParent.getBoundingClientRect();
-            el.dataset.homeX = r.left - pR.left; el.dataset.homeY = r.top - pR.top;
-            el.style.transition = "none"; el.style.animation = "none";
-            el.style.left = el.dataset.homeX + 'px'; el.style.top = el.dataset.homeY + 'px';
-            el.style.transform = 'translate(0, 0)'; el.offsetHeight; 
+            const r = el.getBoundingClientRect();
+            const pR = el.offsetParent.getBoundingClientRect();
+            el.dataset.homeX = r.left - pR.left;
+            el.dataset.homeY = r.top - pR.top;
+            
+            // 固定位置轉為手動控制
+            el.style.transition = "none";
+            el.style.animation = "none";
+            el.style.left = el.dataset.homeX + 'px';
+            el.style.top = el.dataset.homeY + 'px';
+            el.style.transform = 'translate(0, 0)';
+            el.offsetHeight; 
         }
 
-        step++; el.dataset.step = step;
+        step++;
+        el.dataset.step = step;
 
         if (step <= 2) {
-            // 計算「絕對頁面座標」的安全區域
             const pad = 60;
-            // X: 限制在 block 寬度內
-            const minX = blockRect.left + pad;
-            const maxX = blockRect.right - pad;
-            const targetPageX = minX + Math.random() * (maxX - minX);
+            // X 軸：嚴格限制在 Block 左右寬度內
+            const minX_Block = blockRect.left + pad;
+            const maxX_Block = blockRect.right - pad;
+            const targetX_VP = minX_Block + Math.random() * (maxX_Block - minX_Block);
 
-            // Y: 限制在 Banner 之間 (視窗內)
-            const minY = scrollY + hh + pad;
-            const maxY = scrollY + vh - fh - pad;
-            const targetPageY = minY + Math.random() * (maxY - minY);
+            // Y 軸：嚴格限制在上下 Banner 之間 (可見區域)
+            const minY_VP = hh + pad;
+            const maxY_VP = vh - fh - pad;
+            const targetY_VP = minY_VP + Math.random() * (maxY_VP - minY_VP);
 
-            // 轉換為相對 translate (相對於 element 本身的 Page 座標)
-            const homePageX = (el.offsetParent.getBoundingClientRect().left + window.scrollX) + parseFloat(el.style.left);
-            const homePageY = (el.offsetParent.getBoundingClientRect().top + window.scrollY) + parseFloat(el.style.top);
+            // 轉換為相對位移 (相對於 Mascot 原始固定座標)
+            const currentRect = el.getBoundingClientRect();
+            const tx = targetX_VP - currentRect.left;
+            const ty = targetY_VP - currentRect.top;
             
-            const tx = targetPageX - homePageX;
-            const ty = targetPageY - homePageY;
-            
+            // 加入緩動效果
             el.style.transition = "transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
             el.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random()-0.5)*40}deg) scale(1.1)`;
+            
             setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
         } 
         else if (step === 3) {
-            // 逃離
+            // 逃跑階段
             const escX = (Math.random() > 0.5 ? 1 : -1) * vw * 1.5;
             el.style.transition = "transform 1.4s ease-in, opacity 0.5s ease-in";
             el.style.transform = `translate(${escX}px, 0px) rotate(360deg) scale(0.1)`;
-            el.style.opacity = "0"; await new Promise(r => setTimeout(r, 1600));
+            el.style.opacity = "0"; 
+            
+            await new Promise(r => setTimeout(r, 1600));
 
-            const bh = document.getElementById(el.id.replace('mascot', 'bh'));
-            el.style.transition = "none"; el.style.transform = "translate(0, 45px)"; el.offsetHeight;
-            bh.classList.add('visible'); await new Promise(r => setTimeout(r, 800));
+            // --- 歸位：黑洞先現身 ---
+            const bhId = el.id.replace('mascot', 'bh');
+            const bh = document.getElementById(bhId);
+            
+            // 將隱形外星人瞬移回黑洞下方（原位）
+            el.style.transition = "none";
+            el.style.transform = "translate(0, 45px)"; 
+            el.offsetHeight;
 
+            bh.classList.add('visible'); // 開啟黑洞
+            await new Promise(r => setTimeout(r, 800));
+
+            // 外星人現身探頭
             el.style.opacity = "1";
             el.style.transition = "transform 1s cubic-bezier(0.2, 0.8, 0.2, 1)";
-            el.style.transform = "translate(0, 10px)"; await new Promise(r => setTimeout(r, 1100));
+            el.style.transform = "translate(0, 10px)"; 
+            await new Promise(r => setTimeout(r, 1100));
+            
             el.style.transform = "translate(0, 10px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
             el.style.transform = "translate(0, 10px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
             el.style.transform = "translate(0, 10px) rotate(0deg)"; await new Promise(r => setTimeout(r, 300));
+
+            // 跳出歸位
             el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            el.style.transform = "translate(0, -18px)"; await new Promise(r => setTimeout(r, 300));
-            bh.classList.remove('visible'); el.style.transform = "translate(0, 0)"; 
+            el.style.transform = "translate(0, -18px)"; 
+            await new Promise(r => setTimeout(r, 300));
+            
+            bh.classList.remove('visible'); 
+            el.style.transform = "translate(0, 0)"; 
             
             setTimeout(() => {
                 el.style.transition = ""; el.style.left = ""; el.style.top = ""; el.style.animation = ""; 
@@ -243,28 +267,45 @@
         const mS = parseFloat(mSld.value), sS = parseFloat(sSld.value);
         mVal.innerText = mS.toFixed(1); sVal.innerText = sS.toFixed(2);
         angle += sS * dt;
+        
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
         const cX = w / 2, cY = h * 0.4, oR = w * 0.35, wA = mS * 2.5;
         const pX = cX + Math.cos(angle) * oR, pZ = Math.sin(angle), sX = cX - Math.cos(angle) * wA, dV = Math.sin(angle);
+        
+        // 背景 10s 週期紅藍偏移
         const shift = Math.sin(2 * Math.PI * (timestamp / 1000) / 10.0);
         bgL.style.setProperty('--pulse-ratio', (50 + shift * 35) + '%');
+
         ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)'; ctx.strokeRect(10, 10, w - 20, h - 20);
         ctx.fillStyle = Math.abs(dV) > 0.8 ? (dV > 0 ? '#ff4400' : '#0088ff') : 'rgba(0, 242, 255, 0.6)';
         ctx.font = '10px monospace'; ctx.fillText(dV > 0 ? '>> REDSHIFT' : '>> BLUESHIFT', 20, 25);
+
         const sG = ctx.createRadialGradient(sX, cY, 5, sX, cY, starR); sG.addColorStop(0, '#fff'); sG.addColorStop(0.3, `hsl(${45 - dV*20}, 100%, 50%)`); sG.addColorStop(1, 'transparent');
         if (pZ < 0) { ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(pX, cY, planetR, 0, Math.PI*2); ctx.fill(); }
         ctx.fillStyle = sG; ctx.beginPath(); ctx.arc(sX, cY, starR, 0, Math.PI*2); ctx.fill();
         if (pZ >= 0) { ctx.fillStyle = '#000'; ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)'; ctx.beginPath(); ctx.arc(pX, cY, planetR, 0, Math.PI*2); ctx.fill(); ctx.stroke(); }
+
         const sX_l = w * 0.1, sY_l = h * 0.75, sW_l = w * 0.8, sH_l = 40;
         const rb = ctx.createLinearGradient(sX_l, 0, sX_l + sW_l, 0); rb.addColorStop(0, '#f00'); rb.addColorStop(0.5, '#0f0'); rb.addColorStop(1, '#00f');
         ctx.fillStyle = rb; ctx.fillRect(sX_l, sY_l, sW_l, sH_l); ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
         [0.2, 0.35, 0.5, 0.7, 0.85].forEach(p => { const lx = sX_l + p * sW_l + dV * 30; if (lx > sX_l && lx < sX_l + sW_l) { ctx.beginPath(); ctx.moveTo(lx, sY_l); ctx.lineTo(lx, sY_l + sH_l); ctx.stroke(); }});
+        
         requestAnimationFrame(draw);
     }
 
     function resize() { const width = canvas.clientWidth; canvas.width = width * window.devicePixelRatio; canvas.height = (width * 0.9) * window.devicePixelRatio; ctx.scale(window.devicePixelRatio, window.devicePixelRatio); }
     window.onresize = resize; resize(); requestAnimationFrame(draw);
-    document.querySelectorAll('.pixel-mascot').forEach(el => { const t = () => { setTimeout(() => { if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') { const a = Math.random() > 0.5 ? 'idle-jump' : 'idle-color'; el.classList.add(a); setTimeout(() => el.classList.remove(a), a === 'idle-jump' ? 800 : 2000); } t(); }, 4000 + Math.random() * 6000); }; t(); });
+    
+    // 初始化閒置行為
+    document.querySelectorAll('.pixel-mascot').forEach(el => { 
+        const t = () => { setTimeout(() => { 
+            if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') { 
+                const a = Math.random() > 0.5 ? 'idle-jump' : 'idle-color'; 
+                el.classList.add(a); 
+                setTimeout(() => el.classList.remove(a), a === 'idle-jump' ? 800 : 2000); 
+            } t(); 
+        }, 4000 + Math.random() * 6000); }; t(); 
+    });
 </script>
 </body>
 </html>
