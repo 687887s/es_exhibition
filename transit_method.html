@@ -2,13 +2,13 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Advanced Interaction)
+      檔案狀態：正式稿 (Tech Edition - Step-by-Step Interaction)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 重構外星人互動：分段移動 -> 停留 -> 逃出螢幕 -> 歸位。
-      2. 鎖定點擊狀態，防止互動衝突。
-      3. 維持「區塊探頭」佈局與像素眼睛閃爍。
-      4. 強化背景像素網格與呼吸燈亮度。
+      1. 重構外星人：點擊一次跳躍一次，第三次逃跑。
+      2. 停留原地機制：移動後留在新座標等待下次指令。
+      3. 歸位機制：逃離螢幕後自動重置。
+      4. 強化像素感與背景呼吸燈。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -49,7 +49,7 @@
             overflow-x: hidden;
         }
 
-        /* 數位網格背景 */
+        /* 數位網格背景 - 強力像素感 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -101,7 +101,7 @@
             position: absolute;
             width: 32px;
             height: 24px;
-            z-index: 10; 
+            z-index: -1; /* 平時在區塊後方 */
             top: -24px; 
             cursor: pointer;
             transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -109,11 +109,10 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 亂跑狀態特效 */
-        .pixel-mascot.running {
-            animation: none !important;
-            z-index: 5000; 
-            filter: drop-shadow(0 0 20px var(--neon-blue)) contrast(1.2);
+        /* 脫離位置後置於最前方 */
+        .pixel-mascot.active {
+            z-index: 5000;
+            filter: drop-shadow(0 0 15px var(--neon-blue));
         }
 
         .mascot-body {
@@ -171,6 +170,7 @@
 
         .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 40px 0 20px 0; }
 
+        /* 提高透明度 (0.65 -> 0.45) */
         section {
             background: rgba(10, 20, 30, 0.45);
             backdrop-filter: blur(8px);
@@ -316,7 +316,7 @@
     <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">TRANSIT_METHOD_ANALYSIS_UNIT_117</p>
     
     <!-- Header Mascot -->
-    <div class="pixel-mascot" style="right: 20px; top: 10px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotRun(this)">
+    <div class="pixel-mascot" style="right: 20px; top: 10px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
         <div class="mascot-body">
             <div class="mascot-eyes"></div>
         </div>
@@ -327,7 +327,7 @@
 <div class="container">
     <!-- Section 1 -->
     <section>
-        <div class="pixel-mascot" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotRun(this)">
+        <div class="pixel-mascot" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotStep(this)">
             <div class="mascot-body" style="background: var(--vibrant-gold);">
                 <div class="mascot-eyes"></div>
             </div>
@@ -369,7 +369,7 @@
 
     <!-- Section 2 -->
     <section>
-        <div class="pixel-mascot" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotRun(this)">
+        <div class="pixel-mascot" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
             <div class="mascot-body">
                 <div class="mascot-eyes"></div>
             </div>
@@ -400,7 +400,7 @@
 
     <!-- Section 3 -->
     <section>
-        <div class="pixel-mascot" style="left: 50%; margin-left: -16px; animation: peek-slide 2s infinite alternate ease-in-out;" onclick="mascotRun(this)">
+        <div class="pixel-mascot" style="left: 50%; margin-left: -16px; animation: peek-slide 2s infinite alternate ease-in-out;" onclick="mascotStep(this)">
             <div class="mascot-body" style="background: #fff;">
                 <div class="mascot-eyes"></div>
             </div>
@@ -414,7 +414,7 @@
         <details>
             <summary>SYSTEM_LOG: SENSITIVITY_0.01%</summary>
             <div class="details-content">
-                實際觀測變幅僅為 0.01%。系統透過優化演算法，捕捉細微電壓變化並即時轉譯為數位光變曲線。
+                實際觀測變幅僅為 0.01%。系統透過優化演算法，捕捉細維電壓變化並即時轉譯為數位光變曲線。
             </div>
         </details>
     </section>
@@ -464,47 +464,66 @@
         }
     };
 
-    // --- 全新設計的外星人逃跑歸位邏輯 ---
-    async function mascotRun(el) {
-        // 檢查是否正在運行，避免點擊衝突
-        if (el.dataset.running === 'true') return;
-        el.dataset.running = 'true';
-        el.classList.add('running');
+    // --- 外星人步進式互動邏輯 ---
+    function mascotStep(el) {
+        if (el.dataset.moving === 'true') return;
         
-        // 1. 在螢幕上隨機跳動幾次，模擬尋找出口
-        const jumps = 3;
-        for (let i = 0; i < jumps; i++) {
-            // 計算相對於目前父容器的位置，讓它隨機移到螢幕視角內的地方
-            const rx = (Math.random() - 0.5) * (window.innerWidth * 0.8);
-            const ry = (Math.random() - 0.5) * (window.innerHeight * 0.6);
-            const rot = (Math.random() - 0.5) * 45;
-            
-            el.style.transition = "transform 1.8s cubic-bezier(0.4, 0, 0.2, 1)";
-            el.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg) scale(1.1)`;
-            
-            // 待在原地觀察
-            await new Promise(r => setTimeout(r, 2200));
+        // 初始化步數狀態 (0: home, 1: jump1, 2: jump2, 3: escape)
+        let step = parseInt(el.dataset.step || '0');
+        el.dataset.moving = 'true';
+        el.classList.add('active'); // 置於最上層
+        
+        // 捕捉當前動畫座標，防止第一跳瞬間移動
+        const rect = el.getBoundingClientRect();
+        const parentRect = el.offsetParent.getBoundingClientRect();
+        const currentX = rect.left - parentRect.left;
+        const currentY = rect.top - parentRect.top;
+
+        if (step === 0) {
+            // 第一次點擊：從探頭動畫切換到靜態座標
+            el.style.transition = "none";
+            el.style.animation = "none";
+            // 使用 absolute 座標固定當前位置
+            el.style.left = currentX + 'px';
+            el.style.top = currentY + 'px';
+            el.style.transform = 'translate(0, 0)';
+            el.offsetHeight; // Reflow
         }
 
-        // 2. 最終逃出螢幕範圍
-        const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.2;
-        const escapeY = (Math.random() - 0.5) * window.innerHeight;
-        
-        el.style.transition = "transform 1.2s ease-in";
-        el.style.transform = `translate(${escapeX}px, ${escapeY}px) rotate(180deg) scale(0.5)`;
-        
-        // 消失在視野外
-        await new Promise(r => setTimeout(r, 1500));
+        step++;
+        el.dataset.step = step;
 
-        // 3. 悄悄歸位
-        el.style.transition = "transform 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
-        el.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
-        
-        // 等待動畫完全歸位
-        await new Promise(r => setTimeout(r, 1600));
-        
-        el.classList.remove('running');
-        el.dataset.running = 'false';
+        if (step <= 2) {
+            // 跳躍到隨機位置並停留
+            const rx = (Math.random() - 0.5) * (window.innerWidth * 0.7);
+            const ry = (Math.random() - 0.5) * (window.innerHeight * 0.5);
+            const rot = (Math.random() - 0.5) * 40;
+            
+            el.style.transition = "transform 1.8s cubic-bezier(0.34, 1.56, 0.64, 1)";
+            el.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg) scale(1.1)`;
+            
+            setTimeout(() => { el.dataset.moving = 'false'; }, 1800);
+        } 
+        else if (step === 3) {
+            // 逃離螢幕
+            const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
+            const escapeY = (Math.random() - 0.5) * window.innerHeight * 1.5;
+            
+            el.style.transition = "transform 1.5s ease-in";
+            el.style.transform = `translate(${escapeX}px, ${escapeY}px) rotate(180deg) scale(0.3)`;
+            
+            // 2秒後自動重置歸位
+            setTimeout(() => {
+                el.style.transition = "none";
+                el.style.transform = "translate(0, 0) scale(1)";
+                el.style.left = ""; // 恢復 CSS 原始定義
+                el.style.top = "";
+                el.style.animation = ""; // 恢復原來的 peek-bounce / peek-slide
+                el.classList.remove('active');
+                el.dataset.step = '0';
+                el.dataset.moving = 'false';
+            }, 2500);
+        }
     }
 
     sizeSlider.addEventListener('pointerdown', startHighlight);
