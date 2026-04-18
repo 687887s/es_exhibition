@@ -2,12 +2,13 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Interactive Mascots)
+      檔案狀態：正式稿 (Tech Edition - Hyper-Interactive Mascots)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 點擊外星人觸發「隨機亂跑」互動，隨後自動歸位。
-      2. 保持「區塊探頭」佈局，增加像素眼睛。
-      3. 強化互動視覺回饋與背景呼吸燈。
+      1. 顯著擴大外星人點擊後的逃跑範圍與隨機性。
+      2. 亂跑時增加縮放與多重旋轉效果。
+      3. 保持「區塊探頭」佈局與像素眼睛閃爍。
+      4. 強化背景像素網格與呼吸燈亮度。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -94,7 +95,7 @@
             letter-spacing: 3px;
         }
 
-        /* 像素外星人 */
+        /* 像素外星人基礎樣式 */
         .pixel-mascot {
             position: absolute;
             width: 32px;
@@ -107,11 +108,11 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 亂跑狀態：取消原有動畫 */
+        /* 亂跑狀態特效 */
         .pixel-mascot.running {
             animation: none !important;
-            z-index: 100;
-            filter: drop-shadow(0 0 15px var(--neon-blue)) hue-rotate(90deg);
+            z-index: 5000; /* 亂跑時置於最前方 */
+            filter: drop-shadow(0 0 20px var(--neon-blue)) contrast(1.5) brightness(1.2);
         }
 
         .mascot-body {
@@ -461,33 +462,37 @@
         }
     };
 
-    // --- 外星人亂跑互動邏輯 ---
+    // --- 改進後的超級亂跑互動邏輯 ---
     function mascotRun(el) {
         if (el.classList.contains('running')) return;
         
         el.classList.add('running');
         let count = 0;
-        const totalSteps = 15;
+        const totalSteps = 25; // 增加跳動次數
         
         const runInterval = setInterval(() => {
-            // 在畫面上隨機跳動 (範圍 -150px 到 150px)
-            const rx = (Math.random() - 0.5) * 300;
-            const ry = (Math.random() - 0.5) * 300;
-            const rot = (Math.random() - 0.5) * 60; // 隨機旋轉角度
+            // 大幅擴張範圍：從原本 300px 提升至 1000px
+            const rx = (Math.random() - 0.5) * 1000;
+            const ry = (Math.random() - 0.5) * 1000;
+            // 增加隨機旋轉與縮放，讓動作更瘋狂
+            const rot = (Math.random() - 0.5) * 1440; // 瘋狂轉圈
+            const sc = 0.5 + Math.random() * 1.5;   // 大小伸縮
             
-            el.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg)`;
+            el.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg) scale(${sc})`;
             count++;
             
             if (count >= totalSteps) {
                 clearInterval(runInterval);
-                // 歸位
-                el.style.transform = 'translate(0, 0) rotate(0deg)';
-                // 等待平滑動畫結束後移除 running class
+                // 平滑滑回原位
+                el.style.transition = "transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
+                el.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
+                
                 setTimeout(() => {
                     el.classList.remove('running');
-                }, 500);
+                    el.style.transition = "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)"; // 恢復預設
+                }, 800);
             }
-        }, 200);
+        }, 120); // 頻率稍微加快
     }
 
     sizeSlider.addEventListener('pointerdown', startHighlight);
