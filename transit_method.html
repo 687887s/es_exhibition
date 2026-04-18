@@ -2,12 +2,12 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Hyper-Interactive Mascots)
+      檔案狀態：正式稿 (Tech Edition - Advanced Interaction)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 顯著擴大外星人點擊後的逃跑範圍與隨機性。
-      2. 亂跑時增加縮放與多重旋轉效果。
-      3. 保持「區塊探頭」佈局與像素眼睛閃爍。
+      1. 重構外星人互動：分段移動 -> 停留 -> 逃出螢幕 -> 歸位。
+      2. 鎖定點擊狀態，防止互動衝突。
+      3. 維持「區塊探頭」佈局與像素眼睛閃爍。
       4. 強化背景像素網格與呼吸燈亮度。
     -->
     <meta charset="UTF-8">
@@ -74,6 +74,7 @@
             z-index: 4000;
         }
 
+        /* 固定式標題 */
         header {
             position: sticky;
             top: 0;
@@ -103,7 +104,7 @@
             z-index: 10; 
             top: -24px; 
             cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
             filter: drop-shadow(0 0 8px var(--neon-blue));
             -webkit-tap-highlight-color: transparent;
         }
@@ -111,8 +112,8 @@
         /* 亂跑狀態特效 */
         .pixel-mascot.running {
             animation: none !important;
-            z-index: 5000; /* 亂跑時置於最前方 */
-            filter: drop-shadow(0 0 20px var(--neon-blue)) contrast(1.5) brightness(1.2);
+            z-index: 5000; 
+            filter: drop-shadow(0 0 20px var(--neon-blue)) contrast(1.2);
         }
 
         .mascot-body {
@@ -127,6 +128,7 @@
                 8px 8px 0 var(--neon-blue);
         }
 
+        /* 像素眼睛 */
         .mascot-eyes {
             position: absolute;
             top: 4px;
@@ -462,37 +464,47 @@
         }
     };
 
-    // --- 改進後的超級亂跑互動邏輯 ---
-    function mascotRun(el) {
-        if (el.classList.contains('running')) return;
-        
+    // --- 全新設計的外星人逃跑歸位邏輯 ---
+    async function mascotRun(el) {
+        // 檢查是否正在運行，避免點擊衝突
+        if (el.dataset.running === 'true') return;
+        el.dataset.running = 'true';
         el.classList.add('running');
-        let count = 0;
-        const totalSteps = 25; // 增加跳動次數
         
-        const runInterval = setInterval(() => {
-            // 大幅擴張範圍：從原本 300px 提升至 1000px
-            const rx = (Math.random() - 0.5) * 1000;
-            const ry = (Math.random() - 0.5) * 1000;
-            // 增加隨機旋轉與縮放，讓動作更瘋狂
-            const rot = (Math.random() - 0.5) * 1440; // 瘋狂轉圈
-            const sc = 0.5 + Math.random() * 1.5;   // 大小伸縮
+        // 1. 在螢幕上隨機跳動幾次，模擬尋找出口
+        const jumps = 3;
+        for (let i = 0; i < jumps; i++) {
+            // 計算相對於目前父容器的位置，讓它隨機移到螢幕視角內的地方
+            const rx = (Math.random() - 0.5) * (window.innerWidth * 0.8);
+            const ry = (Math.random() - 0.5) * (window.innerHeight * 0.6);
+            const rot = (Math.random() - 0.5) * 45;
             
-            el.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg) scale(${sc})`;
-            count++;
+            el.style.transition = "transform 1.8s cubic-bezier(0.4, 0, 0.2, 1)";
+            el.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg) scale(1.1)`;
             
-            if (count >= totalSteps) {
-                clearInterval(runInterval);
-                // 平滑滑回原位
-                el.style.transition = "transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
-                el.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
-                
-                setTimeout(() => {
-                    el.classList.remove('running');
-                    el.style.transition = "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)"; // 恢復預設
-                }, 800);
-            }
-        }, 120); // 頻率稍微加快
+            // 待在原地觀察
+            await new Promise(r => setTimeout(r, 2200));
+        }
+
+        // 2. 最終逃出螢幕範圍
+        const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.2;
+        const escapeY = (Math.random() - 0.5) * window.innerHeight;
+        
+        el.style.transition = "transform 1.2s ease-in";
+        el.style.transform = `translate(${escapeX}px, ${escapeY}px) rotate(180deg) scale(0.5)`;
+        
+        // 消失在視野外
+        await new Promise(r => setTimeout(r, 1500));
+
+        // 3. 悄悄歸位
+        el.style.transition = "transform 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
+        el.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
+        
+        // 等待動畫完全歸位
+        await new Promise(r => setTimeout(r, 1600));
+        
+        el.classList.remove('running');
+        el.dataset.running = 'false';
     }
 
     sizeSlider.addEventListener('pointerdown', startHighlight);
@@ -585,7 +597,6 @@
 
         const sX = w / 2, sY = h * 0.3; 
 
-        // HUD Decorations
         ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)';
         ctx.strokeRect(10, 10, w - 20, h - 20);
         ctx.fillStyle = inTransit ? '#ff4400' : 'rgba(0, 242, 255, 0.7)';
@@ -605,7 +616,6 @@
             }
         }
 
-        // 軌道虛線
         ctx.save();
         ctx.strokeStyle = hIntensity > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.3 + hIntensity * 0.4})` : 'rgba(0, 242, 255, 0.15)';
         ctx.setLineDash([5, 5]);
@@ -617,7 +627,6 @@
         const px = sX + (planetX - w/2) * 0.5;
         if (planetZ <= 0) drawPlanetInstance(px, sY, planetR, 0.3, hIntensity, false);
 
-        // 恆星
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
         starGrad.addColorStop(0.3, '#ffcc00');
@@ -627,7 +636,6 @@
 
         if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity, inTransit);
 
-        // 光變曲線
         const graphX = w * 0.05, graphY = h * 0.6, graphW = w * 0.9, graphH = h * 0.3;
         ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)';
         ctx.strokeRect(graphX, graphY, graphW, graphH);
@@ -656,7 +664,6 @@
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // 背景呼吸燈強化
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
         bgLayer.style.setProperty('--pulse-opacity', 0.15 + (breath * 0.95));
