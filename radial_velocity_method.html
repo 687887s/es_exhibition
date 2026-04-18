@@ -2,13 +2,13 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Wave Tracker Precision)
+      檔案狀態：正式稿 (Tech Edition - Strict Boundary & Black Hole Fix)
       風格：科技、未來主義風格 (Doppler Theme)
       修訂內容：
-      1. 嚴格限制移動：外星人水平限制在 Block 寬度內。
-      2. 修正物種：波形追蹤者加入雙像素眼睛。
-      3. 背景優化：10秒週期純紅藍漸變，無亮度呼吸。
-      4. 歸位序列：先開洞，外星人後探頭。
+      1. 嚴格邊界控制：外星人僅在「可見視窗」且「區塊寬度內」移動，絕對避開上下 Banner。
+      2. 歸位動畫修正：外星人先隱身，黑洞開後由深處探頭。
+      3. 波形追蹤者升級：加入雙像素眼睛。
+      4. 背景優化：10秒週期紅藍移漸變，無亮度呼吸。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -58,12 +58,12 @@
             width: 100%; height: 100%; background: var(--neon-blue); position: relative;
             box-shadow: -4px 4px 0 var(--neon-blue), 4px 4px 0 var(--neon-blue), -8px 4px 0 var(--neon-blue), 8px 4px 0 var(--neon-blue), 0 -4px 0 var(--neon-blue);
         }
-        /* 天線座與天線 */
+        /* 天線 */
         .mascot-body::after { content: ""; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 4px; height: 8px; background: var(--neon-blue); animation: ant 0.5s infinite alternate; }
         @keyframes ant { from { height: 4px; } to { height: 10px; } }
 
-        /* 波形追蹤者的雙眼 */
-        .mascot-eyes { position: absolute; top: 4px; left: 4px; right: 4px; height: 5px; display: flex; justify-content: space-around; }
+        /* 雙像素眼睛 */
+        .mascot-eyes { position: absolute; top: 4px; left: 4px; right: 4px; height: 5px; display: flex; justify-content: space-around; z-index: 2; }
         .mascot-eyes::before, .mascot-eyes::after { content: ""; width: 5px; height: 5px; background: #000; animation: blink 4s infinite; }
         @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
 
@@ -71,9 +71,10 @@
         .pixel-mascot.idle-jump { animation: idle-f 0.8s ease-in-out !important; }
         .pixel-mascot.idle-color .mascot-body { filter: hue-rotate(180deg) brightness(1.3); transition: filter 0.5s; }
 
+        /* 黑洞 - 調高 z-index 確保位於前景但低於外星人 */
         .black-hole {
-            position: absolute; width: 60px; height: 18px; background: #000; border-radius: 50%;
-            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff; z-index: 5;
+            position: absolute; width: 64px; height: 18px; background: #000; border-radius: 50%;
+            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff; z-index: 5500;
             transform: scale(0); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; opacity: 0;
         }
         .black-hole.visible { transform: scale(1); opacity: 1; }
@@ -112,7 +113,7 @@
         <div class="mascot-body"><div class="mascot-eyes"></div></div>
         <div class="mascot-label">RADAR_WATCHER</div>
     </div>
-    <div class="black-hole" id="bh-header" style="right: 10px; top: 24px;"></div>
+    <div class="black-hole" id="bh-header" style="right: 8px; top: 24px;"></div>
 </header>
 
 <div class="container">
@@ -121,7 +122,7 @@
             <div class="mascot-body" style="background: var(--vibrant-gold);"><div class="mascot-eyes"></div></div>
             <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">WAVE_ALPHA</div>
         </div>
-        <div class="black-hole" id="bh-s1" style="left: 10px; top: 6px;"></div>
+        <div class="black-hole" id="bh-s1" style="left: 6px; top: 6px;"></div>
         <h2>什麼是「徑向速度法」？</h2>
         <p>系外行星繞行時會拉動恆星，產生微小的紅移與藍移現象。</p>
         <div class="canvas-container"><canvas id="wobbleCanvas"></canvas></div>
@@ -136,6 +137,17 @@
             </div>
         </div>
     </section>
+    
+    <section id="s2">
+        <div class="pixel-mascot" id="mascot-s2" style="right: 20px;" onclick="mascotStep(this)">
+            <div class="mascot-body"><div class="mascot-eyes"></div></div>
+            <div class="mascot-label">DOPPLER_BETA</div>
+        </div>
+        <div class="black-hole" id="bh-s2" style="right: 6px; top: 6px;"></div>
+        <h2>都卜勒效應與光譜</h2>
+        <p>當恆星靠近我們，光波被擠壓，光譜向藍色端偏移；遠離時則向紅色端偏移。</p>
+    </section>
+
     <div class="back-nav"><a href="index.html" class="back-btn">Return to Sector 0</a></div>
 </div>
 
@@ -148,38 +160,68 @@
     const mVal = document.getElementById('massVal'), sVal = document.getElementById('speedVal');
     let lastT = performance.now(), angle = 0, starR = 50, planetR = 12;
 
+    // --- 嚴格邊界互動邏輯 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
         el.dataset.moving = 'true'; el.classList.add('active'); 
-        const hH = headerEl.offsetHeight, fH = footerEl.offsetHeight;
+        
+        const scrollY = window.scrollY;
+        const vh = window.innerHeight;
+        const vw = window.innerWidth;
+        const hh = headerEl.offsetHeight;
+        const fh = footerEl.offsetHeight;
         const parentBlock = el.closest('section') || document.querySelector('section');
         const blockRect = parentBlock.getBoundingClientRect();
+        
         let step = parseInt(el.dataset.step || '0');
 
         if (step === 0) {
-            const rect = el.getBoundingClientRect(), pR = el.offsetParent.getBoundingClientRect();
-            el.dataset.homeX = rect.left - pR.left; el.dataset.homeY = rect.top - pR.top;
-            el.style.transition = "none"; el.style.left = el.dataset.homeX + 'px'; el.style.top = el.dataset.homeY + 'px'; el.style.transform = 'translate(0, 0)'; el.offsetHeight;
+            const r = el.getBoundingClientRect(), pR = el.offsetParent.getBoundingClientRect();
+            el.dataset.homeX = r.left - pR.left; el.dataset.homeY = r.top - pR.top;
+            el.style.transition = "none"; el.style.animation = "none";
+            el.style.left = el.dataset.homeX + 'px'; el.style.top = el.dataset.homeY + 'px';
+            el.style.transform = 'translate(0, 0)'; el.offsetHeight; 
         }
 
         step++; el.dataset.step = step;
+
         if (step <= 2) {
-            const pad = 60, scrollY = window.scrollY, viewH = window.innerHeight;
-            const targetVisibleY = scrollY + hH + pad + Math.random() * (viewH - hH - fH - pad * 2);
-            const targetVisibleX = blockRect.left + pad + Math.random() * (blockRect.width - pad * 2);
-            const tx = targetVisibleX - parseFloat(el.style.left), ty = targetVisibleY - parseFloat(el.style.top);
+            // 計算「絕對頁面座標」的安全區域
+            const pad = 60;
+            // X: 限制在 block 寬度內
+            const minX = blockRect.left + pad;
+            const maxX = blockRect.right - pad;
+            const targetPageX = minX + Math.random() * (maxX - minX);
+
+            // Y: 限制在 Banner 之間 (視窗內)
+            const minY = scrollY + hh + pad;
+            const maxY = scrollY + vh - fh - pad;
+            const targetPageY = minY + Math.random() * (maxY - minY);
+
+            // 轉換為相對 translate (相對於 element 本身的 Page 座標)
+            const homePageX = (el.offsetParent.getBoundingClientRect().left + window.scrollX) + parseFloat(el.style.left);
+            const homePageY = (el.offsetParent.getBoundingClientRect().top + window.scrollY) + parseFloat(el.style.top);
+            
+            const tx = targetPageX - homePageX;
+            const ty = targetPageY - homePageY;
+            
             el.style.transition = "transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
             el.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random()-0.5)*40}deg) scale(1.1)`;
-            setTimeout(() => el.dataset.moving = 'false', 1500);
-        } else {
-            const escX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
+            setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
+        } 
+        else if (step === 3) {
+            // 逃離
+            const escX = (Math.random() > 0.5 ? 1 : -1) * vw * 1.5;
             el.style.transition = "transform 1.4s ease-in, opacity 0.5s ease-in";
             el.style.transform = `translate(${escX}px, 0px) rotate(360deg) scale(0.1)`;
             el.style.opacity = "0"; await new Promise(r => setTimeout(r, 1600));
+
             const bh = document.getElementById(el.id.replace('mascot', 'bh'));
             el.style.transition = "none"; el.style.transform = "translate(0, 45px)"; el.offsetHeight;
             bh.classList.add('visible'); await new Promise(r => setTimeout(r, 800));
-            el.style.opacity = "1"; el.style.transition = "transform 1s cubic-bezier(0.2, 0.8, 0.2, 1)";
+
+            el.style.opacity = "1";
+            el.style.transition = "transform 1s cubic-bezier(0.2, 0.8, 0.2, 1)";
             el.style.transform = "translate(0, 10px)"; await new Promise(r => setTimeout(r, 1100));
             el.style.transform = "translate(0, 10px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
             el.style.transform = "translate(0, 10px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
@@ -187,8 +229,9 @@
             el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
             el.style.transform = "translate(0, -18px)"; await new Promise(r => setTimeout(r, 300));
             bh.classList.remove('visible'); el.style.transform = "translate(0, 0)"; 
+            
             setTimeout(() => {
-                el.style.transition = ""; el.style.left = ""; el.style.top = ""; 
+                el.style.transition = ""; el.style.left = ""; el.style.top = ""; el.style.animation = ""; 
                 el.classList.remove('active'); el.dataset.step = '0'; el.dataset.moving = 'false';
             }, 600);
         }
