@@ -2,153 +2,79 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Precision Boundary Control)
+      檔案狀態：正式稿 (Tech Edition - Wave Tracker Precision)
       風格：科技、未來主義風格 (Doppler Theme)
       修訂內容：
-      1. 嚴格限制外星人活動範圍：水平限制於 Block 寬度，垂直避開上下 Banner。
-      2. 修正外星人物種：波形追蹤者加入雙像素眼睛。
-      3. 背景優化：10秒紅藍偏移週期，無亮度呼吸。
-      4. 完整歸位：黑洞固定原位，外星人由深處探頭跳出。
+      1. 嚴格限制移動：外星人水平限制在 Block 寬度內。
+      2. 修正物種：波形追蹤者加入雙像素眼睛。
+      3. 背景優化：10秒週期純紅藍漸變，無亮度呼吸。
+      4. 歸位序列：先開洞，外星人後探頭。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>捕捉宇宙的律動：徑向速度法</title>
     
-    <!-- MathJax 配置 -->
     <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                processEscapes: true
-            }
-        };
+        window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] } };
     </script>
-    <script type="text/javascript" id="MathJax-script" async
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <style>
         :root {
-            --vibrant-gold: #ffcc00;
-            --neon-blue: #00f2ff;
-            --tech-cyan: rgba(0, 242, 255, 0.6);
-            --text-color: #e0faff;
-            --bg-deep: #010408;
-            --bg-color-red: #440000;
-            --bg-color-blue: #001144;
+            --vibrant-gold: #ffcc00; --neon-blue: #00f2ff; --tech-cyan: rgba(0, 242, 255, 0.6);
+            --text-color: #e0faff; --bg-deep: #010408; --bg-color-red: #440000; --bg-color-blue: #001144;
             --pulse-ratio: 50%;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
-            background: var(--bg-deep);
-            color: var(--text-color);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            overflow-x: hidden;
+            background: var(--bg-deep); color: var(--text-color); line-height: 1.6; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden;
         }
 
-        /* 複合式背景：紅藍脈動 + 數位網格 */
         .bg-layer {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background-image: 
                 linear-gradient(rgba(0, 242, 255, 0.15) 2px, transparent 2px),
                 linear-gradient(90deg, rgba(0, 242, 255, 0.15) 2px, transparent 2px),
-                linear-gradient(145deg, 
-                    var(--bg-color-red) 0%, 
-                    var(--bg-color-red) calc(var(--pulse-ratio) - 45%), 
-                    var(--bg-color-blue) calc(var(--pulse-ratio) + 45%), 
-                    var(--bg-color-blue) 100%
-                );
+                linear-gradient(145deg, var(--bg-color-red) 0%, var(--bg-color-red) calc(var(--pulse-ratio) - 45%), var(--bg-color-blue) calc(var(--pulse-ratio) + 45%), var(--bg-color-blue) 100%);
             background-size: 30px 30px, 30px 30px, 100% 100%;
         }
 
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.04));
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
-            z-index: 7000;
-        }
-
         header {
-            position: sticky;
-            top: 0;
-            z-index: 3000;
-            background: rgba(5, 10, 16, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 4vw;
-            text-align: center;
-            border-bottom: 2px solid var(--neon-blue);
-            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
+            position: sticky; top: 0; z-index: 3000; background: rgba(5, 10, 16, 0.95); backdrop-filter: blur(10px);
+            padding: 15px 4vw; text-align: center; border-bottom: 2px solid var(--neon-blue); box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
         }
 
-        h1 { color: var(--neon-blue); font-size: 1.4em; text-shadow: 0 0 10px rgba(0, 242, 255, 0.8); font-weight: 900; margin: 0; letter-spacing: 3px; }
+        h1 { color: var(--neon-blue); font-size: 1.4em; font-weight: 900; margin: 0; letter-spacing: 3px; }
 
         /* 波形追蹤者 (Wave Tracker) */
         .pixel-mascot {
-            position: absolute;
-            width: 36px;
-            height: 20px;
-            z-index: 10; 
-            top: -24px; 
-            cursor: pointer;
-            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
-            filter: drop-shadow(0 0 10px var(--neon-blue));
-            -webkit-tap-highlight-color: transparent;
+            position: absolute; width: 36px; height: 20px; z-index: 10; top: -24px; cursor: pointer;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s; filter: drop-shadow(0 0 10px var(--neon-blue)); -webkit-tap-highlight-color: transparent;
         }
         .pixel-mascot.active { z-index: 6000 !important; }
 
         .mascot-body {
             width: 100%; height: 100%; background: var(--neon-blue); position: relative;
-            box-shadow: 
-                -4px 4px 0 var(--neon-blue), 
-                4px 4px 0 var(--neon-blue),
-                -8px 4px 0 var(--neon-blue),
-                8px 4px 0 var(--neon-blue),
-                0 -4px 0 var(--neon-blue);
+            box-shadow: -4px 4px 0 var(--neon-blue), 4px 4px 0 var(--neon-blue), -8px 4px 0 var(--neon-blue), 8px 4px 0 var(--neon-blue), 0 -4px 0 var(--neon-blue);
         }
+        /* 天線座與天線 */
+        .mascot-body::after { content: ""; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 4px; height: 8px; background: var(--neon-blue); animation: ant 0.5s infinite alternate; }
+        @keyframes ant { from { height: 4px; } to { height: 10px; } }
 
         /* 波形追蹤者的雙眼 */
-        .mascot-eyes {
-            position: absolute; top: 4px; left: 4px; right: 4px; height: 5px; display: flex; justify-content: space-around;
-        }
-        .mascot-eyes::before, .mascot-eyes::after {
-            content: ""; width: 5px; height: 5px; background: #000;
-            animation: eye-blink 4s infinite;
-        }
-        @keyframes eye-blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+        .mascot-eyes { position: absolute; top: 4px; left: 4px; right: 4px; height: 5px; display: flex; justify-content: space-around; }
+        .mascot-eyes::before, .mascot-eyes::after { content: ""; width: 5px; height: 5px; background: #000; animation: blink 4s infinite; }
+        @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
 
-        /* 天線 */
-        .mascot-body::after {
-            content: ""; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-            width: 4px; height: 8px; background: var(--neon-blue);
-            animation: antenna-pulse 0.5s infinite alternate;
-        }
-        @keyframes antenna-pulse { from { height: 4px; opacity: 0.5; } to { height: 10px; opacity: 1; } }
-
-        @keyframes idle-jump-flip {
-            0% { transform: translateY(0) rotate(0); }
-            50% { transform: translateY(-40px) rotate(180deg) scale(1.1); }
-            100% { transform: translateY(0) rotate(360deg) scale(1); }
-        }
-        .pixel-mascot.idle-jump { animation: idle-jump-flip 0.8s ease-in-out !important; }
+        @keyframes idle-f { 0% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-40px) rotate(180deg) scale(1.1); } 100% { transform: translateY(0) rotate(360deg) scale(1); } }
+        .pixel-mascot.idle-jump { animation: idle-f 0.8s ease-in-out !important; }
         .pixel-mascot.idle-color .mascot-body { filter: hue-rotate(180deg) brightness(1.3); transition: filter 0.5s; }
 
-        /* 黑洞特效 */
         .black-hole {
             position: absolute; width: 60px; height: 18px; background: #000; border-radius: 50%;
-            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff;
-            z-index: 5; transform: scale(0); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none; opacity: 0;
+            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff; z-index: 5;
+            transform: scale(0); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; opacity: 0;
         }
         .black-hole.visible { transform: scale(1); opacity: 1; }
 
@@ -157,67 +83,22 @@
             transform: translateX(-50%); background: rgba(0,0,0,0.85); padding: 2px 6px; border: 1px solid var(--neon-blue); white-space: nowrap; pointer-events: none;
         }
 
-        @keyframes peek-bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
-
         .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 40px 0 20px 0; }
-
-        section {
-            background: rgba(10, 20, 30, 0.55); backdrop-filter: blur(8px); margin-bottom: 60px; 
-            padding: 30px 20px; border: 1px solid var(--tech-cyan); position: relative; box-shadow: 4px 4px 0px var(--tech-cyan);
-        }
-        section::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 15px; height: 15px;
-            border-top: 3px solid var(--neon-blue); border-left: 3px solid var(--neon-blue); z-index: 2;
-        }
+        section { background: rgba(10, 20, 30, 0.55); backdrop-filter: blur(8px); margin-bottom: 60px; padding: 30px 20px; border: 1px solid var(--tech-cyan); position: relative; box-shadow: 4px 4px 0px var(--tech-cyan); }
+        section::before { content: ""; position: absolute; top: 0; left: 0; width: 15px; height: 15px; border-top: 3px solid var(--neon-blue); border-left: 3px solid var(--neon-blue); z-index: 2; }
 
         h2 { color: var(--vibrant-gold); margin-top: 0; font-size: 1.25em; display: flex; align-items: center; text-transform: uppercase; }
         h2::before { content: ">> "; color: var(--neon-blue); font-family: monospace; margin-right: 5px; }
 
-        .highlight { color: var(--neon-blue); font-family: monospace; font-weight: bold; }
-
-        .image-placeholder {
-            background: rgba(0, 242, 255, 0.1); border: 1px dashed rgba(0, 242, 255, 0.4); margin: 20px 0;
-            padding: 50px 20px; text-align: center; color: var(--neon-blue); font-size: 0.75em; text-transform: uppercase; letter-spacing: 2px;
-        }
-
-        .canvas-container {
-            margin: 20px -20px; background: rgba(0, 0, 0, 0.85); position: relative;
-            border-top: 1px solid var(--tech-cyan); border-bottom: 1px solid var(--tech-cyan); overflow: hidden; line-height: 0;
-        }
+        .canvas-container { margin: 20px -20px; background: rgba(0, 0, 0, 0.85); position: relative; border-top: 1px solid var(--tech-cyan); border-bottom: 1px solid var(--tech-cyan); overflow: hidden; line-height: 0; }
         canvas { display: block; width: 100%; height: auto; }
 
-        .controls {
-            padding: 20px; background: rgba(6, 14, 22, 0.9); border-bottom: 1px solid var(--tech-cyan); margin: 0 -20px 20px -20px;
-        }
+        .controls { padding: 20px; background: rgba(6, 14, 22, 0.9); border-bottom: 1px solid var(--tech-cyan); margin: 0 -20px 20px -20px; }
         .control-item { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-        .control-label { font-size: 0.8em; color: var(--neon-blue); display: flex; justify-content: space-between; font-family: monospace; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 3px; background: #1a3040; outline: none; touch-action: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 20px; background: var(--neon-blue); border: 1px solid white; cursor: pointer; box-shadow: 0 0 10px var(--neon-blue); }
 
-        input[type="range"] {
-            -webkit-appearance: none; width: 100%; height: 3px; background: #1a3040; outline: none; touch-action: none;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 12px; height: 24px; background: var(--neon-blue); border: 1px solid white; cursor: pointer; box-shadow: 0 0 10px var(--neon-blue);
-        }
-
-        .formula-card {
-            font-size: 1.05em; color: var(--vibrant-gold); text-align: center; margin: 20px 0; padding: 20px 15px; background: rgba(0, 242, 255, 0.15); border: 1px solid var(--tech-cyan);
-        }
-
-        details { background: rgba(0, 0, 0, 0.5); margin: 25px -20px -30px -20px; border-top: 1px solid var(--tech-cyan); }
-        summary { padding: 15px 20px; font-weight: bold; color: var(--neon-blue); cursor: pointer; display: flex; justify-content: space-between; font-family: monospace; }
-
-        .back-nav { text-align: center; margin: 40px 0; }
-        .back-btn { 
-            color: var(--neon-blue); text-decoration: none; font-size: 0.9em; border: 1px solid var(--neon-blue); 
-            padding: 15px 35px; text-transform: uppercase; letter-spacing: 3px; transition: all 0.3s;
-            font-family: monospace; background: rgba(0, 242, 255, 0.05);
-        }
-        .back-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 20px var(--neon-blue); }
-
-        footer { 
-            text-align: center; padding: 60px 20px; font-size: 0.75em; color: #446688; background: #010305; 
-            letter-spacing: 4px; font-family: monospace; border-top: 1px solid rgba(0, 242, 255, 0.2);
-        }
+        footer { text-align: center; padding: 60px 20px; font-size: 0.75em; color: #446688; background: #010305; letter-spacing: 4px; font-family: monospace; border-top: 1px solid rgba(0, 242, 255, 0.2); }
     </style>
 </head>
 <body>
@@ -227,8 +108,7 @@
 <header id="mainHeader">
     <h1>捕捉宇宙的律動</h1>
     <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">RADIAL_VELOCITY_ANALYSIS_UNIT_117</p>
-    
-    <div class="pixel-mascot" id="mascot-header" style="right: 20px; top: 10px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
+    <div class="pixel-mascot" id="mascot-header" style="right: 20px; top: 10px;" onclick="mascotStep(this)">
         <div class="mascot-body"><div class="mascot-eyes"></div></div>
         <div class="mascot-label">RADAR_WATCHER</div>
     </div>
@@ -236,62 +116,26 @@
 </header>
 
 <div class="container">
-    <section id="section-1">
-        <div class="pixel-mascot" id="mascot-s1" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotStep(this)">
+    <section id="s1">
+        <div class="pixel-mascot" id="mascot-s1" style="left: 20px;" onclick="mascotStep(this)">
             <div class="mascot-body" style="background: var(--vibrant-gold);"><div class="mascot-eyes"></div></div>
             <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">WAVE_ALPHA</div>
         </div>
         <div class="black-hole" id="bh-s1" style="left: 10px; top: 6px;"></div>
-
         <h2>什麼是「徑向速度法」？</h2>
-        <p>系外行星探索是一場精密的追蹤。當行星繞行恆星時，兩者實際上都在繞著共同的<span class="highlight">質心</span>旋轉。這就像是救護車開過來時聲音變尖、開走時聲音變低一樣規律。</p>
-        <p>對星光來說，移動改變的是<span class="highlight">「顏色」</span>：靠近時光波變密，偏向藍色（藍移）；遠離時變稀疏，偏向紅色（紅移）。</p>
-        
-        <div class="image-placeholder">[ Image of 救護車與鴨子游水的都卜勒效應示意圖 ]</div>
-
+        <p>系外行星繞行時會拉動恆星，產生微小的紅移與藍移現象。</p>
         <div class="canvas-container"><canvas id="wobbleCanvas"></canvas></div>
-        
         <div class="controls">
             <div class="control-item">
-                <div class="control-label"><span>PLANET_MASS (引力強度)</span><span id="massVal" style="color:white">5.0</span></div>
+                <div class="control-label"><span>PLANET_MASS</span><span id="massVal" style="color:white">5.0</span></div>
                 <input type="range" id="massSlider" min="1" max="15" value="5" step="0.1">
             </div>
             <div class="control-item">
-                <div class="control-label"><span>ORBIT_VELOCITY (公轉速度)</span><span id="speedVal" style="color:white">3.00</span></div>
+                <div class="control-label"><span>ORBIT_VELOCITY</span><span id="speedVal" style="color:white">3.00</span></div>
                 <input type="range" id="speedSlider" min="0.5" max="10" value="3" step="0.1">
             </div>
         </div>
     </section>
-
-    <section id="section-2">
-        <div class="pixel-mascot" id="mascot-s2" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
-            <div class="mascot-body"><div class="mascot-eyes"></div></div>
-            <div class="mascot-label">DOPPLER_BETA</div>
-        </div>
-        <div class="black-hole" id="bh-s2" style="right: 20px; top: 6px;"></div>
-
-        <h2>宇宙偵探：星際雙人舞</h2>
-        <p>引力是互相的。當行星拉動恆星，會產生規律的「來回晃動」。這種規律的<span class="highlight">紅移與藍移</span>，讓我們能算出這顆行星的週期與質量下限。</p>
-        <div class="formula-card">$$M_p \sin i$$</div>
-        <div class="image-placeholder">[ Image of 恆星與行星繞質心公轉示意圖 ]</div>
-        <p>我們透過精密的光譜儀分析恆星的<span class="highlight">「光譜指紋」</span>，即使這晃動速度只有每秒數公尺，依然無所遁形。</p>
-    </section>
-
-    <section id="section-3">
-        <div class="pixel-mascot" id="mascot-s3" style="left: 50%; margin-left: -18px; animation: peek-bounce 2s infinite alternate ease-in-out;" onclick="mascotStep(this)">
-            <div class="mascot-body" style="background: #fff;"><div class="mascot-eyes"></div></div>
-            <div class="mascot-label" style="color:#fff; border-color:#fff">SIGNAL_UNIT</div>
-        </div>
-        <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -30px; top: 6px;"></div>
-
-        <h2>ARDUINO：捕捉脈動</h2>
-        <p>教具使用高亮度光源模擬星體。系統透過 Arduino 優化演算法，偵測極其微小的位移並即時轉譯為光譜變化圖形。</p>
-        <details>
-            <summary>SYSTEM_LOG: DOPPLER_SPECTROSCOPY</summary>
-            <div class="details-content">徑向速度法對於偵測「熱木星」特別有效。透過連續觀測，我們能建構出精確的恆星速度變化曲線。</div>
-        </details>
-    </section>
-
     <div class="back-nav"><a href="index.html" class="back-btn">Return to Sector 0</a></div>
 </div>
 
@@ -299,110 +143,43 @@
 
 <script>
     const canvas = document.getElementById('wobbleCanvas'), ctx = canvas.getContext('2d');
-    const bgLayer = document.getElementById('bgLayer'), headerEl = document.getElementById('mainHeader'), footerEl = document.getElementById('mainFooter');
+    const headerEl = document.getElementById('mainHeader'), footerEl = document.getElementById('mainFooter'), bgL = document.getElementById('bgLayer');
     const mSld = document.getElementById('massSlider'), sSld = document.getElementById('speedSlider');
     const mVal = document.getElementById('massVal'), sVal = document.getElementById('speedVal');
+    let lastT = performance.now(), angle = 0, starR = 50, planetR = 12;
 
-    const RGB_NEON_BLUE = '0, 242, 255', COLOR_GOLD = '#ffcc00';
-    let lastTimestamp = performance.now(), angle = 0, starR = 50, planetR = 12;
-    const bgPulsePeriod = 10.0;
-
-    function draw(timestamp) {
-        const dt = (timestamp - lastTimestamp) / 1000;
-        lastTimestamp = timestamp;
-        const w = canvas.width / window.devicePixelRatio, h = canvas.height / window.devicePixelRatio;
-        const mS = parseFloat(mSld.value), sS = parseFloat(sSld.value);
-        mVal.innerText = mS.toFixed(1); sVal.innerText = sS.toFixed(2);
-        angle += sS * dt;
-        
-        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
-        const centerX = w / 2, centerY = h * 0.4, orbitR = w * 0.35, wobbleAmp = mS * 2.5;
-        const pX = centerX + Math.cos(angle) * orbitR, pZ = Math.sin(angle);
-        const sX = centerX - Math.cos(angle) * wobbleAmp, dopplerVel = Math.sin(angle);
-
-        const bgTimeFactor = (timestamp / 1000) / bgPulsePeriod;
-        const bgShift = Math.sin(2 * Math.PI * bgTimeFactor); 
-        bgLayer.style.setProperty('--pulse-ratio', (50 + bgShift * 35) + '%');
-
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)'; ctx.strokeRect(10, 10, w - 20, h - 20);
-        ctx.fillStyle = Math.abs(dopplerVel) > 0.8 ? (dopplerVel > 0 ? '#ff4400' : '#0088ff') : 'rgba(0, 242, 255, 0.6)';
-        ctx.font = '10px monospace'; ctx.fillText(dopplerVel > 0 ? '>> STATUS: REDSHIFT' : '>> STATUS: BLUESHIFT', 20, 25);
-
-        if (pZ < 0) { ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(pX, centerY, planetR, 0, Math.PI*2); ctx.fill(); }
-        const sG = ctx.createRadialGradient(sX, centerY, 5, sX, centerY, starR);
-        sG.addColorStop(0, '#fff'); sG.addColorStop(0.3, `hsl(${45 - dopplerVel*20}, 100%, 50%)`); sG.addColorStop(1, 'transparent');
-        ctx.fillStyle = sG; ctx.beginPath(); ctx.arc(sX, centerY, starR, 0, Math.PI*2); ctx.fill();
-        if (pZ >= 0) { ctx.fillStyle = '#000'; ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)'; ctx.beginPath(); ctx.arc(pX, centerY, planetR, 0, Math.PI*2); ctx.fill(); ctx.stroke(); }
-
-        const specX = w * 0.1, specY = h * 0.75, specW = w * 0.8, specH = 40;
-        const rb = ctx.createLinearGradient(specX, 0, specX + specW, 0); rb.addColorStop(0, '#f00'); rb.addColorStop(0.5, '#0f0'); rb.addColorStop(1, '#00f');
-        ctx.fillStyle = rb; ctx.fillRect(specX, specY, specW, specH);
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-        [0.2, 0.35, 0.5, 0.7, 0.85].forEach(p => {
-            const lx = specX + p * specW + dopplerVel * 30;
-            if (lx > specX && lx < specX + specW) { ctx.beginPath(); ctx.moveTo(lx, specY); ctx.lineTo(lx, specY + specH); ctx.stroke(); }
-        });
-        requestAnimationFrame(draw);
-    }
-
-    // --- 精確邊界互動邏輯 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
         el.dataset.moving = 'true'; el.classList.add('active'); 
-        
-        const hH = headerEl.offsetHeight;
-        const fH = footerEl.offsetHeight;
-        // 獲取所屬區塊的寬度資訊
+        const hH = headerEl.offsetHeight, fH = footerEl.offsetHeight;
         const parentBlock = el.closest('section') || document.querySelector('section');
         const blockRect = parentBlock.getBoundingClientRect();
-        
         let step = parseInt(el.dataset.step || '0');
 
         if (step === 0) {
-            const r = el.getBoundingClientRect(), pR = el.offsetParent.getBoundingClientRect();
-            el.dataset.homeX = r.left - pR.left; el.dataset.homeY = r.top - pR.top;
-            el.style.transition = "none"; el.style.animation = "none";
-            el.style.left = el.dataset.homeX + 'px'; el.style.top = el.dataset.homeY + 'px';
-            el.style.transform = 'translate(0, 0)'; el.offsetHeight; 
+            const rect = el.getBoundingClientRect(), pR = el.offsetParent.getBoundingClientRect();
+            el.dataset.homeX = rect.left - pR.left; el.dataset.homeY = rect.top - pR.top;
+            el.style.transition = "none"; el.style.left = el.dataset.homeX + 'px'; el.style.top = el.dataset.homeY + 'px'; el.style.transform = 'translate(0, 0)'; el.offsetHeight;
         }
 
         step++; el.dataset.step = step;
-
         if (step <= 2) {
-            // 第一、二次跳躍：嚴格限制在 Block 寬度內，且避開上下 Banner
-            const scrollY = window.scrollY, viewW = window.innerWidth, viewH = window.innerHeight;
-            const pad = 40;
-
-            // X 軸限制：Block 的左邊界到右邊界
-            const minX = blockRect.left + pad;
-            const maxX = blockRect.right - pad;
-            const targetX = minX + Math.random() * (maxX - minX);
-
-            // Y 軸限制：Banner 之間
-            const minY = scrollY + hH + pad;
-            const maxY = scrollY + viewH - fH - pad;
-            const targetY = minY + Math.random() * (maxY - minY);
-
-            const tx = targetX - parseFloat(el.style.left);
-            const ty = targetY - parseFloat(el.style.top);
-            
+            const pad = 60, scrollY = window.scrollY, viewH = window.innerHeight;
+            const targetVisibleY = scrollY + hH + pad + Math.random() * (viewH - hH - fH - pad * 2);
+            const targetVisibleX = blockRect.left + pad + Math.random() * (blockRect.width - pad * 2);
+            const tx = targetVisibleX - parseFloat(el.style.left), ty = targetVisibleY - parseFloat(el.style.top);
             el.style.transition = "transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
             el.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random()-0.5)*40}deg) scale(1.1)`;
-            setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
-        } 
-        else if (step === 3) {
-            // 第三次：逃離螢幕
+            setTimeout(() => el.dataset.moving = 'false', 1500);
+        } else {
             const escX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
             el.style.transition = "transform 1.4s ease-in, opacity 0.5s ease-in";
             el.style.transform = `translate(${escX}px, 0px) rotate(360deg) scale(0.1)`;
             el.style.opacity = "0"; await new Promise(r => setTimeout(r, 1600));
-
-            const bhId = el.id.replace('mascot', 'bh'), bh = document.getElementById(bhId);
+            const bh = document.getElementById(el.id.replace('mascot', 'bh'));
             el.style.transition = "none"; el.style.transform = "translate(0, 45px)"; el.offsetHeight;
             bh.classList.add('visible'); await new Promise(r => setTimeout(r, 800));
-
-            el.style.opacity = "1";
-            el.style.transition = "transform 1s cubic-bezier(0.2, 0.8, 0.2, 1)";
+            el.style.opacity = "1"; el.style.transition = "transform 1s cubic-bezier(0.2, 0.8, 0.2, 1)";
             el.style.transform = "translate(0, 10px)"; await new Promise(r => setTimeout(r, 1100));
             el.style.transform = "translate(0, 10px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
             el.style.transform = "translate(0, 10px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
@@ -410,37 +187,41 @@
             el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
             el.style.transform = "translate(0, -18px)"; await new Promise(r => setTimeout(r, 300));
             bh.classList.remove('visible'); el.style.transform = "translate(0, 0)"; 
-            
             setTimeout(() => {
-                el.style.transition = ""; el.style.left = ""; el.style.top = ""; el.style.animation = ""; 
+                el.style.transition = ""; el.style.left = ""; el.style.top = ""; 
                 el.classList.remove('active'); el.dataset.step = '0'; el.dataset.moving = 'false';
             }, 600);
         }
     }
 
-    function initIdleBehaviors() {
-        document.querySelectorAll('.pixel-mascot').forEach(el => {
-            const triggerNext = () => {
-                setTimeout(() => {
-                    if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') {
-                        const action = Math.random() > 0.5 ? 'idle-jump' : 'idle-color';
-                        el.classList.add(action);
-                        setTimeout(() => el.classList.remove(action), action === 'idle-jump' ? 800 : 2000);
-                    }
-                    triggerNext();
-                }, 4000 + Math.random() * 6000);
-            };
-            triggerNext();
-        });
+    function draw(timestamp) {
+        const dt = (timestamp - lastT) / 1000; lastT = timestamp;
+        const w = canvas.width / window.devicePixelRatio, h = canvas.height / window.devicePixelRatio;
+        const mS = parseFloat(mSld.value), sS = parseFloat(sSld.value);
+        mVal.innerText = mS.toFixed(1); sVal.innerText = sS.toFixed(2);
+        angle += sS * dt;
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+        const cX = w / 2, cY = h * 0.4, oR = w * 0.35, wA = mS * 2.5;
+        const pX = cX + Math.cos(angle) * oR, pZ = Math.sin(angle), sX = cX - Math.cos(angle) * wA, dV = Math.sin(angle);
+        const shift = Math.sin(2 * Math.PI * (timestamp / 1000) / 10.0);
+        bgL.style.setProperty('--pulse-ratio', (50 + shift * 35) + '%');
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)'; ctx.strokeRect(10, 10, w - 20, h - 20);
+        ctx.fillStyle = Math.abs(dV) > 0.8 ? (dV > 0 ? '#ff4400' : '#0088ff') : 'rgba(0, 242, 255, 0.6)';
+        ctx.font = '10px monospace'; ctx.fillText(dV > 0 ? '>> REDSHIFT' : '>> BLUESHIFT', 20, 25);
+        const sG = ctx.createRadialGradient(sX, cY, 5, sX, cY, starR); sG.addColorStop(0, '#fff'); sG.addColorStop(0.3, `hsl(${45 - dV*20}, 100%, 50%)`); sG.addColorStop(1, 'transparent');
+        if (pZ < 0) { ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(pX, cY, planetR, 0, Math.PI*2); ctx.fill(); }
+        ctx.fillStyle = sG; ctx.beginPath(); ctx.arc(sX, cY, starR, 0, Math.PI*2); ctx.fill();
+        if (pZ >= 0) { ctx.fillStyle = '#000'; ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)'; ctx.beginPath(); ctx.arc(pX, cY, planetR, 0, Math.PI*2); ctx.fill(); ctx.stroke(); }
+        const sX_l = w * 0.1, sY_l = h * 0.75, sW_l = w * 0.8, sH_l = 40;
+        const rb = ctx.createLinearGradient(sX_l, 0, sX_l + sW_l, 0); rb.addColorStop(0, '#f00'); rb.addColorStop(0.5, '#0f0'); rb.addColorStop(1, '#00f');
+        ctx.fillStyle = rb; ctx.fillRect(sX_l, sY_l, sW_l, sH_l); ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+        [0.2, 0.35, 0.5, 0.7, 0.85].forEach(p => { const lx = sX_l + p * sW_l + dV * 30; if (lx > sX_l && lx < sX_l + sW_l) { ctx.beginPath(); ctx.moveTo(lx, sY_l); ctx.lineTo(lx, sY_l + sH_l); ctx.stroke(); }});
+        requestAnimationFrame(draw);
     }
 
-    function resize() {
-        const width = canvas.clientWidth; canvas.width = width * window.devicePixelRatio; canvas.height = (width * 0.9) * window.devicePixelRatio; 
-        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    }
-    window.addEventListener('resize', resize); resize();
-    requestAnimationFrame(draw); initIdleBehaviors();
+    function resize() { const width = canvas.clientWidth; canvas.width = width * window.devicePixelRatio; canvas.height = (width * 0.9) * window.devicePixelRatio; ctx.scale(window.devicePixelRatio, window.devicePixelRatio); }
+    window.onresize = resize; resize(); requestAnimationFrame(draw);
+    document.querySelectorAll('.pixel-mascot').forEach(el => { const t = () => { setTimeout(() => { if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') { const a = Math.random() > 0.5 ? 'idle-jump' : 'idle-color'; el.classList.add(a); setTimeout(() => el.classList.remove(a), a === 'idle-jump' ? 800 : 2000); } t(); }, 4000 + Math.random() * 6000); }; t(); });
 </script>
-
 </body>
 </html>
