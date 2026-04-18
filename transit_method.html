@@ -2,13 +2,13 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Autonomous Mascots)
+      檔案狀態：正式稿 (Tech Edition - Mobile Stability Fix)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 增加閒置行為：外星人在原地時會隨機跳躍翻轉、變換顏色。
-      2. 維持步進式互動：兩次原地跳躍，第三次逃跑。
+      1. 修正手機滑桿互動問題：加入 touch-action: none 並優化事件監聽。
+      2. 增加閒置行為：外星人在原地時會隨機跳躍翻轉、變換顏色。
       3. 歸位序列優化：黑洞先現身，外星人再由內而外探頭。
-      4. 邊界嚴格限制：前兩次點擊絕對不會跳出螢幕。
+      4. 邊界嚴格限制：跳躍行為避開頂部 Banner。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -112,7 +112,6 @@
             z-index: 5000;
         }
 
-        /* 閒置隨機跳躍翻轉動畫 */
         @keyframes idle-jump-flip {
             0% { transform: translateY(0) rotate(0); }
             50% { transform: translateY(-30px) rotate(180deg) scale(1.2); }
@@ -122,7 +121,6 @@
             animation: idle-jump-flip 0.8s ease-in-out !important;
         }
 
-        /* 閒置隨機變色 */
         .pixel-mascot.idle-color .mascot-body {
             filter: hue-rotate(150deg) brightness(1.5) saturate(1.2);
             transition: filter 0.5s;
@@ -284,12 +282,14 @@
             height: 3px;
             background: #1a3040;
             outline: none;
+            /* 修正手機滑動問題：防止捲動干擾 pointer 事件 */
+            touch-action: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 10px;
-            height: 20px;
+            width: 12px;
+            height: 24px;
             background: var(--neon-blue);
             border: 1px solid white;
             cursor: pointer;
@@ -497,15 +497,25 @@
         }
     };
 
+    // 修正手機滑桿問題：除了 pointerdown，在 input (滑動中) 也強制維持互動狀態
+    sizeSlider.addEventListener('pointerdown', startHighlight);
+    speedSlider.addEventListener('pointerdown', startHighlight);
+    sizeSlider.addEventListener('input', startHighlight); 
+    speedSlider.addEventListener('input', startHighlight);
+    
+    // 釋放監聽：增加 change 作為 double-check
+    window.addEventListener('pointerup', endHighlight);
+    window.addEventListener('pointercancel', endHighlight);
+    sizeSlider.addEventListener('change', endHighlight);
+    speedSlider.addEventListener('change', endHighlight);
+
     // --- 閒置自主行為初始化 ---
     function initIdleBehaviors() {
         const mascots = document.querySelectorAll('.pixel-mascot');
         mascots.forEach(el => {
             const triggerNext = () => {
-                // 隨機冷卻 4 到 10 秒
                 const delay = 4000 + Math.random() * 6000;
                 setTimeout(() => {
-                    // 檢查條件：必須在原位 (step 0) 且未在互動中
                     const step = parseInt(el.dataset.step || '0');
                     const isMoving = el.dataset.moving === 'true';
                     
@@ -618,11 +628,6 @@
             }, 600);
         }
     }
-
-    sizeSlider.addEventListener('pointerdown', startHighlight);
-    speedSlider.addEventListener('pointerdown', startHighlight);
-    window.addEventListener('pointerup', endHighlight);
-    window.addEventListener('pointercancel', endHighlight);
 
     function resize() {
         const width = canvas.clientWidth;
