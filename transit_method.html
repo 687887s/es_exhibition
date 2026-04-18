@@ -3,14 +3,15 @@
 <head>
     <!-- 
       檔案狀態：草稿 (DRAFT)
-      最後修訂：2024年展覽準備版 - 凌日法頁面
+      最後修訂：根據地科展教具 PDF 內容完整更新
       更新內容：
-      1. 優化高亮消失邏輯：新增「滯留時間 (Hold)」與「反向指數衰減 (Ease-in decay)」。
-      2. 維持垂直佈局、密集光變曲線、以及累積相位軌道邏輯。
+      1. 內容同步：納入大氣層分析、WASP-96b 概念、以及 Arduino 感測細節。
+      2. 公式增補：加入行星與恆星半徑比例公式。
+      3. 模擬器優化：維持垂直佈局、密集光變曲線、反指數衰減高亮邏輯。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>[草稿] 捕捉宇宙的閃爍：凌日法</title>
+    <title>捕捉宇宙的閃爍：凌日法</title>
     
     <!-- MathJax 配置 -->
     <script>
@@ -95,10 +96,10 @@
         canvas { display: block; width: 100%; height: auto; }
 
         .controls {
-            padding: 0px 18px;
+            padding: 5px 18px 25px 18px;
             background: #000; 
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 0 -18px 0px -18px;
+            margin: 0 -18px 15px -18px;
         }
 
         .control-item {
@@ -107,8 +108,6 @@
             gap: 6px;
             margin-bottom: 12px;
         }
-
-        .control-item:last-child { margin-bottom: 0; }
 
         .control-label {
             font-size: 0.85em;
@@ -173,7 +172,7 @@
     <section>
         <h2>★ 什麼是「凌日法」？</h2>
         <p>
-            想像黑夜中有一盞超亮的探照燈。如果有一隻<span class="highlight">小蚊子</span>飛過燈泡正前方，亮度會呈現平滑的下降與回升。
+            想像在黑夜中有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈泡正前方，雖然看不清蚊子，但你會發現探照燈的亮度瞬間稍微變暗了一點點。
         </p>
         
         <div class="canvas-container">
@@ -188,33 +187,52 @@
                 </div>
                 <input type="range" id="sizeSlider" min="5" max="25" value="12" step="0.1">
             </div>
-            <div class="control-item" style="margin:0px 0px 20px 0px">
+            <div class="control-item">
                 <div class="control-label">
                     <span>公轉速度 (Orbital Speed)</span>
-                    <span id="speedVal">5.0</span>
+                    <span id="speedVal">5.00</span>
                 </div>
                 <input type="range" id="speedSlider" min="0.5" max="10" value="5" step="0.05">
             </div>
         </div>
-        <div style="text-align: center; padding-bottom: 5px;">
-            <span style="font-size:0.8em; color:#888;">調整滑桿觀察 U 型光變曲線</span>
+        <div style="text-align: center; padding-bottom: 10px;">
+            <span style="font-size:0.8em; color:#888;">調整滑桿：觀察 U 型「光變曲線」的深度與寬度</span>
         </div>
+
+        <p>
+            這種亮度變化稱為<span class="highlight">「光變曲線」(Light Curve)</span>。著名的克卜勒太空望遠鏡（Kepler）就以此發現了數千顆行星。
+        </p>
     </section>
 
     <section>
-        <h2>★ 數據解讀：我們能知道什麼？</h2>
-        <ul>
-            <li><span class="highlight">行星大小</span>：凌日造成的亮度下降「深度」。</li>
-            <li><span class="highlight">公轉週期</span>：兩次凌日間的時間間隔。</li>
-        </ul>
+        <h2>★ 透過凌日法能得到什麼？</h2>
         
+        <p><strong>1. 有東西經過嗎？</strong></p>
+        <p>當觀測到的光度曲線突然掉下去一個「坑」，就代表行星正在經過恆星前方。</p>
+
+        <p><strong>2. 它是巨無霸還是小不點？</strong></p>
+        <p>行星越大，遮住的光就越多，「坑」就越深。透過下方公式，我們能回推行星的半徑：</p>
+        <div class="formula-card">
+            $$\displaystyle \text{亮度下降比例} = \left(\frac{\text{行星半徑}}{\text{恆星半徑}}\right)^2$$
+        </div>
+
+        <p><strong>3. 它跑得有多快？</strong></p>
+        <p>如果這個「坑」出現得很頻繁，代表公轉速度很快。透過週期 $T$，可依克卜勒第三定律計算軌道半徑 $a$：</p>
+        <div class="formula-card">$$\displaystyle \frac{a^3}{T^2} = k$$</div>
+
+        <p><strong>4. 它的大氣層有什麼？</strong></p>
+        <p>當恆星光穿過行星邊緣的大氣層時，大氣分子會吸收特定顏色的光。分析這道<span class="highlight">「光譜指紋」</span>，就能得知該行星是否含有氧氣、水蒸氣或甲烷。</p>
+    </section>
+
+    <section>
+        <h2>★ 地科展教具：Arduino 的眼睛</h2>
+        <p>
+            我們使用燈箱代表恆星，行星模型繞其運動。透過 <span class="highlight">Arduino</span> 精密的光度感測套件，捕捉肉眼難以察覺的細微閃爍。
+        </p>
         <details>
-            <summary>物理百科：克卜勒第三定律</summary>
+            <summary>科普深度：0.01% 的挑戰</summary>
             <div class="details-content">
-                透過週期 $T$，我們可以計算軌道半徑 $a$：
-                <div class="formula-card">
-                    $$\displaystyle \frac{a^3}{T^2} = k$$
-                </div>
+                在實際天文學中，凌日造成的變化通常僅有 <span class="highlight">0.01% 到 1%</span>（想像一萬顆燈泡熄滅了一顆）。因此必須依賴 Arduino 具備的高頻率取樣能力與感測器來記錄數據，並將其視覺化為曲線。
             </div>
         </details>
     </section>
@@ -225,7 +243,7 @@
 </div>
 
 <footer>
-    <p>地科 117 級 天文股 製作<br>—— 內容狀態：草稿修訂中 ——</p>
+    <p>地科 117 級 天文股 製作<br>—— 傾聽宇宙的閃爍 ——</p>
 </footer>
 
 <script>
@@ -241,21 +259,18 @@
     const RGB_NEON_BLUE = '0, 212, 255'; 
     const COLOR_VIBRANT_GOLD = '#ffcc00';
 
-    // 模擬核心變數
     let planetR = parseFloat(sizeSlider.value);
     let speedMult = parseFloat(speedSlider.value);
     let points = []; 
     const starR = 60; 
     const breathPeriod = 12.0; 
 
-    // 相位累積
     let lastTimestamp = performance.now();
     let currentOrbitAngle = 0; 
 
-    // --- 高亮控制核心變數 ---
     let highlightTimer = 0;
-    const HOLD_DURATION = 1000;       // 滑桿放開後，維持全亮的時間 (ms)
-    const DECAY_DURATION = 1200;      // 開始衰減後的總時長 (ms)
+    const HOLD_DURATION = 500;       
+    const DECAY_DURATION = 800;      
     let isInteracting = false; 
 
     const startHighlight = () => { isInteracting = true; };
@@ -348,23 +363,19 @@
 
         const sX = w / 2, sY = h * 0.28; 
 
-        // --- 核心優化：計算高亮強度 (含 Hold 與 反指數衰減) ---
         let hIntensity = 0;
         if (isInteracting) {
             hIntensity = 1.0;
         } else {
             const elapsed = Date.now() - highlightTimer;
             if (elapsed < HOLD_DURATION) {
-                hIntensity = 1.0; // 滯留期：維持全亮
+                hIntensity = 1.0; 
             } else if (elapsed < HOLD_DURATION + DECAY_DURATION) {
-                // 衰減期：計算衰減進度 (0 到 1)
                 const decayProgress = (elapsed - HOLD_DURATION) / DECAY_DURATION;
-                // 反向指數曲線 (Ease-in): 1 - x^3
                 hIntensity = 1 - Math.pow(decayProgress, 3);
             }
         }
 
-        // 1. 軌道虛線
         ctx.save();
         if (hIntensity > 0) {
             ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${0.1 + hIntensity * 0.3})`;
@@ -381,11 +392,8 @@
         ctx.restore();
 
         const px = sX + (planetX - w/2) * 0.5;
-
-        // 2. 後景行星
         if (planetZ <= 0) drawPlanetInstance(px, sY, planetR, 0.4, hIntensity);
 
-        // 3. 恆星
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
         starGrad.addColorStop(0.3, '#ffcc00');
@@ -393,10 +401,8 @@
         ctx.fillStyle = starGrad;
         ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
-        // 4. 前景行星
         if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity);
 
-        // 5. 光變曲線圖表
         const graphX = w * 0.05, graphY = h * 0.55, graphW = w * 0.9, graphH = h * 0.35;
         ctx.strokeStyle = '#444';
         ctx.lineWidth = 1;
