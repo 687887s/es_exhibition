@@ -2,11 +2,11 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：外星人層級與歸位修復版 (Mascot Z-index & Reset Fix)
+      檔案狀態：外星人層級穿透修復版 (Mascot Z-index Override Fix)
       風格：科技、未來主義、全息螢幕 (Holographic UI)
       修訂內容：
-      1. 歸位精確化：改回「備份並還原」原始 style 屬性，確保外星人初始的 left/right 定位不會被誤刪而錯位。
-      2. 層級動態提升：偵測所屬容器（包含 header），在外星人移動時動態提升至 8000，確保不被任何 Block 遮擋。
+      1. 層級遮擋修復：精確區分容器層級提升。Section 最高只提升至 3500 (低於 Header 的 4000)，確保移動中的區塊絕對不會遮擋右上角的外星人。
+      2. 歸位精確化：還原原始 style 屬性，確保外星人初始定位不偏移。
       3. 觸發優化：維持 30% 寬鬆觸發條件，確保全息展開順暢。
       4. 物理相位維持：端點徑向速度最強，光譜偏移與顏色同步。
     -->
@@ -338,13 +338,15 @@
     function initHologramReveal() {
         const observerOptions = {
             threshold: 0,
-            rootMargin: "30% 0px 30% 0px" 
+            // 使用絕對像素擴大偵測範圍，比 % 更加穩定
+            rootMargin: "400px 0px 400px 0px" 
         };
         
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-active');
+                    // 一旦展開即保持狀態，不再重複動畫
                     observer.unobserve(entry.target);
                 }
             });
@@ -355,14 +357,15 @@
         });
     }
 
-    // --- 外星人嚴格邊界與乾淨歸位邏輯 ---
+    // --- 外星人嚴格邊界與層級修復邏輯 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
         el.dataset.moving = 'true'; el.classList.add('active'); 
         
         const hH = headerEl.offsetHeight, fH = footerEl.offsetHeight;
         const viewW = window.innerWidth, viewH = window.innerHeight;
-        // zIndexBlock 確保 Header 和 Section 都能在外星人跳躍時被提升層級
+        
+        // zIndexBlock 定義了層級提升的目標 (Section 或 Header)
         const zIndexBlock = el.closest('section') || el.closest('header');
         const parentBlock = el.closest('section') || document.body;
         const blockRect = parentBlock.getBoundingClientRect();
@@ -375,11 +378,18 @@
             el.dataset.homeVPX = r.left;
             el.dataset.homeVPY = r.top;
             
-            // 備份原本的 Inline Style 以便後續精確還原 (防止 left/right 等定位被誤刪)
+            // 備份原本的 Inline Style 以便後續精確還原
             el.dataset.origStyle = el.getAttribute('style') || ""; 
             
             if (zIndexBlock) {
-                zIndexBlock.style.zIndex = "8000"; // 強制提升至最頂層
+                // 【核心修復】精確區分容器層級提升
+                // 如果是 Header 的外星人，提升到最頂層 (8000)
+                // 如果是 Section 的外星人，只需高於其他 Section，但需保持低於 Header (4000)
+                if (zIndexBlock.tagName.toLowerCase() === 'header') {
+                    zIndexBlock.style.zIndex = "8000";
+                } else {
+                    zIndexBlock.style.zIndex = "3500";
+                }
             }
             el.offsetHeight; 
         }
