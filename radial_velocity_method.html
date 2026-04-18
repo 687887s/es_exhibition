@@ -2,86 +2,196 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：物理精確對齊版 (Radial Velocity - Physical Phase Calibration)
-      風格：科技、未來主義風格 (Doppler Theme)
-      修正項目：
-      1. 物理相位校正：紅/藍移在左右端點最強（徑向速度最大），中心點為零。
-      2. 質量聯動：行星質量同時影響擺動振幅與都卜勒訊號強度。
-      3. 移除行星：僅顯示恆星，模擬「看不見行星」的偵測情境。
-      4. 歸位修復：使用原位備份邏輯，確保 Banner 與居中外星人精確歸位。
-      5. 內容恢復：恢復三區塊架構與圖片預留位，移除 Arduino 描述。
+      檔案狀態：外星人層級與歸位修復版 (Mascot Z-index & Reset Fix)
+      風格：科技、未來主義、全息螢幕 (Holographic UI)
+      修訂內容：
+      1. 歸位精確化：改回「備份並還原」原始 style 屬性，確保外星人初始的 left/right 定位不會被誤刪而錯位。
+      2. 層級動態提升：偵測所屬容器（包含 header），在外星人移動時動態提升至 8000，確保不被任何 Block 遮擋。
+      3. 觸發優化：維持 30% 寬鬆觸發條件，確保全息展開順暢。
+      4. 物理相位維持：端點徑向速度最強，光譜偏移與顏色同步。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>捕捉宇宙的律動：徑向速度法</title>
     
     <script>
-        window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] } };
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            }
+        };
     </script>
-    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
     
     <style>
-        /* 全域結構穩定 */
         * { box-sizing: border-box; }
         
         :root {
-            --vibrant-gold: #ffcc00; --neon-blue: #00f2ff; --tech-cyan: rgba(0, 242, 255, 0.6);
-            --text-color: #e0faff; --bg-deep: #010408; --bg-color-red: #440000; --bg-color-blue: #001144;
+            --vibrant-gold: #ffcc00;
+            --neon-blue: #00f2ff;
+            --tech-cyan: rgba(0, 242, 255, 0.6);
+            --text-color: #e0faff;
+            --bg-deep: #010408;
+            --bg-color-red: #440000;
+            --bg-color-blue: #001144;
             --pulse-ratio: 50%;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
-            background: var(--bg-deep); color: var(--text-color); line-height: 1.6; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden;
+            background: var(--bg-deep);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* 獨立氛圍背景：10s 固定週期 */
+        /* 氛圍背景 */
         .bg-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
             background-image: 
-                linear-gradient(rgba(0, 242, 255, 0.1) 2px, transparent 2px),
-                linear-gradient(90deg, rgba(0, 242, 255, 0.1) 2px, transparent 2px),
-                linear-gradient(145deg, var(--bg-color-red) 0%, var(--bg-color-red) calc(var(--pulse-ratio) - 45%), var(--bg-color-blue) calc(var(--pulse-ratio) + 45%), var(--bg-color-blue) 100%);
+                linear-gradient(rgba(0, 242, 255, 0.15) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.15) 2px, transparent 2px),
+                linear-gradient(145deg, 
+                    var(--bg-color-red) 0%, 
+                    var(--bg-color-red) calc(var(--pulse-ratio) - 45%), 
+                    var(--bg-color-blue) calc(var(--pulse-ratio) + 45%), 
+                    var(--bg-color-blue) 100%
+                );
             background-size: 30px 30px, 30px 30px, 100% 100%;
         }
 
         body::after {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%); background-size: 100% 4px; pointer-events: none; z-index: 7000;
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.04));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 7000;
         }
 
         header {
-            position: sticky; top: 0; z-index: 4000; background: rgba(5, 10, 16, 0.95); backdrop-filter: blur(10px);
-            padding: 15px 4vw; text-align: center; border-bottom: 2px solid var(--neon-blue); box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
+            position: sticky; top: 0; z-index: 4000;
+            background: rgba(5, 10, 16, 0.95); backdrop-filter: blur(10px);
+            padding: 15px 4vw; text-align: center;
+            border-bottom: 2px solid var(--neon-blue);
+            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
         }
-        h1 { color: var(--neon-blue); font-size: 1.4em; font-weight: 900; margin: 0; letter-spacing: 3px; }
 
-        .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 40px 0 20px 0; position: relative; }
+        h1 { color: var(--neon-blue); font-size: 1.4em; text-shadow: 0 0 10px rgba(0, 242, 255, 0.8); font-weight: 900; margin: 0; letter-spacing: 3px; }
 
+        .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 20px 0; position: relative; }
+
+        /* --- 全息展開動畫區塊 --- */
         section {
-            background: rgba(10, 20, 30, 0.7); backdrop-filter: blur(8px); margin-bottom: 80px; padding: 35px 25px;
-            border: 1px solid var(--tech-cyan); position: relative; box-shadow: 4px 4px 0px var(--tech-cyan);
+            background: rgba(10, 20, 30, 0.75);
+            backdrop-filter: blur(10px);
+            margin-bottom: 120px;
+            padding: 40px 30px;
+            border: 1px solid var(--tech-cyan);
+            position: relative; 
+            
+            /* 初始狀態：中間的一段引導雷射線，等待觸發 */
+            opacity: 0.6;
+            clip-path: inset(49.5% 35% 49.5% 35%);
+            filter: drop-shadow(0 0 10px var(--neon-blue)) brightness(1.5);
+            transform: translate(0px, 0px);
+            box-shadow: 0px 0px 0px transparent;
+            pointer-events: none;
         }
-        section::before { content: ""; position: absolute; top: 0; left: 0; width: 15px; height: 15px; border-top: 3px solid var(--neon-blue); border-left: 3px solid var(--neon-blue); }
+
+        /* 觸發全息展開 */
+        section.is-active {
+            animation: hologramExpandDetailed 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            pointer-events: auto;
+        }
+
+        @keyframes hologramExpandDetailed {
+            0% { 
+                clip-path: inset(49.5% 35% 49.5% 35%); 
+                filter: brightness(2); 
+                transform: translate(0, 0); 
+                box-shadow: 0px 0px 0px transparent; 
+            }
+            40% { 
+                clip-path: inset(49.5% -30px 49.5% -30px); /* 激光向兩側伸展 */
+                filter: brightness(3); 
+                transform: translate(0, 0); 
+                box-shadow: 0px 0px 0px transparent; 
+                opacity: 1;
+            }
+            85% { 
+                clip-path: inset(-50px -30px -30px -30px); /* 上下展開為完整區塊 */
+                filter: brightness(1); 
+                transform: translate(0, 0); 
+                box-shadow: 0px 0px 0px transparent; 
+                opacity: 1;
+            }
+            100% { 
+                clip-path: inset(-500% -500% -500% -500%); /* 完全釋放邊界 */
+                filter: brightness(1); 
+                transform: translate(-4px, -4px); /* 彈出偏移 */
+                box-shadow: 4px 4px 0px var(--tech-cyan); /* 生成實心陰影 */
+                opacity: 1; 
+            }
+        }
+
+        /* 激光視覺效果強化 */
+        section::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-top: 1px solid var(--neon-blue); border-bottom: 1px solid var(--neon-blue);
+            pointer-events: none;
+            opacity: 0.3; transition: opacity 1s;
+        }
+        section.is-active::after { opacity: 0.6; }
+
+        section::before { 
+            content: ""; position: absolute; top: -1px; left: -1px; width: 18px; height: 18px; 
+            border-top: 3px solid var(--neon-blue); border-left: 3px solid var(--neon-blue); 
+            opacity: 0; transition: opacity 0.5s 1.2s; z-index: 2;
+        }
+        section.is-active::before { opacity: 1; }
 
         h2 { color: var(--vibrant-gold); margin-top: 0; font-size: 1.3em; display: flex; align-items: center; text-transform: uppercase; }
         h2::before { content: ">> "; color: var(--neon-blue); font-family: monospace; margin-right: 5px; }
+
+        .highlight { color: var(--neon-blue); font-family: monospace; font-weight: bold; }
 
         .image-placeholder {
             background: rgba(0, 242, 255, 0.08); border: 1px dashed rgba(0, 242, 255, 0.4); margin: 25px 0;
             padding: 60px 20px; text-align: center; color: var(--neon-blue); font-size: 0.8em; text-transform: uppercase; letter-spacing: 2px;
         }
 
-        .canvas-container { margin: 25px -25px; background: rgba(0, 0, 0, 0.95); position: relative; border-top: 1px solid var(--tech-cyan); border-bottom: 1px solid var(--tech-cyan); overflow: hidden; line-height: 0; }
+        .canvas-container {
+            margin: 25px -30px; background: rgba(0, 0, 0, 0.95); position: relative;
+            border-top: 1px solid var(--tech-cyan); border-bottom: 1px solid var(--tech-cyan); overflow: hidden; line-height: 0;
+        }
         canvas { display: block; width: 100%; height: auto; }
 
-        .controls { padding: 25px; background: rgba(6, 14, 22, 0.9); border-bottom: 1px solid var(--tech-cyan); margin: 0 -25px -35px -25px; }
+        .controls {
+            padding: 25px; background: rgba(6, 14, 22, 0.95); border-bottom: 1px solid var(--tech-cyan); margin: 0 -30px -40px -30px;
+        }
         .control-item { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
         .control-label { font-size: 0.85em; color: var(--neon-blue); display: flex; justify-content: space-between; font-family: monospace; }
+
         input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: #1a3040; outline: none; touch-action: none; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 22px; background: var(--neon-blue); border: 1px solid white; cursor: pointer; box-shadow: 0 0 10px var(--neon-blue); }
 
-        /* 波形追蹤者 (Wave Tracker) */
+        .formula-card {
+            font-size: 1.05em; color: var(--vibrant-gold); text-align: center; margin: 25px 0; padding: 20px 15px; background: rgba(0, 242, 255, 0.15); border: 1px solid var(--tech-cyan);
+        }
+
+        /* 波形追蹤者 */
         .pixel-mascot {
             position: absolute; width: 36px; height: 22px; z-index: 10; top: -26px; cursor: pointer;
             transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s; filter: drop-shadow(0 0 8px var(--neon-blue)); -webkit-tap-highlight-color: transparent;
@@ -114,16 +224,19 @@
         .pixel-mascot.idle-jump { animation: idle-f 0.8s ease-in-out !important; }
         .pixel-mascot.idle-color .mascot-body { filter: hue-rotate(180deg) brightness(1.3); transition: filter 0.5s; }
 
-        .formula-card { font-size: 1.05em; color: var(--vibrant-gold); text-align: center; margin: 25px 0; padding: 20px 15px; background: rgba(0, 242, 255, 0.1); border: 1px solid var(--tech-cyan); }
-        .highlight { color: var(--neon-blue); font-family: monospace; font-weight: bold; }
-        
+        @keyframes peek-bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+
         .back-nav { text-align: center; margin: 60px 0; }
-        .back-btn { color: var(--neon-blue); text-decoration: none; font-size: 1em; border: 1px solid var(--neon-blue); padding: 18px 40px; text-transform: uppercase; letter-spacing: 4px; transition: all 0.3s; font-family: monospace; background: rgba(0, 242, 255, 0.05); }
+        .back-btn { 
+            color: var(--neon-blue); text-decoration: none; font-size: 1em; border: 1px solid var(--neon-blue); 
+            padding: 18px 40px; text-transform: uppercase; letter-spacing: 4px; transition: all 0.3s;
+            font-family: monospace; background: rgba(0, 242, 255, 0.05);
+        }
         .back-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 25px var(--neon-blue); }
 
         footer { 
-            position: relative; z-index: 3000; text-align: center; padding: 60px 20px; font-size: 0.75em; 
-            color: #446688; background: #010305; letter-spacing: 4px; font-family: monospace; border-top: 1px solid rgba(0, 242, 255, 0.2); 
+            text-align: center; padding: 60px 20px; font-size: 0.75em; color: #446688; background: #010305; 
+            letter-spacing: 4px; font-family: monospace; border-top: 1px solid rgba(0, 242, 255, 0.2);
         }
     </style>
 </head>
@@ -135,7 +248,7 @@
     <h1>捕捉宇宙的律動</h1>
     <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">RADIAL_VELOCITY_ANALYSIS_UNIT_117</p>
     
-    <div class="pixel-mascot" id="mascot-header" style="right: 20px; top: 10px;" onclick="mascotStep(this)">
+    <div class="pixel-mascot" id="mascot-header" style="right: 20px; top: 10px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
         <div class="mascot-body"><div class="mascot-eyes"></div></div>
         <div class="mascot-label">RADAR_WATCHER</div>
     </div>
@@ -143,9 +256,8 @@
 </header>
 
 <div class="container">
-    <!-- Section 1 -->
-    <section id="s1">
-        <div class="pixel-mascot" id="mascot-s1" style="left: 20px;" onclick="mascotStep(this)">
+    <section id="section-1", style="margin:120px 0px 120px 0px">
+        <div class="pixel-mascot" id="mascot-s1" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotStep(this)">
             <div class="mascot-body" style="background: var(--vibrant-gold);"><div class="mascot-eyes"></div></div>
             <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">WAVE_ALPHA</div>
         </div>
@@ -158,11 +270,12 @@
 
         <p>對星光來說，移動改變的是<span class="highlight">「顏色」</span>：靠近我們時光波壓縮，偏向藍色（藍移）；遠離時拉伸，偏向紅色（紅移）。</p>
 
+        <!-- 徑向速度模擬器 -->
         <div class="canvas-container"><canvas id="wobbleCanvas"></canvas></div>
         
         <div class="controls">
             <div class="control-item">
-                <div class="control-label"><span>行星質量 (影響都卜勒位移強度)</span><span id="massVal" style="color:white">5.0</span></div>
+                <div class="control-label"><span>行星質量 (影響都卜勒強度)</span><span id="massVal" style="color:white">5.0</span></div>
                 <input type="range" id="massSlider" min="1" max="15" value="5" step="0.1">
             </div>
             <div class="control-item">
@@ -172,16 +285,15 @@
         </div>
     </section>
     
-    <!-- Section 2 -->
-    <section id="s2">
-        <div class="pixel-mascot" id="mascot-s2" style="right: 20px;" onclick="mascotStep(this)">
+    <section id="section-2">
+        <div class="pixel-mascot" id="mascot-s2" style="right: 20px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
             <div class="mascot-body"><div class="mascot-eyes"></div></div>
             <div class="mascot-label">DOPPLER_BETA</div>
         </div>
         <div class="black-hole" id="bh-s2" style="right: 6px; top: 6px;"></div>
         
         <h2>宇宙偵探：星際雙人舞</h2>
-        <p>引力是互相的。當行星拉動恆星產生規轉時，光譜線就會同步偏移。我們藉此計算行星質量的下限值：</p>
+        <p>引力是互相的。當行星拉動恆星產生晃動時，恆星光譜線就會同步偏移。即使我們完全看不見行星，也能藉此計算出行星質量的下限值：</p>
 
         <div class="formula-card">$$M_p \sin i$$</div>
 
@@ -192,22 +304,21 @@
         <div class="image-placeholder">[ Image of 吸收線隨恆星晃動而同步偏移的對比圖 ]</div>
     </section>
 
-    <!-- Section 3 -->
-    <section id="s3">
-        <div class="pixel-mascot" id="mascot-s3" style="left: 50%; margin-left: -18px;" onclick="mascotStep(this)">
+    <section id="section-3">
+        <div class="pixel-mascot" id="mascot-s3" style="left: 50%; margin-left: -18px; animation: peek-bounce 2s infinite alternate ease-in-out;" onclick="mascotStep(this)">
             <div class="mascot-body" style="background: #fff;"><div class="mascot-eyes"></div></div>
             <div class="mascot-label" style="color:#fff; border-color:#fff">FINDER_UNIT</div>
         </div>
         <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -32px; top: 6px;"></div>
 
         <h2>發現的里程碑：51 Pegasi b</h2>
-        <p>1995 年，天文學家利用徑向速度法發現了第一顆繞行類太陽恆星的系外行星 —— <span class="highlight">51 Pegasi b</span>。這項發現獲得了 2019 年諾貝爾物理學獎。</p>
+        <p>1995 年，天文學家利用徑向速度法發現了第一顆繞行類太陽恆星的系外行星 —— <span class="highlight">51 Pegasi b</span>。這項發現獲得了 2019 年諾貝爾物理學獎，徹底改變了我們對行星系統形成的認知。</p>
         
-        <div class="image-placeholder">[ Image of 51 Pegasi b 藝術想像圖與光譜發現數據 ]</div>
+        <div class="image-placeholder">[ Image of 51 Pegasi b 藝術想像圖與其發現數據 ]</div>
 
-        <p>目前這項技術對於偵測離恆星較近、質量較大的行星（如熱木星）特別有效，是目前尋找系外行星的核心手段。</p>
+        <p>目前這項技術對於偵測離恆星較近、質量較大的行星（如熱木星）特別有效，是目前地基望遠鏡主要的偵測手段。</p>
         
-        <div class="image-placeholder">[ Image of 大型地面望遠鏡觀測現場與高解析度光譜儀 ]</div>
+        <div class="image-placeholder">[ Image of 大型地面望遠鏡觀測現場模擬圖 ]</div>
     </section>
 
     <div class="back-nav"><a href="index.html" class="back-btn">Return to Sector 0</a></div>
@@ -217,19 +328,42 @@
 
 <script>
     const canvas = document.getElementById('wobbleCanvas'), ctx = canvas.getContext('2d');
-    const headerEl = document.getElementById('mainHeader'), footerEl = document.getElementById('mainFooter'), bgL = document.getElementById('bgLayer');
+    const headerEl = document.getElementById('mainHeader'), footerEl = document.getElementById('mainFooter'), bgLayer = document.getElementById('bgLayer');
     const mSld = document.getElementById('massSlider'), sSld = document.getElementById('speedSlider');
     const mVal = document.getElementById('massVal'), sVal = document.getElementById('speedVal');
 
-    let lastT = performance.now(), angle = 0, starR = 55;
+    let lastTimestamp = null, angle = 0, starR = 55;
 
-    // --- 嚴格邊界與 Viewport Delta 歸位邏輯 ---
+    // --- 強化版全息展開監測邏輯 ---
+    function initHologramReveal() {
+        const observerOptions = {
+            threshold: 0,
+            rootMargin: "30% 0px 30% 0px" 
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    }
+
+    // --- 外星人嚴格邊界與乾淨歸位邏輯 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
         el.dataset.moving = 'true'; el.classList.add('active'); 
         
-        const hh = headerEl.offsetHeight, fh = footerEl.offsetHeight;
-        const vh = window.innerHeight, vw = window.innerWidth;
+        const hH = headerEl.offsetHeight, fH = footerEl.offsetHeight;
+        const viewW = window.innerWidth, viewH = window.innerHeight;
+        // zIndexBlock 確保 Header 和 Section 都能在外星人跳躍時被提升層級
+        const zIndexBlock = el.closest('section') || el.closest('header');
         const parentBlock = el.closest('section') || document.body;
         const blockRect = parentBlock.getBoundingClientRect();
         
@@ -240,7 +374,13 @@
             const r = el.getBoundingClientRect();
             el.dataset.homeVPX = r.left;
             el.dataset.homeVPY = r.top;
+            
+            // 備份原本的 Inline Style 以便後續精確還原 (防止 left/right 等定位被誤刪)
             el.dataset.origStyle = el.getAttribute('style') || ""; 
+            
+            if (zIndexBlock) {
+                zIndexBlock.style.zIndex = "8000"; // 強制提升至最頂層
+            }
             el.offsetHeight; 
         }
 
@@ -249,9 +389,9 @@
         if (step <= 2) {
             const pad = 60;
             const minX = Math.max(blockRect.left + pad, pad);
-            const maxX = Math.min(blockRect.right - pad, vw - pad);
-            const minY = Math.max(hh + pad, blockRect.top + pad);
-            const maxY = Math.min(vh - fh - pad, blockRect.bottom - pad);
+            const maxX = Math.min(blockRect.right - pad, viewW - pad);
+            const minY = Math.max(hH + pad, blockRect.top + pad);
+            const maxY = Math.min(viewH - fH - pad, blockRect.bottom - pad);
 
             const targetX = minX + Math.random() * (maxX - minX);
             const targetY = minY + Math.random() * (maxY - minY);
@@ -264,7 +404,7 @@
             setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
         } 
         else {
-            const escX = (Math.random() > 0.5 ? 1 : -1) * vw * 1.3;
+            const escX = (Math.random() > 0.5 ? 1 : -1) * viewW * 1.3;
             el.style.transition = "transform 1.2s ease-in, opacity 0.5s ease-in";
             el.style.transform = `translate(${escX}px, 0px) rotate(720deg) scale(0.1)`;
             el.style.opacity = "0"; 
@@ -272,7 +412,10 @@
 
             const bhId = el.id.replace('mascot', 'bh');
             const bh = document.getElementById(bhId);
-            el.style.transition = "none"; el.style.transform = "translate(0, 50px)"; el.offsetHeight;
+            el.style.transition = "none"; 
+            el.style.transform = "translate(0, 50px)"; 
+            el.offsetHeight;
+
             bh.classList.add('visible'); await new Promise(r => setTimeout(r, 800));
 
             el.style.opacity = "1";
@@ -287,106 +430,130 @@
             bh.classList.remove('visible'); el.style.transform = "translate(0, 0)"; 
             
             setTimeout(() => {
+                // 還原最初的 Inline Style 確保錯位不再發生
                 el.setAttribute('style', el.dataset.origStyle);
                 el.classList.remove('active'); el.dataset.step = '0'; el.dataset.moving = 'false';
+                
+                if (zIndexBlock) {
+                    zIndexBlock.style.zIndex = "";
+                }
             }, 600);
         }
     }
 
-    // --- 模擬器繪製：物理相位全同步 (Radial Velocity Physics Sync) ---
-    function draw(timestamp) {
-        const dt = (timestamp - lastT) / 1000; lastT = timestamp;
-        const w = canvas.width / window.devicePixelRatio, h = canvas.height / window.devicePixelRatio;
-        const mS = parseFloat(mSld.value), sS = parseFloat(sSld.value);
-        mVal.innerText = mS.toFixed(1); sVal.innerText = sS.toFixed(2);
-        
-        // 1. 背景獨立氛圍
-        const bgShift = Math.sin(2 * Math.PI * (timestamp / 10000)); 
-        bgL.style.setProperty('--pulse-ratio', (50 + bgShift * 38) + '%');
+    // --- 強化防當機渲染函數 (Resize Handler) ---
+    function resize() {
+        const width = canvas.clientWidth;
+        if (width === 0) return; // 防止 iframe 初始化瞬間 width 為 0 導致畫布消失
+        canvas.width = width * window.devicePixelRatio; 
+        canvas.height = (width * 0.95) * window.devicePixelRatio; 
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resize);
 
-        // 2. 更新物理相位
+    // --- 模擬器繪製：物理相位同步與防當機 ---
+    function draw(timestamp) {
+        timestamp = timestamp || performance.now();
+        if (!lastTimestamp) { lastTimestamp = timestamp; resize(); }
+        const dt = (timestamp - lastTimestamp) / 1000; 
+        lastTimestamp = timestamp;
+
+        // 【防當機機制】即時偵測父容器寬度，解決隱藏狀態下 Canvas 無法取得寬高的 Bug
+        if (canvas.clientWidth > 0 && Math.abs(canvas.width - Math.floor(canvas.clientWidth * window.devicePixelRatio)) > 2) {
+            resize();
+        }
+
+        const w = canvas.width / window.devicePixelRatio;
+        const h = canvas.height / window.devicePixelRatio;
+        
+        // 若寬高依然異常則跳過該幀，避免繪圖引擎報錯
+        if (w === 0 || h === 0) {
+            requestAnimationFrame(draw);
+            return;
+        }
+
+        // 數值安全保護
+        const mS = mSld ? parseFloat(mSld.value) : 5.0;
+        const sS = sSld ? parseFloat(sSld.value) : 3.0;
+        if (mVal) mVal.innerText = mS.toFixed(1); 
+        if (sVal) sVal.innerText = sS.toFixed(2);
+        
+        const bgShift = Math.sin(2 * Math.PI * (timestamp / 10000)); 
+        if (bgLayer) bgLayer.style.setProperty('--pulse-ratio', (50 + bgShift * 38) + '%');
+
         angle += sS * dt;
         
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
         const cX = w / 2, cY = h * 0.45;
         
-        // --- 物理對齊核心修正 ---
-        // 恆星位置 (X軸)：使用 cos(angle)，最右為 cos(0)=1，最左為 cos(pi)=-1
-        const wobbleAmp = mS * 3.2;
+        const wobbleAmp = mS * 3.5;
         const sX = cX + Math.cos(angle) * wobbleAmp; 
         
-        // 都卜勒速度分量 (Radial Velocity)：
-        // 依照物理要求，在最左及最右端點最強力。
-        // 當 X 為正極大(最右)，速度向量最直接對向/背向觀察者。
-        // 我們讓：
-        // 右端點 (cos=1) -> 紅移 (Receding)
-        // 左端點 (cos=-1) -> 藍移 (Approaching)
-        // 中心點 (cos=0) -> 速度垂直於視線 -> 無位移
-        const dopplerVel = Math.cos(angle); 
-        
-        // 訊號強度受行星質量影響：質量越大，色偏與位移越劇烈
-        const massFactor = (mS / 15.0); 
-        const signalIntensity = dopplerVel * massFactor;
+        // 繪製系統質心與軌道線，增加模擬的科學背景 (在沒有行星的情況下)
+        ctx.beginPath();
+        ctx.ellipse(cX, cY, wobbleAmp, 4, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
-        // 3. 恆星色相同步
+        ctx.beginPath();
+        ctx.moveTo(cX - 8, cY); ctx.lineTo(cX + 8, cY);
+        ctx.moveTo(cX, cY - 8); ctx.lineTo(cX, cY + 8);
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.6)';
+        ctx.stroke();
+        
+        // 徑向速度 (Doppler)：在左右端點(位移極大值)時，速度向量與視線最平行，強度最強。
+        const dopplerIntensity = Math.cos(angle) * (mS / 15.0); 
+
         const starGrad = ctx.createRadialGradient(sX, cY, 5, sX, cY, starR); 
-        // 色相偏移：45(黃) -> 增加為藍色，減少為紅色
-        // 注意：signalIntensity 為正(右端)時減色相變紅，為負(左端)時加色相變藍
-        const shiftHue = -signalIntensity * 35; 
+        const shiftHue = -dopplerIntensity * 35; // 藍移(負值)加色相變藍
         starGrad.addColorStop(0, '#fff'); 
         starGrad.addColorStop(0.3, `hsl(${45 + shiftHue}, 100%, 50%)`); 
         starGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = starGrad; ctx.beginPath(); ctx.arc(sX, cY, starR, 0, Math.PI*2); ctx.fill();
 
-        // 4. HUD 狀態同步
         ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)'; ctx.strokeRect(10, 10, w - 20, h - 20);
         ctx.font = '10px monospace';
-        if (Math.abs(dopplerVel) > 0.1) {
-            // dopplerVel > 0 (右端) 為紅移，dopplerVel < 0 (左端) 為藍移
-            const isRed = dopplerVel > 0;
+        if (Math.abs(dopplerIntensity) > 0.1) {
+            const isRed = dopplerIntensity > 0;
             ctx.fillStyle = isRed ? '#ff3300' : '#00aaff';
             ctx.fillText(isRed ? '>> STATUS: REDSHIFT (MOVING AWAY)' : '>> STATUS: BLUESHIFT (APPROACHING)', 20, 25);
-        } else {
-            ctx.fillStyle = 'rgba(255,255,255,0.4)';
-            ctx.fillText('>> STATUS: ZERO_RADIAL_VELOCITY', 20, 25);
         }
 
-        // 5. 光譜分析條全同步 (左藍右紅)
-        const sX_l = w * 0.1, sY_l = h * 0.82, sW_l = w * 0.8, sH_l = 32;
-        const rb = ctx.createLinearGradient(sX_l, 0, sX_l + sW_l, 0); 
+        // 光譜分析條同步
+        const specX = w * 0.1, specY = h * 0.82, specW = w * 0.8, specH = 32;
+        const rb = ctx.createLinearGradient(specX, 0, specX + specW, 0); 
         rb.addColorStop(0, '#00f'); rb.addColorStop(0.5, '#0f0'); rb.addColorStop(1, '#f00');
-        ctx.fillStyle = rb; ctx.fillRect(sX_l, sY_l, sW_l, sH_l);
+        ctx.fillStyle = rb; ctx.fillRect(specX, specY, specW, specH);
         
-        // 吸收線偏移：
-        // 藍移 (signalIntensity 負，恆星在左端) -> lx 應變小（向左移）
-        // 紅移 (signalIntensity 正，恆星在右端) -> lx 應變大（向右移）
-        const lineOffset = signalIntensity * 55; 
+        const lineOffset = dopplerIntensity * 55; // 紅移向右移
         ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
         [0.2, 0.35, 0.5, 0.7, 0.85].forEach(p => { 
-            const lx = sX_l + p * sW_l + lineOffset; 
-            if (lx > sX_l && lx < sX_l + sW_l) { 
-                ctx.beginPath(); ctx.moveTo(lx, sY_l); ctx.lineTo(lx, sY_l + sH_l); ctx.stroke(); 
+            const lx = specX + p * specW + lineOffset; 
+            if (lx > specX && lx < specX + specW) { 
+                ctx.beginPath(); ctx.moveTo(lx, specY); ctx.lineTo(lx, specY + specH); ctx.stroke(); 
             }
         });
         
-        ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = '9px monospace'; ctx.fillText('DOPPLER_CALIBRATED_SYNC', sX_l, sY_l - 8);
+        ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = '9px monospace'; ctx.fillText('HOLOGRAPHIC_PHYSICS_SYNC: ACTIVE', specX, specY - 8);
         
         requestAnimationFrame(draw);
     }
 
-    function resize() { const width = canvas.clientWidth; canvas.width = width * window.devicePixelRatio; canvas.height = (width * 0.95) * window.devicePixelRatio; ctx.scale(window.devicePixelRatio, window.devicePixelRatio); }
-    window.onresize = resize; resize(); requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
     
     // 初始化外星人閒置行為
     document.querySelectorAll('.pixel-mascot').forEach(el => { 
-        const t = () => { setTimeout(() => { 
+        const triggerNext = () => { setTimeout(() => { 
             if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') { 
-                const a = Math.random() > 0.5 ? 'idle-jump' : 'idle-color'; 
-                el.classList.add(a); 
-                setTimeout(() => el.classList.remove(a), a === 'idle-jump' ? 800 : 2000); 
-            } t(); 
-        }, 5000 + Math.random() * 5000); }; t(); 
+                const action = Math.random() > 0.5 ? 'idle-jump' : 'idle-color'; 
+                el.classList.add(action); 
+                setTimeout(() => el.classList.remove(action), action === 'idle-jump' ? 800 : 2000); 
+            } triggerNext(); 
+        }, 5000 + Math.random() * 5000); }; triggerNext(); 
     });
+
+    initHologramReveal();
 </script>
 </body>
 </html>
