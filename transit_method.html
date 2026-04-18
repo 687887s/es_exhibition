@@ -2,12 +2,12 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Black Hole Return)
+      檔案狀態：正式稿 (Tech Edition - Final Interaction)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 歸位序列：黑洞生成 -> 探頭左右看 -> 跳出歸位。
-      2. 步進互動：點擊兩次隨機跳躍，第三次逃跑。
-      3. 視覺強化：黑洞發光特效與像素動畫同步。
+      1. 優化外星人跳躍範圍：確保前兩次留在螢幕內且避開 Header。
+      2. 完整展示歸位動畫：黑洞生成 -> 探頭 -> 左右觀望 -> 跳出。
+      3. 調整層次順序：活動中外星人置於最頂層 (z-index 5000)。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -82,7 +82,7 @@
             padding: 15px 4vw;
             text-align: center;
             border-bottom: 2px solid var(--neon-blue);
-            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
+            box-shadow: 0 5px 30px rgba(0, 242, 255, 0.5);
         }
 
         h1 { 
@@ -102,11 +102,12 @@
             z-index: -1; 
             top: -24px; 
             cursor: pointer;
-            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            filter: drop-shadow(0 0 8px var(--neon-blue));
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 10px var(--neon-blue));
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* 活動狀態層級最高 */
         .pixel-mascot.active {
             z-index: 5000;
             filter: drop-shadow(0 0 15px var(--neon-blue));
@@ -135,10 +136,11 @@
         }
         .mascot-eyes::before, .mascot-eyes::after {
             content: "";
-            width: 4px;
-            height: 4px;
+            width: 5px;
+            height: 5px;
             background: #000;
-            animation: eye-blink 3s infinite;
+            box-shadow: 0 0 2px rgba(255,255,255,0.5);
+            animation: eye-blink 4s infinite;
         }
 
         @keyframes eye-blink {
@@ -149,14 +151,16 @@
         /* 黑洞特效 */
         .black-hole {
             position: absolute;
-            width: 48px;
-            height: 12px;
+            width: 50px;
+            height: 15px;
             background: #000;
             border-radius: 50%;
-            box-shadow: 0 0 15px 2px var(--neon-blue);
+            box-shadow: 0 0 20px 2px var(--neon-blue);
             z-index: -2;
+            left: -9px;
+            top: 12px;
             transform: scale(0);
-            transition: transform 0.5s ease-out;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
         }
         .black-hole.visible { transform: scale(1); }
@@ -166,11 +170,11 @@
             font-family: monospace;
             color: var(--neon-blue);
             position: absolute;
-            top: -15px;
+            top: -18px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            padding: 1px 4px;
+            background: rgba(0,0,0,0.85);
+            padding: 2px 6px;
             border: 1px solid var(--neon-blue);
             white-space: nowrap;
             pointer-events: none;
@@ -321,7 +325,7 @@
 
 <div class="bg-layer" id="bgLayer"></div>
 
-<header>
+<header id="mainHeader">
     <h1>捕捉宇宙的閃爍</h1>
     <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">TRANSIT_METHOD_ANALYSIS_UNIT_117</p>
     
@@ -330,7 +334,7 @@
             <div class="mascot-eyes"></div>
         </div>
         <div class="mascot-label">HUB_SENTRY</div>
-        <div class="black-hole" style="left:-8px; top:12px;"></div>
+        <div class="black-hole"></div>
     </div>
 </header>
 
@@ -342,7 +346,7 @@
                 <div class="mascot-eyes"></div>
             </div>
             <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">UNIT_ALPHA</div>
-            <div class="black-hole" style="left:-8px; top:12px;"></div>
+            <div class="black-hole"></div>
         </div>
 
         <div class="image-placeholder">[ Image of 凌日法示意圖 ]</div>
@@ -385,7 +389,7 @@
                 <div class="mascot-eyes"></div>
             </div>
             <div class="mascot-label">UNIT_BETA</div>
-            <div class="black-hole" style="left:-8px; top:12px;"></div>
+            <div class="black-hole"></div>
         </div>
 
         <h2>數據資訊分析</h2>
@@ -417,7 +421,7 @@
                 <div class="mascot-eyes"></div>
             </div>
             <div class="mascot-label" style="color:#fff; border-color:#fff">UNIT_GAMMA</div>
-            <div class="black-hole" style="left:-8px; top:12px;"></div>
+            <div class="black-hole"></div>
         </div>
 
         <h2>ARDUINO 探測系統</h2>
@@ -446,6 +450,7 @@
     const canvas = document.getElementById('transitCanvas');
     const ctx = canvas.getContext('2d');
     const bgLayer = document.getElementById('bgLayer');
+    const headerEl = document.getElementById('mainHeader');
     
     const sizeSlider = document.getElementById('sizeSlider');
     const speedSlider = document.getElementById('speedSlider');
@@ -477,7 +482,7 @@
         }
     };
 
-    // --- 外星人步進互動與黑洞歸位邏輯 ---
+    // --- 改進後的步進互動與展示歸位序列 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
         
@@ -485,10 +490,13 @@
         el.dataset.moving = 'true';
         el.classList.add('active'); 
         
-        // 捕捉原位座標（僅第一次點擊時執行）
+        // 捕捉初始狀態與 Header 高度
+        const headerHeight = headerEl.offsetHeight;
+        const rect = el.getBoundingClientRect();
+        const parentRect = el.offsetParent.getBoundingClientRect();
+
         if (step === 0) {
-            const rect = el.getBoundingClientRect();
-            const parentRect = el.offsetParent.getBoundingClientRect();
+            // 第一次點擊：凍結當前動畫座標，切換為絕對定位操控
             el.dataset.homeX = rect.left - parentRect.left;
             el.dataset.homeY = rect.top - parentRect.top;
             
@@ -497,59 +505,64 @@
             el.style.left = el.dataset.homeX + 'px';
             el.style.top = el.dataset.homeY + 'px';
             el.style.transform = 'translate(0, 0)';
-            el.offsetHeight; 
+            el.offsetHeight; // Reflow
         }
 
         step++;
         el.dataset.step = step;
 
         if (step <= 2) {
-            // 跳躍到隨機位置
-            const rx = (Math.random() - 0.5) * (window.innerWidth * 0.7);
-            const ry = (Math.random() - 0.5) * (window.innerHeight * 0.4);
+            // 跳躍到螢幕內的隨機位置，確保避開 Header
+            // 隨機範圍：X (20 ~ innerWidth-50), Y (headerHeight+50 ~ innerHeight-50)
+            const targetX_Viewport = 20 + Math.random() * (window.innerWidth - 70);
+            const targetY_Viewport = (headerHeight + 50) + Math.random() * (window.innerHeight - headerHeight - 120);
+
+            // 轉換為相對於父容器的 translate 值
+            const tx = targetX_Viewport - rect.left;
+            const ty = targetY_Viewport - rect.top;
             const rot = (Math.random() - 0.5) * 40;
             
-            el.style.transition = "transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
-            el.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg) scale(1.1)`;
+            el.style.transition = "transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
+            el.style.transform = `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(1.1)`;
             
-            setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
+            setTimeout(() => { el.dataset.moving = 'false'; }, 1400);
         } 
         else if (step === 3) {
-            // 1. 逃離螢幕
-            const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
+            // 1. 逃離螢幕：向左或向右遠處衝刺
+            const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.3;
             el.style.transition = "transform 1.2s ease-in";
-            el.style.transform = `translate(${escapeX}px, 0px) rotate(180deg) scale(0.3)`;
+            el.style.transform = `translate(${escapeX}px, 0px) rotate(180deg) scale(0.2)`;
             
-            await new Promise(r => setTimeout(r, 1500));
+            await new Promise(r => setTimeout(r, 1400));
 
-            // 2. 原位出現黑洞
+            // 2. 啟動歸位序列：原本位置出現黑洞
             const bh = el.querySelector('.black-hole');
             el.style.transition = "none";
-            el.style.transform = "translate(0, 25px)"; // 先藏在黑洞下方
+            el.style.transform = "translate(0, 30px)"; // 隱藏在黑洞深處
             bh.classList.add('visible');
-            await new Promise(r => setTimeout(r, 600));
-
-            // 3. 探頭從黑洞出現並左右看
-            el.style.transition = "transform 0.8s ease-out";
-            el.style.transform = "translate(0, 8px)"; // 探頭一半
             await new Promise(r => setTimeout(r, 800));
-            
-            el.style.transform = "translate(0, 8px) rotate(-15deg)"; // 左看
-            await new Promise(r => setTimeout(r, 500));
-            el.style.transform = "translate(0, 8px) rotate(15deg)"; // 右看
-            await new Promise(r => setTimeout(r, 500));
-            el.style.transform = "translate(0, 8px) rotate(0deg)"; // 擺正
-            await new Promise(r => setTimeout(r, 300));
 
-            // 4. 跳出黑洞歸位
+            // 3. 探頭從黑洞出現並左右看 (展示動畫)
+            el.style.transition = "transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1)";
+            el.style.transform = "translate(0, 10px)"; // 露出上半身
+            await new Promise(r => setTimeout(r, 1000));
+            
+            el.style.transform = "translate(0, 10px) rotate(-20deg)"; // 左看
+            await new Promise(r => setTimeout(r, 600));
+            el.style.transform = "translate(0, 10px) rotate(20deg)"; // 右看
+            await new Promise(r => setTimeout(r, 600));
+            el.style.transform = "translate(0, 10px) rotate(0deg)"; // 擺正
+            await new Promise(r => setTimeout(r, 400));
+
+            // 4. 奮力跳出黑洞歸位
             el.style.transition = "transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            el.style.transform = "translate(0, -10px)"; // 向上跳
+            el.style.transform = "translate(0, -15px)"; // 向上跳躍
             await new Promise(r => setTimeout(r, 300));
             
-            bh.classList.remove('visible'); // 黑洞消失
-            el.style.transform = "translate(0, 0)"; // 落下
+            bh.classList.remove('visible'); // 黑洞關閉
+            el.style.transform = "translate(0, 0)"; // 落下至原位
             
-            // 恢復所有屬性
+            // 恢復原本的 CSS 動畫與佈局
             setTimeout(() => {
                 el.style.transition = "";
                 el.style.left = ""; 
@@ -558,7 +571,7 @@
                 el.classList.remove('active');
                 el.dataset.step = '0';
                 el.dataset.moving = 'false';
-            }, 500);
+            }, 600);
         }
     }
 
