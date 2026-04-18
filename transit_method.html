@@ -2,9 +2,12 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition)
+      檔案狀態：正式稿 (Tech Edition - Enhanced)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
-      修訂內容：加入數位掃描元素、稜角邊框、HUD 介面與數位網格背景
+      修訂內容：
+      1. 加入跳動像素外星人 (Unit-01)。
+      2. 強化背景呼吸燈亮度與對比度。
+      3. 優化數位網格視覺深度。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -45,17 +48,18 @@
             overflow-x: hidden;
         }
 
-        /* 數位網格背景 */
+        /* 數位網格背景 - 強化亮度與對比 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
             background: 
-                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px),
-                radial-gradient(circle at center, #102030 0%, #050a10 100%);
-            background-size: 40px 40px, 40px 40px, 100% 100%;
+                linear-gradient(rgba(0, 242, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.1) 1px, transparent 1px),
+                radial-gradient(circle at center, #1a3a5a 0%, #050a10 100%);
+            background-size: 50px 50px, 50px 50px, 100% 100%;
             opacity: var(--pulse-opacity);
+            transition: opacity 0.05s ease-out;
         }
 
         /* 掃描線效果 */
@@ -63,8 +67,8 @@
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
             z-index: 100;
@@ -75,8 +79,9 @@
             padding: 30px 4vw;
             text-align: center;
             border-bottom: 2px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
             position: relative;
+            overflow: hidden;
         }
 
         h1 { 
@@ -88,11 +93,49 @@
             letter-spacing: 2px;
         }
 
+        /* 像素外星人小元素 */
+        .pixel-alien {
+            position: absolute;
+            right: 20px;
+            bottom: 10px;
+            width: 30px;
+            height: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: alien-bounce 0.6s infinite alternate;
+        }
+
+        .alien-body {
+            width: 20px;
+            height: 15px;
+            background: var(--neon-blue);
+            box-shadow: 
+                -4px 4px 0 var(--neon-blue), 
+                4px 4px 0 var(--neon-blue),
+                -8px 8px 0 var(--neon-blue),
+                8px 8px 0 var(--neon-blue),
+                0 4px 0 #000; /* 眼睛 */
+            position: relative;
+        }
+
+        .alien-label {
+            font-size: 8px;
+            font-family: monospace;
+            color: var(--neon-blue);
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+
+        @keyframes alien-bounce {
+            from { transform: translateY(0) scaleX(1); }
+            to { transform: translateY(-8px) scaleX(1.1); }
+        }
+
         .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 20px 0; }
 
-        /* 科技感區塊 */
         section {
-            background: rgba(10, 20, 30, 0.8);
+            background: rgba(10, 20, 30, 0.85);
             backdrop-filter: blur(10px);
             margin-bottom: 30px;
             padding: 30px 20px;
@@ -101,7 +144,6 @@
             clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
         }
 
-        /* 裝飾性角落 */
         section::before {
             content: "";
             position: absolute;
@@ -126,7 +168,7 @@
         .highlight { color: var(--neon-blue); font-family: "Courier New", Courier, monospace; font-weight: bold; }
 
         .image-placeholder {
-            background: rgba(0, 242, 255, 0.03);
+            background: rgba(0, 242, 255, 0.05);
             border: 1px solid rgba(0, 242, 255, 0.2);
             margin: 20px 0;
             padding: 60px 20px;
@@ -136,13 +178,6 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             position: relative;
-        }
-        .image-placeholder::after {
-            content: "SCANNING_VISUAL_DATA";
-            position: absolute;
-            bottom: 5px; right: 10px;
-            font-size: 10px;
-            opacity: 0.5;
         }
 
         .canvas-container {
@@ -157,7 +192,6 @@
 
         canvas { display: block; width: 100%; height: auto; }
 
-        /* 控制台樣式 */
         .controls {
             padding: 20px;
             background: #060e16; 
@@ -185,7 +219,6 @@
             width: 100%;
             height: 4px;
             background: #1a3040;
-            border-radius: 0;
             outline: none;
         }
 
@@ -207,12 +240,10 @@
             padding: 25px 15px;
             background: rgba(0, 242, 255, 0.05);
             border: 1px solid rgba(0, 242, 255, 0.2);
-            font-family: serif;
         }
 
         details { background: rgba(0, 0, 0, 0.3); margin: 25px -20px -30px -20px; border-top: 1px solid var(--tech-cyan); }
         summary { padding: 15px 20px; font-weight: bold; color: var(--neon-blue); cursor: pointer; display: flex; justify-content: space-between; font-family: monospace; }
-        .details-content { padding: 20px; font-size: 0.9em; color: #a0c0d0; border-top: 1px solid rgba(0, 242, 255, 0.1); }
 
         .back-nav { text-align: center; margin: 40px 0; }
         .back-btn { 
@@ -246,6 +277,12 @@
 <header>
     <h1>捕捉宇宙的閃爍</h1>
     <p style="color:var(--tech-cyan); font-size:0.8em; margin-top:5px; font-family: monospace;">[ TRANSIT_METHOD_ANALYSIS_UNIT_117 ]</p>
+    
+    <!-- 新增的小元素：像素外星人 -->
+    <div class="pixel-alien">
+        <div class="alien-body"></div>
+        <div class="alien-label">UNIT_01</div>
+    </div>
 </header>
 
 <div class="container">
@@ -346,7 +383,7 @@
     let speedMult = parseFloat(speedSlider.value);
     let points = []; 
     const starR = 60; 
-    const breathPeriod = 12.0; 
+    const breathPeriod = 8.0; // 加快呼吸頻率讓效果明顯
 
     let lastTimestamp = performance.now();
     let currentOrbitAngle = 0; 
@@ -382,7 +419,6 @@
         ctx.save();
         ctx.globalAlpha = opacity;
         
-        // 如果正在凌日且有高亮，增加一個目標瞄準框
         if (intensity > 0.5) {
             ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${intensity * 0.5})`;
             ctx.setLineDash([]);
@@ -456,13 +492,12 @@
 
         const sX = w / 2, sY = h * 0.3; 
 
-        // HUD Decorations
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.1)';
+        // HUD
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.15)';
         ctx.lineWidth = 1;
         ctx.strokeRect(10, 10, w - 20, h - 20);
         
-        // 狀態文字
-        ctx.fillStyle = inTransit ? '#ff3300' : 'rgba(0, 242, 255, 0.5)';
+        ctx.fillStyle = inTransit ? '#ff3300' : 'rgba(0, 242, 255, 0.6)';
         ctx.font = '10px monospace';
         ctx.fillText(inTransit ? '>> EVENT: TRANSIT_DETECTED' : '>> STATUS: SCANNING_SYSTEM', 20, 25);
 
@@ -481,7 +516,7 @@
 
         // 軌道虛線
         ctx.save();
-        ctx.strokeStyle = hIntensity > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.1 + hIntensity * 0.4})` : 'rgba(0, 242, 255, 0.05)';
+        ctx.strokeStyle = hIntensity > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.2 + hIntensity * 0.4})` : 'rgba(0, 242, 255, 0.1)';
         ctx.setLineDash([5, 5]);
         ctx.beginPath();
         ctx.ellipse(sX, sY, orbitRadius * 0.5, 6, 0, 0, Math.PI * 2);
@@ -491,14 +526,7 @@
         const px = sX + (planetX - w/2) * 0.5;
         if (planetZ <= 0) drawPlanetInstance(px, sY, planetR, 0.3, hIntensity, false);
 
-        // 恆星 (加入 HUD 瞄準框)
-        ctx.save();
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)';
-        ctx.beginPath();
-        ctx.moveTo(sX - starR - 10, sY - 20); ctx.lineTo(sX - starR - 10, sY - starR - 10); ctx.lineTo(sX - 20, sY - starR - 10);
-        ctx.stroke();
-        ctx.restore();
-
+        // 恆星
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
         starGrad.addColorStop(0.3, '#ffdd00');
@@ -508,14 +536,13 @@
 
         if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity, inTransit);
 
-        // 下半部：光變曲線 (HUD 介面風格)
+        // 下半部：光變曲線
         const graphX = w * 0.05, graphY = h * 0.6, graphW = w * 0.9, graphH = h * 0.3;
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)';
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.3)';
         ctx.strokeRect(graphX, graphY, graphW, graphH);
         
-        // 曲線背景網格
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.05)';
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.08)';
         for(let i=1; i<4; i++) {
             ctx.moveTo(graphX, graphY + graphH * i / 4);
             ctx.lineTo(graphX + graphW, graphY + graphH * i / 4);
@@ -524,7 +551,7 @@
 
         ctx.strokeStyle = COLOR_VIBRANT_GOLD;
         ctx.lineWidth = 2;
-        ctx.shadowBlur = 5;
+        ctx.shadowBlur = 8;
         ctx.shadowColor = COLOR_VIBRANT_GOLD;
         ctx.beginPath();
         points.forEach((p, i) => {
@@ -538,14 +565,11 @@
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        ctx.fillStyle = 'rgba(0, 242, 255, 0.7)';
-        ctx.font = '9px monospace';
-        ctx.fillText('DATA_LOG: FLUX_VAR', graphX + 5, graphY + 12);
-
-        // 背景呼吸燈與網格閃爍
+        // 背景呼吸燈強化
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
-        bgLayer.style.setProperty('--pulse-opacity', 0.15 + (breath * 0.1));
+        // 將震盪範圍擴大為 0.3 到 0.8，最大亮度增加
+        bgLayer.style.setProperty('--pulse-opacity', 0.3 + (breath * 0.5));
 
         requestAnimationFrame(draw);
     }
