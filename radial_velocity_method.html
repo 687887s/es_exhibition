@@ -2,12 +2,13 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Final Boundary & Layer Fix)
+      檔案狀態：正式稿 (Tech Edition - Absolute Boundary Protection)
       風格：科技、未來主義風格 (Doppler Theme)
       修訂內容：
-      1. 嚴格邊界邏輯：偵測 Block 寬度與 Banner 高度，確保外星人始終在可見內容區。
-      2. 歸位動畫修正：先現黑洞，外星人後從中探頭現身。
-      3. 波形追蹤者：加入雙像素眼睛與 10s 紅藍移背景。
+      1. 嚴格邊界邏輯：外星人活動範圍精確限制於 Block 寬度與上下 Banner 之間。
+      2. 歸位序列修正：外星人逃脫後完全隱身，黑洞開啟後才在洞內現身探頭。
+      3. 波形追蹤者：雙像素眼、碟形身體、頻率天線。
+      4. 背景優化：10秒週期紅藍偏移，無亮度呼吸。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -46,7 +47,6 @@
 
         h1 { color: var(--neon-blue); font-size: 1.4em; font-weight: 900; margin: 0; letter-spacing: 3px; }
 
-        /* 波形追蹤者 (Wave Tracker) */
         .pixel-mascot {
             position: absolute; width: 36px; height: 20px; z-index: 10; top: -24px; cursor: pointer;
             transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s; filter: drop-shadow(0 0 10px var(--neon-blue)); -webkit-tap-highlight-color: transparent;
@@ -60,8 +60,8 @@
         .mascot-body::after { content: ""; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 4px; height: 8px; background: var(--neon-blue); animation: ant 0.5s infinite alternate; }
         @keyframes ant { from { height: 4px; } to { height: 10px; } }
 
-        .mascot-eyes { position: absolute; top: 4px; left: 4px; right: 4px; height: 5px; display: flex; justify-content: space-around; z-index: 2; }
-        .mascot-eyes::before, .mascot-eyes::after { content: ""; width: 5px; height: 5px; background: #000; border-radius: 1px; animation: blink 4s infinite; }
+        .mascot-eyes { position: absolute; top: 4px; left: 4px; right: 4px; height: 5px; display: flex; justify-content: space-around; z-index: 2; pointer-events: none; }
+        .mascot-eyes::before, .mascot-eyes::after { content: ""; width: 6px; height: 5px; background: #000; animation: blink 4s infinite; }
         @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
 
         @keyframes idle-f { 0% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-40px) rotate(180deg) scale(1.1); } 100% { transform: translateY(0) rotate(360deg) scale(1); } }
@@ -120,7 +120,7 @@
         </div>
         <div class="black-hole" id="bh-s1" style="left: 6px; top: 6px;"></div>
         <h2>什麼是「徑向速度法」？</h2>
-        <p>系外行星繞行時會拉動恆星，產生微小的紅移與藍移現象。</p>
+        <p>系外行星繞行時會拉動恆星，產生微小的紅移與藍移現象。這就像是救護車經過時聲音頻率的變化。</p>
         <div class="canvas-container"><canvas id="wobbleCanvas"></canvas></div>
         <div class="controls">
             <div class="control-item">
@@ -141,7 +141,7 @@
         </div>
         <div class="black-hole" id="bh-s2" style="right: 6px; top: 6px;"></div>
         <h2>都卜勒效應與光譜</h2>
-        <p>當恆星靠近我們，光波被擠壓，光譜向藍色端偏移；遠離時則向紅色端偏移。</p>
+        <p>靠近我們時光譜藍移，遠離時紅移。這讓我們能推算出系外行星的存在與其質量的下限值：$$M_p \sin i$$</p>
     </section>
 
     <div class="back-nav"><a href="index.html" class="back-btn">Return to Sector 0</a></div>
@@ -156,31 +156,30 @@
     const mVal = document.getElementById('massVal'), sVal = document.getElementById('speedVal');
     let lastT = performance.now(), angle = 0, starR = 50, planetR = 12;
 
-    // --- 改進後的嚴格邊界邏輯 ---
+    // --- 強化版邊界控制與座標轉換 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
-        el.dataset.moving = 'true'; el.classList.add('active'); 
+        el.dataset.moving = 'true'; 
+        el.classList.add('active'); 
         
-        const scrollY = window.scrollY;
-        const vh = window.innerHeight;
-        const vw = window.innerWidth;
         const hh = headerEl.offsetHeight;
         const fh = footerEl.offsetHeight;
+        const vh = window.innerHeight;
+        const vw = window.innerWidth;
         
-        // 偵測所屬區塊
+        // 找到所屬內容區塊以限制水平範圍
         const parentBlock = el.closest('section') || document.querySelector('section');
         const blockRect = parentBlock.getBoundingClientRect();
         
         let step = parseInt(el.dataset.step || '0');
 
-        // 初始化：記錄原始絕對位置
+        // 第一次點擊：凍結當前動畫位置並記錄「家」的基準座標
         if (step === 0) {
             const r = el.getBoundingClientRect();
-            const pR = el.offsetParent.getBoundingClientRect();
-            el.dataset.homeX = r.left - pR.left;
-            el.dataset.homeY = r.top - pR.top;
+            const offsetParentRect = el.offsetParent.getBoundingClientRect();
+            el.dataset.homeX = r.left - offsetParentRect.left;
+            el.dataset.homeY = r.top - offsetParentRect.top;
             
-            // 固定位置轉為手動控制
             el.style.transition = "none";
             el.style.animation = "none";
             el.style.left = el.dataset.homeX + 'px';
@@ -194,61 +193,72 @@
 
         if (step <= 2) {
             const pad = 60;
-            // X 軸：嚴格限制在 Block 左右寬度內
-            const minX_Block = blockRect.left + pad;
-            const maxX_Block = blockRect.right - pad;
-            const targetX_VP = minX_Block + Math.random() * (maxX_Block - minX_Block);
-
-            // Y 軸：嚴格限制在上下 Banner 之間 (可見區域)
+            // 1. 計算螢幕上的「安全可見區」
+            // 水平：限制在 Block 內
+            const minX_VP = blockRect.left + pad;
+            const maxX_VP = blockRect.right - pad;
+            // 垂直：限制在 Header 與 Footer 之間
             const minY_VP = hh + pad;
             const maxY_VP = vh - fh - pad;
+
+            // 2. 隨機選取目標點 (Viewport 座標)
+            const targetX_VP = minX_VP + Math.random() * (maxX_VP - minX_VP);
             const targetY_VP = minY_VP + Math.random() * (maxY_VP - minY_VP);
 
-            // 轉換為相對位移 (相對於 Mascot 原始固定座標)
-            const currentRect = el.getBoundingClientRect();
-            const tx = targetX_VP - currentRect.left;
-            const ty = targetY_VP - currentRect.top;
+            // 3. 轉換為相對於「家」的位移量
+            const mascotBaseRect = el.getBoundingClientRect();
+            // 注意：我們需要的是目標與 Mascot 當前位置的差值，加到目前的 translate 上
+            // 簡單做法： targetX_VP - ( el.offsetParent.getBoundingClientRect().left + parseFloat(el.style.left) )
+            const parentLeft = el.offsetParent.getBoundingClientRect().left;
+            const parentTop = el.offsetParent.getBoundingClientRect().top;
             
-            // 加入緩動效果
+            const tx = targetX_VP - (parentLeft + parseFloat(el.style.left));
+            const ty = targetY_VP - (parentTop + parseFloat(el.style.top));
+            
+            const rot = (Math.random() - 0.5) * 45;
+            
             el.style.transition = "transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
-            el.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random()-0.5)*40}deg) scale(1.1)`;
+            el.style.transform = `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(1.1)`;
             
             setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
         } 
         else if (step === 3) {
-            // 逃跑階段
+            // 逃離
             const escX = (Math.random() > 0.5 ? 1 : -1) * vw * 1.5;
             el.style.transition = "transform 1.4s ease-in, opacity 0.5s ease-in";
             el.style.transform = `translate(${escX}px, 0px) rotate(360deg) scale(0.1)`;
             el.style.opacity = "0"; 
+            el.style.pointerEvents = "none";
             
             await new Promise(r => setTimeout(r, 1600));
 
-            // --- 歸位：黑洞先現身 ---
+            // --- 歸位序列 ---
             const bhId = el.id.replace('mascot', 'bh');
             const bh = document.getElementById(bhId);
             
-            // 將隱形外星人瞬移回黑洞下方（原位）
+            // 將隱形的外星人瞬移回黑洞下方位置
             el.style.transition = "none";
-            el.style.transform = "translate(0, 45px)"; 
+            el.style.transform = "translate(0, 50px)"; 
             el.offsetHeight;
 
-            bh.classList.add('visible'); // 開啟黑洞
+            // 開啟黑洞
+            bh.classList.add('visible'); 
             await new Promise(r => setTimeout(r, 800));
 
-            // 外星人現身探頭
+            // 外星人現身並緩緩探頭
             el.style.opacity = "1";
-            el.style.transition = "transform 1s cubic-bezier(0.2, 0.8, 0.2, 1)";
-            el.style.transform = "translate(0, 10px)"; 
-            await new Promise(r => setTimeout(r, 1100));
+            el.style.transition = "transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1)";
+            el.style.transform = "translate(0, 12px)"; 
+            await new Promise(r => setTimeout(r, 1200));
             
-            el.style.transform = "translate(0, 10px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
-            el.style.transform = "translate(0, 10px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
-            el.style.transform = "translate(0, 10px) rotate(0deg)"; await new Promise(r => setTimeout(r, 300));
+            // 左右看看
+            el.style.transform = "translate(0, 12px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
+            el.style.transform = "translate(0, 12px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
+            el.style.transform = "translate(0, 12px) rotate(0deg)"; await new Promise(r => setTimeout(r, 300));
 
-            // 跳出歸位
+            // 跳出黑洞歸位
             el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            el.style.transform = "translate(0, -18px)"; 
+            el.style.transform = "translate(0, -20px)"; 
             await new Promise(r => setTimeout(r, 300));
             
             bh.classList.remove('visible'); 
@@ -256,6 +266,7 @@
             
             setTimeout(() => {
                 el.style.transition = ""; el.style.left = ""; el.style.top = ""; el.style.animation = ""; 
+                el.style.opacity = ""; el.style.pointerEvents = "";
                 el.classList.remove('active'); el.dataset.step = '0'; el.dataset.moving = 'false';
             }, 600);
         }
