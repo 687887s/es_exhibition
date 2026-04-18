@@ -2,12 +2,13 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Black Hole & Boundary Fixed)
+      檔案狀態：正式稿 (Tech Edition - Autonomous Mascots)
       風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 修正歸位動畫：外星人先隱身，黑洞開啟後才從深處出現。
-      2. 嚴格邊界控制：前兩次點擊限制在視窗安全區域內，避開 Header。
-      3. 完整歸位序列：黑洞生成 -> 探頭 -> 左右觀望 -> 跳出歸位。
+      1. 增加閒置行為：外星人在原地時會隨機跳躍翻轉、變換顏色。
+      2. 維持步進式互動：兩次原地跳躍，第三次逃跑。
+      3. 歸位序列優化：黑洞先現身，外星人再由內而外探頭。
+      4. 邊界嚴格限制：前兩次點擊絕對不會跳出螢幕。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -73,7 +74,6 @@
             z-index: 4000;
         }
 
-        /* 固定式標題 */
         header {
             position: sticky;
             top: 0;
@@ -109,7 +109,23 @@
         }
 
         .pixel-mascot.active {
-            z-index: 5000; /* 活動時在最上層，甚至高過標題 */
+            z-index: 5000;
+        }
+
+        /* 閒置隨機跳躍翻轉動畫 */
+        @keyframes idle-jump-flip {
+            0% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-30px) rotate(180deg) scale(1.2); }
+            100% { transform: translateY(0) rotate(360deg) scale(1); }
+        }
+        .pixel-mascot.idle-jump {
+            animation: idle-jump-flip 0.8s ease-in-out !important;
+        }
+
+        /* 閒置隨機變色 */
+        .pixel-mascot.idle-color .mascot-body {
+            filter: hue-rotate(150deg) brightness(1.5) saturate(1.2);
+            transition: filter 0.5s;
         }
 
         .mascot-body {
@@ -146,7 +162,7 @@
             95% { transform: scaleY(0.1); }
         }
 
-        /* 黑洞特效 - 移到外層或調整 z-index 確保可見 */
+        /* 黑洞特效 */
         .black-hole {
             position: absolute;
             width: 54px;
@@ -481,7 +497,37 @@
         }
     };
 
-    // --- 強化版步進式外星人互動 ---
+    // --- 閒置自主行為初始化 ---
+    function initIdleBehaviors() {
+        const mascots = document.querySelectorAll('.pixel-mascot');
+        mascots.forEach(el => {
+            const triggerNext = () => {
+                // 隨機冷卻 4 到 10 秒
+                const delay = 4000 + Math.random() * 6000;
+                setTimeout(() => {
+                    // 檢查條件：必須在原位 (step 0) 且未在互動中
+                    const step = parseInt(el.dataset.step || '0');
+                    const isMoving = el.dataset.moving === 'true';
+                    
+                    if (step === 0 && !isMoving) {
+                        const actionType = Math.random() > 0.5 ? 'jump' : 'color';
+                        
+                        if (actionType === 'jump') {
+                            el.classList.add('idle-jump');
+                            setTimeout(() => el.classList.remove('idle-jump'), 800);
+                        } else {
+                            el.classList.add('idle-color');
+                            setTimeout(() => el.classList.remove('idle-color'), 2000);
+                        }
+                    }
+                    triggerNext();
+                }, delay);
+            };
+            triggerNext();
+        });
+    }
+
+    // --- 步進式互動邏輯 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
         
@@ -491,7 +537,6 @@
         
         const headerHeight = headerEl.offsetHeight;
 
-        // 初始化：固定當前座標
         if (step === 0) {
             const rect = el.getBoundingClientRect();
             const parentRect = el.offsetParent.getBoundingClientRect();
@@ -510,8 +555,6 @@
         el.dataset.step = step;
 
         if (step <= 2) {
-            // 第一、二次跳躍：嚴格計算螢幕內的隨機座標
-            // 計算安全寬度與高度（避開 Header 與底邊）
             const padding = 60;
             const safeWidth = window.innerWidth - padding * 2;
             const safeHeight = window.innerHeight - headerHeight - padding * 2;
@@ -519,7 +562,6 @@
             const targetGlobalX = padding + Math.random() * safeWidth;
             const targetGlobalY = headerHeight + padding + Math.random() * safeHeight;
 
-            // 轉換為相對於原位 (left/top) 的 translate 數值
             const rect = el.getBoundingClientRect();
             const tx = targetGlobalX - rect.left;
             const ty = targetGlobalY - rect.top;
@@ -531,7 +573,6 @@
             setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
         } 
         else if (step === 3) {
-            // 第三次：逃離螢幕
             const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
             const escapeY = (Math.random() - 0.5) * window.innerHeight;
             
@@ -541,18 +582,15 @@
             
             await new Promise(r => setTimeout(r, 1600));
 
-            // --- 歸位序列展示 ---
             const bh = el.querySelector('.black-hole');
-            // 瞬間移回原位正下方（仍隱身）
             el.style.transition = "none";
             el.style.transform = "translate(0, 45px)"; 
-            bh.classList.add('visible'); // 開啟黑洞
+            bh.classList.add('visible');
             await new Promise(r => setTimeout(r, 800));
 
-            // 探頭左右看
             el.style.opacity = "1";
             el.style.transition = "transform 1.0s cubic-bezier(0.2, 0.8, 0.2, 1)";
-            el.style.transform = "translate(0, 10px)"; // 露出頭
+            el.style.transform = "translate(0, 10px)"; 
             await new Promise(r => setTimeout(r, 1200));
             
             el.style.transform = "translate(0, 10px) rotate(-15deg)";
@@ -562,16 +600,14 @@
             el.style.transform = "translate(0, 10px) rotate(0deg)";
             await new Promise(r => setTimeout(r, 400));
 
-            // 跳出歸位
             el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            el.style.transform = "translate(0, -18px)"; // 奮力一跳
+            el.style.transform = "translate(0, -18px)"; 
             await new Promise(r => setTimeout(r, 300));
             
-            bh.classList.remove('visible'); // 關閉黑洞
-            el.style.transform = "translate(0, 0)"; // 落地
+            bh.classList.remove('visible'); 
+            el.style.transform = "translate(0, 0)"; 
             
             setTimeout(() => {
-                // 恢復 CSS 預設屬性
                 el.style.transition = "";
                 el.style.left = ""; 
                 el.style.top = "";
@@ -747,7 +783,9 @@
         requestAnimationFrame(draw);
     }
     
+    // 初始化動畫循環與閒置行為
     requestAnimationFrame(draw);
+    initIdleBehaviors();
 </script>
 
 </body>
