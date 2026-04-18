@@ -2,9 +2,9 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Final Draft)
-      最後修訂：根據地科展教具 PDF 完整內容重製，並預留圖片位
-      保留功能：垂直佈局模擬器、累積相位變速邏輯、Hold+Ease-in 衰減高亮
+      檔案狀態：正式稿 (Tech Edition)
+      風格：科技、未來主義風格 (HUD / Tech / Futuristic)
+      修訂內容：加入數位掃描元素、稜角邊框、HUD 介面與數位網格背景
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -27,16 +27,16 @@
     <style>
         :root {
             --vibrant-gold: #ffcc00;
-            --neon-blue: #00d4ff;
-            --text-color: #f0f0f0;
-            --bg-color-center: #333333; 
-            --bg-color-edge: #0a0a0a;   
+            --neon-blue: #00f2ff;
+            --tech-cyan: rgba(0, 242, 255, 0.6);
+            --text-color: #e0faff;
+            --bg-deep: #050a10;
             --pulse-opacity: 1;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
-            background: #000;
+            background: var(--bg-deep);
             color: var(--text-color);
             line-height: 1.6;
             margin: 0;
@@ -45,126 +45,198 @@
             overflow-x: hidden;
         }
 
+        /* 數位網格背景 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, var(--bg-color-center) 0%, var(--bg-color-edge) 100%);
+            background: 
+                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                radial-gradient(circle at center, #102030 0%, #050a10 100%);
+            background-size: 40px 40px, 40px 40px, 100% 100%;
             opacity: var(--pulse-opacity);
-            transition: opacity 0.1s linear;
+        }
+
+        /* 掃描線效果 */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 100;
         }
 
         header {
-            background: rgba(0, 0, 0, 0.85);
-            padding: 25px 4vw;
+            background: rgba(5, 10, 16, 0.9);
+            padding: 30px 4vw;
             text-align: center;
-            border-bottom: 2px solid var(--vibrant-gold);
+            border-bottom: 2px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            position: relative;
         }
 
-        h1 { color: var(--vibrant-gold); font-size: 1.5em; text-shadow: 0 0 10px rgba(255, 204, 0, 0.4); font-weight: 800; margin: 0; }
+        h1 { 
+            color: var(--neon-blue); 
+            font-size: 1.6em; 
+            text-shadow: 0 0 15px rgba(0, 242, 255, 0.5); 
+            font-weight: 900; 
+            margin: 0; 
+            letter-spacing: 2px;
+        }
 
-        .container { width: 92vw; max-width: 600px; margin: 0 auto; padding: 15px 0; }
+        .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 20px 0; }
 
+        /* 科技感區塊 */
         section {
-            background: rgba(25, 25, 25, 0.85);
-            backdrop-filter: blur(15px);
-            margin-bottom: 20px;
-            padding: 25px 18px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            background: rgba(10, 20, 30, 0.8);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            border: 1px solid var(--tech-cyan);
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
         }
 
-        h2 { color: var(--vibrant-gold); margin-top: 0; padding-bottom: 12px; display: flex; align-items: center; font-size: 1.3em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        h2::before { content: ""; width: 4px; height: 1.2em; background: var(--vibrant-gold); margin-right: 12px; border-radius: 2px; }
+        /* 裝飾性角落 */
+        section::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 15px; height: 15px;
+            border-top: 3px solid var(--neon-blue);
+            border-left: 3px solid var(--neon-blue);
+        }
 
-        .highlight { color: var(--neon-blue); font-weight: bold; }
+        h2 { 
+            color: var(--vibrant-gold); 
+            margin-top: 0; 
+            font-size: 1.3em; 
+            display: flex; 
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        h2::before { content: "[ "; color: var(--neon-blue); margin-right: 8px; }
+        h2::after { content: " ]"; color: var(--neon-blue); margin-left: 8px; }
+
+        .highlight { color: var(--neon-blue); font-family: "Courier New", Courier, monospace; font-weight: bold; }
 
         .image-placeholder {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px dashed #444;
-            border-radius: 10px;
-            margin: 15px 0;
-            padding: 40px 20px;
+            background: rgba(0, 242, 255, 0.03);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            margin: 20px 0;
+            padding: 60px 20px;
             text-align: center;
-            color: #888;
-            font-size: 0.9em;
+            color: var(--tech-cyan);
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+        }
+        .image-placeholder::after {
+            content: "SCANNING_VISUAL_DATA";
+            position: absolute;
+            bottom: 5px; right: 10px;
+            font-size: 10px;
+            opacity: 0.5;
         }
 
         .canvas-container {
-            margin: 15px -18px;
+            margin: 20px -20px;
             background: #000;
             position: relative;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--tech-cyan);
+            border-bottom: 1px solid var(--tech-cyan);
             overflow: hidden;
             line-height: 0;
-            font-size: 0;
         }
 
         canvas { display: block; width: 100%; height: auto; }
 
+        /* 控制台樣式 */
         .controls {
-            padding: 5px 18px 25px 18px;
-            background: #000; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 0 -18px 15px -18px;
+            padding: 20px;
+            background: #060e16; 
+            border-bottom: 1px solid var(--tech-cyan);
+            margin: 0 -20px 20px -20px;
         }
 
         .control-item {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            margin-bottom: 12px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .control-label {
-            font-size: 0.85em;
-            color: var(--vibrant-gold);
+            font-size: 0.8em;
+            color: var(--neon-blue);
             display: flex;
             justify-content: space-between;
+            font-family: monospace;
         }
 
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
-            height: 6px;
-            background: #222;
-            border-radius: 3px;
+            height: 4px;
+            background: #1a3040;
+            border-radius: 0;
             outline: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 24px;
+            width: 12px;
             height: 24px;
-            background: var(--vibrant-gold);
-            border-radius: 50%;
+            background: var(--neon-blue);
+            border: 1px solid white;
             cursor: pointer;
-            box-shadow: 0 0 10px var(--vibrant-gold);
+            box-shadow: 0 0 10px var(--neon-blue);
         }
 
         .formula-card {
             font-size: 1.1em;
             color: var(--vibrant-gold);
             text-align: center;
-            margin: 15px 0;
-            padding: 20px 15px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 204, 0, 0.2);
+            margin: 20px 0;
+            padding: 25px 15px;
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            font-family: serif;
         }
 
-        details { background: rgba(255, 255, 255, 0.05); margin: 20px -18px -25px -18px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-        summary { padding: 15px 20px; font-weight: bold; color: var(--vibrant-gold); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; outline: none; }
-        summary::after { content: "↓"; transition: transform 0.3s; }
-        details[open] summary::after { transform: rotate(180deg); }
-        .details-content { padding: 15px 20px; background: rgba(0, 0, 0, 0.3); font-size: 0.95em; color: #ccc; }
+        details { background: rgba(0, 0, 0, 0.3); margin: 25px -20px -30px -20px; border-top: 1px solid var(--tech-cyan); }
+        summary { padding: 15px 20px; font-weight: bold; color: var(--neon-blue); cursor: pointer; display: flex; justify-content: space-between; font-family: monospace; }
+        .details-content { padding: 20px; font-size: 0.9em; color: #a0c0d0; border-top: 1px solid rgba(0, 242, 255, 0.1); }
 
-        .back-nav { text-align: center; margin: 30px 0; }
-        .back-btn { color: var(--vibrant-gold); text-decoration: none; font-size: 0.9em; border: 1px solid var(--vibrant-gold); padding: 8px 20px; border-radius: 20px; transition: all 0.3s; }
-        .back-btn:hover { background: var(--vibrant-gold); color: #000; }
+        .back-nav { text-align: center; margin: 40px 0; }
+        .back-btn { 
+            color: var(--neon-blue); 
+            text-decoration: none; 
+            font-size: 0.9em; 
+            border: 1px solid var(--neon-blue); 
+            padding: 12px 30px; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            font-family: monospace;
+        }
+        .back-btn:hover { background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 15px var(--neon-blue); }
 
-        footer { text-align: center; padding: 50px 20px; font-size: 0.85em; color: #777; background: rgba(0, 0, 0, 0.8); }
+        footer { 
+            text-align: center; 
+            padding: 60px 20px; 
+            font-size: 0.7em; 
+            color: #446688; 
+            background: #020508; 
+            letter-spacing: 3px;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
@@ -173,21 +245,21 @@
 
 <header>
     <h1>捕捉宇宙的閃爍</h1>
-    <p style="color:#aaa; font-size:0.9em; margin-top:5px;">地科展天文股：凌日法內容展示</p>
+    <p style="color:var(--tech-cyan); font-size:0.8em; margin-top:5px; font-family: monospace;">[ TRANSIT_METHOD_ANALYSIS_UNIT_117 ]</p>
 </header>
 
 <div class="container">
     <section>
-        <div class="image-placeholder"></div>
-        <h2>★ 什麼是「凌日法」？</h2>
+        <div class="image-placeholder">[ Image of 凌日法示意圖 ]</div>
+        <h2>什麼是「凌日法」？</h2>
         <p>
             想像一下，在黑夜中有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，雖然你看不清蚊子，但你會發現探照燈的亮度瞬間稍微變暗了一點點。
         </p>
         <p>
-            這種光度隨時間變化所繪出的曲線的專業術語叫做<span class="highlight">「光變曲線」(Light Curve)</span>。科學家發現，凌日法是目前發現系外行星數量最多的技術（著名的克卜勒太空望遠鏡 Kepler 就以此發現了數千顆行星）。它不僅能偵測行星，還能讓我們測量行星的直徑。
+            這種光度隨時間變化所繪出的曲線稱為<span class="highlight">「光變曲線」(Light Curve)</span>。科學家發現，凌日法是目前發現系外行星數量最多的技術。它不僅能偵測行星，還能讓我們精確測量行星的直徑。
         </p>
         
-        <div class="image-placeholder"></div>
+        <div class="image-placeholder">[ Image of 系外行星 WASP-96b 透過凌日法測得的光變曲線 ]</div>
 
         <div class="canvas-container">
             <canvas id="transitCanvas"></canvas>
@@ -196,67 +268,65 @@
         <div class="controls">
             <div class="control-item">
                 <div class="control-label">
-                    <span>行星大小 (Planet Size)</span>
-                    <span id="sizeVal">12.0</span>
+                    <span>OBJECT_SIZE_SCALE</span>
+                    <span id="sizeVal" style="color:white">12.0</span>
                 </div>
                 <input type="range" id="sizeSlider" min="5" max="25" value="12" step="0.1">
             </div>
             <div class="control-item">
                 <div class="control-label">
-                    <span>公轉速度 (Orbital Speed)</span>
-                    <span id="speedVal">5.00</span>
+                    <span>ORBITAL_VELOCITY</span>
+                    <span id="speedVal" style="color:white">5.00</span>
                 </div>
                 <input type="range" id="speedSlider" min="0.5" max="10" value="5" step="0.05">
             </div>
         </div>
-        <div style="text-align: center; padding-bottom: 5px;">
-            <span style="font-size:0.8em; color:#888;">調整滑桿：親自模擬系外行星的凌日觀測</span>
-        </div>
     </section>
 
     <section>
-        <h2>★ 透過凌日法能得到什麼資訊？</h2>
+        <h2>數據資訊分析</h2>
         
-        <p><strong>1. 有東西經過嗎？</strong></p>
-        <p>當我們觀測到的光度曲線突然掉下去一個「坑」，就代表行星正在經過恆星前方。</p>
+        <p><strong>1. 偵測行星存在</strong></p>
+        <p>當觀測到的光度曲線出現週期性的下降「坑洞」，即確認行星凌日現象。</p>
 
-        <p><strong>2. 它是巨無霸還是小不點？</strong></p>
-        <p>行星越大，遮住的光就越多，光度曲線掉下去的「坑」就越深。行星遮擋的面積與恆星總面積的比例，決定了光度下降的「深度」。公式如下：</p>
+        <p><strong>2. 幾何尺寸計算</strong></p>
+        <p>行星遮擋面積與恆星面積的比例決定了下降深度。透過公式可回推行星半徑：</p>
         <div class="formula-card">
-            $$\displaystyle \text{亮度下降比例} = \left(\frac{\text{行星半徑}}{\text{恆星半徑}}\right)^2$$
+            $$\text{Depth} = \left(\frac{R_{planet}}{R_{star}}\right)^2$$
         </div>
         
-        <div class="image-placeholder"></div>
+        <div class="image-placeholder">[ Image of TRAPPIST-1 系統兩顆不同大小行星的光變曲線對比 ]</div>
 
-        <p><strong>3. 它跑得有多快？</strong></p>
-        <p>如果這個「坑」出現得很頻繁，代表這顆行星公轉速度很快。根據克卜勒第三定律，我們能從兩次凌日的時間間隔計算出行星的軌道半徑。這對判斷行星是否位在<span class="highlight">適居帶</span>（生命可能存在的區域）至關重要。</p>
+        <p><strong>3. 軌道力學推演</strong></p>
+        <p>根據兩次凌日時間間隔（週期 $T$），依克卜勒第三定律計算軌道半徑 $a$，判斷是否位於<span class="highlight">適居帶 (Habitable Zone)</span>。</p>
 
-        <p><strong>4. 它的大氣層有什麼？</strong></p>
-        <p>當行星經過恆星前方時，恆星發出的光會穿過行星邊緣的大氣層。大氣中的化學分子（例如水蒸氣、氧氣、甚至甲烷）會吸收特定顏色的光。分析這道<span class="highlight">「光譜指紋」</span>，就能確定大氣成分。</p>
+        <p><strong>4. 大氣成分光譜分析</strong></p>
+        <p>恆星光穿過行星邊緣大氣時，化學分子（如 $H_2O, O_2, CH_4$）會吸收特定顏色。分析此<span class="highlight">「光譜指紋」</span>即可解析大氣組成。</p>
         
-        <div class="image-placeholder"></div>
+        <div class="image-placeholder">[ Image of 透過凌日法探測系外行星大氣原理圖 ]</div>
     </section>
 
     <section>
-        <h2>★ 地科展教具：Arduino 的眼睛</h2>
+        <h2>ARDUINO 探測系統</h2>
         <p>
-            在我們的教具中，我們使用燈箱代表恆星，行星模型繞其運動。透過 <span class="highlight">Arduino</span> 與精密光度感測器，捕捉肉眼難以察覺的細微閃爍。
+            教具使用高亮度燈箱模擬恆星，行星模型進行公轉。透過 <span class="highlight">Arduino</span> 搭配精密光度感測器，執行高頻率數據採樣（Sampling）。
         </p>
         <details>
-            <summary>科普深度：0.01% 的挑戰</summary>
+            <summary>SYSTEM_LOG: 0.01% SENSITIVITY</summary>
             <div class="details-content">
-                在實際天文觀測中，凌日造成的變化通常僅有 <span class="highlight">0.01% 到 1%</span>（想像一萬顆燈泡熄滅了一顆）。因此教具必須依賴高頻率取樣的電子感測器，才能將數據記錄並視覺化為即時的光變曲線。
+                實際觀測中凌日變幅僅為 0.01% - 1%。本系統透過 Arduino 優化運算法，捕捉細微電壓變化並即時轉譯為數位化光變曲線。
             </div>
         </details>
     </section>
 
     <div class="back-nav">
-        <a href="index.html" class="back-btn">← 返回展覽首頁</a>
+        <a href="index.html" class="back-btn">Exit to Main Interface</a>
     </div>
 </div>
 
 <footer>
-    <p>地科 117 級 天文股 製作<br>—— 傾聽宇宙的閃爍 ——</p>
+    EST. 2024 EARTH SCIENCE EXHIBITION<br>
+    ASTRO_DEPT_UNIT.117 // LISTENING TO STELLAR PULSE
 </footer>
 
 <script>
@@ -269,7 +339,7 @@
     const sizeVal = document.getElementById('sizeVal');
     const speedVal = document.getElementById('speedVal');
 
-    const RGB_NEON_BLUE = '0, 212, 255'; 
+    const RGB_NEON_BLUE = '0, 242, 255'; 
     const COLOR_VIBRANT_GOLD = '#ffcc00';
 
     let planetR = parseFloat(sizeSlider.value);
@@ -278,11 +348,9 @@
     const starR = 60; 
     const breathPeriod = 12.0; 
 
-    // 相位累積
     let lastTimestamp = performance.now();
     let currentOrbitAngle = 0; 
 
-    // 高亮控制
     let highlightTimer = 0;
     const HOLD_DURATION = 500;       
     const DECAY_DURATION = 800;      
@@ -304,23 +372,31 @@
     function resize() {
         const width = canvas.clientWidth;
         canvas.width = width * window.devicePixelRatio;
-        canvas.height = (width * 0.75) * window.devicePixelRatio; 
+        canvas.height = (width * 0.8) * window.devicePixelRatio; 
         ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
     window.addEventListener('resize', resize);
     resize();
 
-    function drawPlanetInstance(pX, pY, radius, opacity, intensity) {
+    function drawPlanetInstance(pX, pY, radius, opacity, intensity, isTransit) {
         ctx.save();
         ctx.globalAlpha = opacity;
+        
+        // 如果正在凌日且有高亮，增加一個目標瞄準框
+        if (intensity > 0.5) {
+            ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${intensity * 0.5})`;
+            ctx.setLineDash([]);
+            ctx.strokeRect(pX - radius - 5, pY - radius - 5, radius*2 + 10, radius*2 + 10);
+        }
+
         ctx.beginPath(); 
         ctx.arc(pX, pY, radius, 0, Math.PI*2);
         
         if (intensity > 0) {
-            ctx.shadowBlur = 15 * intensity;
+            ctx.shadowBlur = 20 * intensity;
             ctx.shadowColor = `rgba(${RGB_NEON_BLUE}, ${intensity})`;
             ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${intensity})`;
-            ctx.lineWidth = 2.5;
+            ctx.lineWidth = 2;
             ctx.stroke();
         }
         
@@ -346,7 +422,7 @@
         currentOrbitAngle += angularVelocity * dt;
         currentOrbitAngle %= (2 * Math.PI); 
 
-        const orbitRadius = w * 0.46;
+        const orbitRadius = w * 0.45;
         const planetX = (w / 2) + Math.cos(currentOrbitAngle) * orbitRadius;
         const planetZ = Math.sin(currentOrbitAngle); 
         
@@ -356,9 +432,11 @@
         
         let brightness = 1.0;
         const maxDepth = (planetR * planetR) / (starR * starR);
+        let inTransit = false;
 
         if (planetZ > 0) { 
             if (dist < totalContactRadius) {
+                inTransit = true;
                 if (dist < fullInsideRadius) {
                     brightness = 1.0 - maxDepth;
                 } else {
@@ -369,14 +447,24 @@
             }
         }
 
-        points.push({ x: w * 0.9, y: brightness });
-        if (points.length > 500) points.shift();
-        points.forEach(p => p.x -= 1.2);
+        points.push({ x: w * 0.95, y: brightness });
+        if (points.length > 600) points.shift();
+        points.forEach(p => p.x -= 1.4);
 
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
 
-        const sX = w / 2, sY = h * 0.28; 
+        const sX = w / 2, sY = h * 0.3; 
+
+        // HUD Decorations
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.1)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(10, 10, w - 20, h - 20);
+        
+        // 狀態文字
+        ctx.fillStyle = inTransit ? '#ff3300' : 'rgba(0, 242, 255, 0.5)';
+        ctx.font = '10px monospace';
+        ctx.fillText(inTransit ? '>> EVENT: TRANSIT_DETECTED' : '>> STATUS: SCANNING_SYSTEM', 20, 25);
 
         let hIntensity = 0;
         if (isInteracting) {
@@ -391,61 +479,73 @@
             }
         }
 
+        // 軌道虛線
         ctx.save();
-        if (hIntensity > 0) {
-            ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${0.1 + hIntensity * 0.3})`;
-            ctx.lineWidth = 1;
-            ctx.setLineDash([5, 5]);
-        } else {
-            ctx.strokeStyle = '#222';
-            ctx.globalAlpha = 0.5;
-            ctx.setLineDash([3, 3]);
-        }
+        ctx.strokeStyle = hIntensity > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.1 + hIntensity * 0.4})` : 'rgba(0, 242, 255, 0.05)';
+        ctx.setLineDash([5, 5]);
         ctx.beginPath();
         ctx.ellipse(sX, sY, orbitRadius * 0.5, 6, 0, 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
 
         const px = sX + (planetX - w/2) * 0.5;
-        if (planetZ <= 0) drawPlanetInstance(px, sY, planetR, 0.4, hIntensity);
+        if (planetZ <= 0) drawPlanetInstance(px, sY, planetR, 0.3, hIntensity, false);
+
+        // 恆星 (加入 HUD 瞄準框)
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)';
+        ctx.beginPath();
+        ctx.moveTo(sX - starR - 10, sY - 20); ctx.lineTo(sX - starR - 10, sY - starR - 10); ctx.lineTo(sX - 20, sY - starR - 10);
+        ctx.stroke();
+        ctx.restore();
 
         const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
         starGrad.addColorStop(0, '#fff');
-        starGrad.addColorStop(0.3, '#ffcc00');
+        starGrad.addColorStop(0.3, '#ffdd00');
         starGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = starGrad;
         ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
-        if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity);
+        if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity, inTransit);
 
-        const graphX = w * 0.05, graphY = h * 0.55, graphW = w * 0.9, graphH = h * 0.35;
-        ctx.strokeStyle = '#444';
-        ctx.lineWidth = 1;
+        // 下半部：光變曲線 (HUD 介面風格)
+        const graphX = w * 0.05, graphY = h * 0.6, graphW = w * 0.9, graphH = h * 0.3;
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)';
         ctx.strokeRect(graphX, graphY, graphW, graphH);
         
+        // 曲線背景網格
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.05)';
+        for(let i=1; i<4; i++) {
+            ctx.moveTo(graphX, graphY + graphH * i / 4);
+            ctx.lineTo(graphX + graphW, graphY + graphH * i / 4);
+        }
+        ctx.stroke();
+
         ctx.strokeStyle = COLOR_VIBRANT_GOLD;
-        ctx.lineWidth = 1.8;
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = COLOR_VIBRANT_GOLD;
         ctx.beginPath();
         points.forEach((p, i) => {
             const drawX = graphX + (p.x - (w * 0.05));
-            const drawY = graphY + (1.0 - p.y) * 400 + 40; 
+            const drawY = graphY + (1.0 - p.y) * 450 + 35; 
             if (drawX > graphX && drawX < graphX + graphW) {
                 if (i === 0) ctx.moveTo(drawX, drawY);
                 else ctx.lineTo(drawX, drawY);
             }
         });
         ctx.stroke();
+        ctx.shadowBlur = 0;
 
-        ctx.fillStyle = '#888';
-        ctx.font = '10px Arial';
-        ctx.fillText('亮度 (Brightness)', graphX + 5, graphY + 15);
-        ctx.textAlign = 'right';
-        ctx.fillText('時間 (Time) →', graphX + graphW, graphY + graphH + 15);
-        ctx.textAlign = 'left';
+        ctx.fillStyle = 'rgba(0, 242, 255, 0.7)';
+        ctx.font = '9px monospace';
+        ctx.fillText('DATA_LOG: FLUX_VAR', graphX + 5, graphY + 12);
 
+        // 背景呼吸燈與網格閃爍
         const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
         const breath = (Math.sin(breathAngle) + 1) / 2;
-        bgLayer.style.setProperty('--pulse-opacity', 0.2 + (breath * 0.8));
+        bgLayer.style.setProperty('--pulse-opacity', 0.15 + (breath * 0.1));
 
         requestAnimationFrame(draw);
     }
