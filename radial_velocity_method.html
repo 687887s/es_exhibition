@@ -2,12 +2,13 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：正式稿 (Tech Edition - Wave Tracker & Doppler Background)
+      檔案狀態：正式稿 (Tech Edition - Precision Boundary Control)
       風格：科技、未來主義風格 (Doppler Theme)
       修訂內容：
-      1. 外星人升級：為波形追蹤者加入雙像素眼睛。
-      2. 背景優化：移除明暗呼吸，僅保留紅藍移色偏，週期改為 10 秒。
-      3. 互動邏輯：點擊步進位移、螢幕內界限控制、黑洞歸位序列。
+      1. 嚴格限制外星人活動範圍：水平限制於 Block 寬度，垂直避開上下 Banner。
+      2. 修正外星人物種：波形追蹤者加入雙像素眼睛。
+      3. 背景優化：10秒紅藍偏移週期，無亮度呼吸。
+      4. 完整歸位：黑洞固定原位，外星人由深處探頭跳出。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -50,7 +51,7 @@
             overflow-x: hidden;
         }
 
-        /* 複合式背景：紅藍脈動 + 數位網格 (移除明暗呼吸) */
+        /* 複合式背景：紅藍脈動 + 數位網格 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -65,7 +66,6 @@
                     var(--bg-color-blue) 100%
                 );
             background-size: 30px 30px, 30px 30px, 100% 100%;
-            opacity: 1; /* 固定透明度，不再呼吸 */
         }
 
         body::after {
@@ -93,7 +93,7 @@
 
         h1 { color: var(--neon-blue); font-size: 1.4em; text-shadow: 0 0 10px rgba(0, 242, 255, 0.8); font-weight: 900; margin: 0; letter-spacing: 3px; }
 
-        /* 波形追蹤者 (Wave Tracker) 樣式修正 */
+        /* 波形追蹤者 (Wave Tracker) */
         .pixel-mascot {
             position: absolute;
             width: 36px;
@@ -117,18 +117,17 @@
                 0 -4px 0 var(--neon-blue);
         }
 
-        /* 雙像素眼睛 */
+        /* 波形追蹤者的雙眼 */
         .mascot-eyes {
-            position: absolute; top: 4px; left: 4px; right: 4px; height: 4px; display: flex; justify-content: space-around;
+            position: absolute; top: 4px; left: 4px; right: 4px; height: 5px; display: flex; justify-content: space-around;
         }
         .mascot-eyes::before, .mascot-eyes::after {
             content: ""; width: 5px; height: 5px; background: #000;
             animation: eye-blink 4s infinite;
         }
-
         @keyframes eye-blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
 
-        /* 頂部天線 */
+        /* 天線 */
         .mascot-body::after {
             content: ""; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
             width: 4px; height: 8px; background: var(--neon-blue);
@@ -136,7 +135,6 @@
         }
         @keyframes antenna-pulse { from { height: 4px; opacity: 0.5; } to { height: 10px; opacity: 1; } }
 
-        /* 閒置動作 */
         @keyframes idle-jump-flip {
             0% { transform: translateY(0) rotate(0); }
             50% { transform: translateY(-40px) rotate(180deg) scale(1.1); }
@@ -145,7 +143,7 @@
         .pixel-mascot.idle-jump { animation: idle-jump-flip 0.8s ease-in-out !important; }
         .pixel-mascot.idle-color .mascot-body { filter: hue-rotate(180deg) brightness(1.3); transition: filter 0.5s; }
 
-        /* 黑洞 */
+        /* 黑洞特效 */
         .black-hole {
             position: absolute; width: 60px; height: 18px; background: #000; border-radius: 50%;
             box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff;
@@ -238,7 +236,7 @@
 </header>
 
 <div class="container">
-    <section>
+    <section id="section-1">
         <div class="pixel-mascot" id="mascot-s1" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotStep(this)">
             <div class="mascot-body" style="background: var(--vibrant-gold);"><div class="mascot-eyes"></div></div>
             <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">WAVE_ALPHA</div>
@@ -265,7 +263,7 @@
         </div>
     </section>
 
-    <section>
+    <section id="section-2">
         <div class="pixel-mascot" id="mascot-s2" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
             <div class="mascot-body"><div class="mascot-eyes"></div></div>
             <div class="mascot-label">DOPPLER_BETA</div>
@@ -279,7 +277,7 @@
         <p>我們透過精密的光譜儀分析恆星的<span class="highlight">「光譜指紋」</span>，即使這晃動速度只有每秒數公尺，依然無所遁形。</p>
     </section>
 
-    <section>
+    <section id="section-3">
         <div class="pixel-mascot" id="mascot-s3" style="left: 50%; margin-left: -18px; animation: peek-bounce 2s infinite alternate ease-in-out;" onclick="mascotStep(this)">
             <div class="mascot-body" style="background: #fff;"><div class="mascot-eyes"></div></div>
             <div class="mascot-label" style="color:#fff; border-color:#fff">SIGNAL_UNIT</div>
@@ -297,17 +295,16 @@
     <div class="back-nav"><a href="index.html" class="back-btn">Return to Sector 0</a></div>
 </div>
 
-<footer>EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.117</footer>
+<footer id="mainFooter">EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.117</footer>
 
 <script>
     const canvas = document.getElementById('wobbleCanvas'), ctx = canvas.getContext('2d');
-    const bgLayer = document.getElementById('bgLayer'), headerEl = document.getElementById('mainHeader');
+    const bgLayer = document.getElementById('bgLayer'), headerEl = document.getElementById('mainHeader'), footerEl = document.getElementById('mainFooter');
     const mSld = document.getElementById('massSlider'), sSld = document.getElementById('speedSlider');
     const mVal = document.getElementById('massVal'), sVal = document.getElementById('speedVal');
 
     const RGB_NEON_BLUE = '0, 242, 255', COLOR_GOLD = '#ffcc00';
     let lastTimestamp = performance.now(), angle = 0, starR = 50, planetR = 12;
-    // 背景週期設定為 10 秒
     const bgPulsePeriod = 10.0;
 
     function draw(timestamp) {
@@ -323,11 +320,9 @@
         const pX = centerX + Math.cos(angle) * orbitR, pZ = Math.sin(angle);
         const sX = centerX - Math.cos(angle) * wobbleAmp, dopplerVel = Math.sin(angle);
 
-        // --- 修正後的背景邏輯：固定 10 秒紅藍移週期，不變亮度 ---
         const bgTimeFactor = (timestamp / 1000) / bgPulsePeriod;
         const bgShift = Math.sin(2 * Math.PI * bgTimeFactor); 
-        const pulseRatio = 50 + (bgShift * 35); 
-        bgLayer.style.setProperty('--pulse-ratio', pulseRatio + '%');
+        bgLayer.style.setProperty('--pulse-ratio', (50 + bgShift * 35) + '%');
 
         ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)'; ctx.strokeRect(10, 10, w - 20, h - 20);
         ctx.fillStyle = Math.abs(dopplerVel) > 0.8 ? (dopplerVel > 0 ? '#ff4400' : '#0088ff') : 'rgba(0, 242, 255, 0.6)';
@@ -350,11 +345,19 @@
         requestAnimationFrame(draw);
     }
 
+    // --- 精確邊界互動邏輯 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
         el.dataset.moving = 'true'; el.classList.add('active'); 
+        
         const hH = headerEl.offsetHeight;
+        const fH = footerEl.offsetHeight;
+        // 獲取所屬區塊的寬度資訊
+        const parentBlock = el.closest('section') || document.querySelector('section');
+        const blockRect = parentBlock.getBoundingClientRect();
+        
         let step = parseInt(el.dataset.step || '0');
+
         if (step === 0) {
             const r = el.getBoundingClientRect(), pR = el.offsetParent.getBoundingClientRect();
             el.dataset.homeX = r.left - pR.left; el.dataset.homeY = r.top - pR.top;
@@ -362,25 +365,44 @@
             el.style.left = el.dataset.homeX + 'px'; el.style.top = el.dataset.homeY + 'px';
             el.style.transform = 'translate(0, 0)'; el.offsetHeight; 
         }
+
         step++; el.dataset.step = step;
+
         if (step <= 2) {
-            const scrollY = window.scrollY, viewW = window.innerWidth, viewH = window.innerHeight, pad = 80;
-            const targetY = scrollY + hH + pad + Math.random() * (viewH - hH - pad * 2);
-            const targetX = pad + Math.random() * (viewW - pad * 2);
-            const tx = targetX - parseFloat(el.style.left), ty = targetY - parseFloat(el.style.top);
+            // 第一、二次跳躍：嚴格限制在 Block 寬度內，且避開上下 Banner
+            const scrollY = window.scrollY, viewW = window.innerWidth, viewH = window.innerHeight;
+            const pad = 40;
+
+            // X 軸限制：Block 的左邊界到右邊界
+            const minX = blockRect.left + pad;
+            const maxX = blockRect.right - pad;
+            const targetX = minX + Math.random() * (maxX - minX);
+
+            // Y 軸限制：Banner 之間
+            const minY = scrollY + hH + pad;
+            const maxY = scrollY + viewH - fH - pad;
+            const targetY = minY + Math.random() * (maxY - minY);
+
+            const tx = targetX - parseFloat(el.style.left);
+            const ty = targetY - parseFloat(el.style.top);
+            
             el.style.transition = "transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
             el.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random()-0.5)*40}deg) scale(1.1)`;
             setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
         } 
         else if (step === 3) {
+            // 第三次：逃離螢幕
             const escX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
             el.style.transition = "transform 1.4s ease-in, opacity 0.5s ease-in";
             el.style.transform = `translate(${escX}px, 0px) rotate(360deg) scale(0.1)`;
             el.style.opacity = "0"; await new Promise(r => setTimeout(r, 1600));
+
             const bhId = el.id.replace('mascot', 'bh'), bh = document.getElementById(bhId);
             el.style.transition = "none"; el.style.transform = "translate(0, 45px)"; el.offsetHeight;
             bh.classList.add('visible'); await new Promise(r => setTimeout(r, 800));
-            el.style.opacity = "1"; el.style.transition = "transform 1s cubic-bezier(0.2, 0.8, 0.2, 1)";
+
+            el.style.opacity = "1";
+            el.style.transition = "transform 1s cubic-bezier(0.2, 0.8, 0.2, 1)";
             el.style.transform = "translate(0, 10px)"; await new Promise(r => setTimeout(r, 1100));
             el.style.transform = "translate(0, 10px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
             el.style.transform = "translate(0, 10px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
@@ -388,6 +410,7 @@
             el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
             el.style.transform = "translate(0, -18px)"; await new Promise(r => setTimeout(r, 300));
             bh.classList.remove('visible'); el.style.transform = "translate(0, 0)"; 
+            
             setTimeout(() => {
                 el.style.transition = ""; el.style.left = ""; el.style.top = ""; el.style.animation = ""; 
                 el.classList.remove('active'); el.dataset.step = '0'; el.dataset.moving = 'false';
