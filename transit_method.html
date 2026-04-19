@@ -2,12 +2,12 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：全息流動 + 凌日法精確還原版 (Transit Method - Clean Sync)
+      檔案狀態：凌日法精確還原與 Bug 修復版 (Transit Method - ID Crash Fix)
       風格：科技、未來主義、全息螢幕 (Holographic UI)
       修訂內容：
-      1. 致命 Bug 修復：修正 HTML 與 JS 畫布 ID 不一致 (wobbleCanvas -> transitCanvas) 導致的當機問題。
-      2. 回溯冗餘代碼：移除不必要的 Resize 駭客寫法，回歸徑向速度法中驗證成功的乾淨迴圈。
-      3. 全息立體展開：保留 30% 寬鬆觸發與 4px 實心陰影彈出特效。
+      1. 致命 Bug 消除：徹底修正 HTML 與 JS 標籤不匹配的問題 (transitCanvas/sizeSlider 等)。
+      2. 凌日法內容恢復：重建正確的凌日法文字、圖片預留區以及光變曲線模擬器。
+      3. 全息立體展開：保留寬鬆觸發與 4px 實心陰影彈出特效。
       4. 外星人防遮擋：精確控制 z-index (Header: 8000, Section: 3500)，確保跨區塊穿梭不被遮擋。
     -->
     <meta charset="UTF-8">
@@ -270,12 +270,13 @@
 
         <p>這就像是一隻飛蛾從路燈前飛過，會短暫地遮擋住一點點光線。天文學家透過極其精密的儀器，測量恆星亮度的微小下降，就能推斷出行星的存在。</p>
 
-        <!-- 凌日法模擬器與光變曲線 (ID 已修正為 transitCanvas) -->
+        <!-- 正確的凌日法模擬器 -->
         <div class="canvas-container"><canvas id="transitCanvas"></canvas></div>
         
         <div class="controls">
             <div class="control-item">
-                <div class="control-label"><span>行星半徑 (影響遮擋面積與光度)</span><span id="sizeVal" style="color:white">6.0</span></div>
+                <div class="control-label"><span>行星半徑 (影響遮擋面積與光度下降)</span><span id="sizeVal" style="color:white">6.0</span></div>
+                <!-- 正確的凌日法 Slider IDs -->
                 <input type="range" id="sizeSlider" min="2" max="15" value="6" step="0.1">
             </div>
             <div class="control-item">
@@ -325,27 +326,28 @@
 <footer id="mainFooter">EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.042</footer>
 
 <script>
-    // 確保 ID 匹配！
+    // --- 正確綁定凌日法專用的 Canvas 與 Control IDs ---
     const canvas = document.getElementById('transitCanvas'), ctx = canvas.getContext('2d');
     const headerEl = document.getElementById('mainHeader'), footerEl = document.getElementById('mainFooter'), bgLayer = document.getElementById('bgLayer');
     const sSld = document.getElementById('sizeSlider'), spdSld = document.getElementById('speedSlider');
     const sVal = document.getElementById('sizeVal'), spdVal = document.getElementById('speedVal');
 
-    let lastT = performance.now(), angle = 0;
-    // 光度歷史陣列，預設全滿 100%
+    let lastTimestamp = null, angle = 0;
+    // 初始化光變歷史數據陣列，全為 100% 亮度
     const lightHistory = new Array(150).fill(100.0);
 
-    // --- 強化版全息展開監測邏輯 (寬鬆觸發 30%) ---
+    // --- 強化版全息展開監測邏輯 (使用 px 確保最上方 Block 能觸發) ---
     function initHologramReveal() {
         const observerOptions = {
             threshold: 0,
-            rootMargin: "30% 0px 30% 0px" 
+            rootMargin: "300px 0px 300px 0px" // 上下放寬 300px，確保畫面一載入就觸發頂部區塊
         };
         
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-active');
+                    // 一旦展開即保持狀態
                     observer.unobserve(entry.target);
                 }
             });
@@ -376,15 +378,15 @@
             el.dataset.homeVPX = r.left;
             el.dataset.homeVPY = r.top;
             
-            // 備份原本的 Inline Style 以便精確還原
+            // 備份原本的 Inline Style
             el.dataset.origStyle = el.getAttribute('style') || ""; 
             
             if (zIndexBlock) {
                 // 區分容器層級提升
                 if (zIndexBlock.tagName.toLowerCase() === 'header') {
-                    zIndexBlock.style.zIndex = "8000";
+                    zIndexBlock.style.zIndex = "8000"; // Header 外星人最頂層
                 } else {
-                    zIndexBlock.style.zIndex = "3500";
+                    zIndexBlock.style.zIndex = "3500"; // Section 外星人高於其他 Section 但不遮擋 Header
                 }
             }
             el.offsetHeight; 
@@ -426,4 +428,160 @@
 
             el.style.opacity = "1";
             el.style.transition = "transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1)";
-            el.st
+            el.style.transform = "translate(0, 12px)"; await new Promise(r => setTimeout(r, 1200));
+            el.style.transform = "translate(0, 12px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
+            el.style.transform = "translate(0, 12px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
+            el.style.transform = "translate(0, 12px) rotate(0deg)"; await new Promise(r => setTimeout(r, 300));
+            el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+            el.style.transform = "translate(0, -15px)"; await new Promise(r => setTimeout(r, 300));
+            
+            bh.classList.remove('visible'); el.style.transform = "translate(0, 0)"; 
+            
+            setTimeout(() => {
+                // 精確還原 Inline Style 確保不發生錯位
+                el.setAttribute('style', el.dataset.origStyle);
+                el.classList.remove('active'); el.dataset.step = '0'; el.dataset.moving = 'false';
+                
+                if (zIndexBlock) {
+                    zIndexBlock.style.zIndex = "";
+                }
+            }, 600);
+        }
+    }
+
+    // --- 畫布自適應 ---
+    function resize() {
+        const width = canvas.clientWidth;
+        if (width === 0) return;
+        canvas.width = width * window.devicePixelRatio; 
+        canvas.height = (width * 0.95) * window.devicePixelRatio; 
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resize);
+    
+    // --- 模擬器繪製：凌日法物理模擬 (Transit & Light Curve) ---
+    function draw(timestamp) {
+        timestamp = timestamp || performance.now();
+        if (!lastTimestamp) { lastTimestamp = timestamp; resize(); }
+        const dt = (timestamp - lastTimestamp) / 1000; 
+        lastTimestamp = timestamp;
+
+        if (canvas.clientWidth > 0 && Math.abs(canvas.width - Math.floor(canvas.clientWidth * window.devicePixelRatio)) > 2) {
+            resize();
+        }
+
+        const w = canvas.width / window.devicePixelRatio;
+        const h = canvas.height / window.devicePixelRatio;
+        
+        if (w === 0 || h === 0) {
+            requestAnimationFrame(draw);
+            return;
+        }
+
+        // 取值保護
+        const pSize = sSld ? parseFloat(sSld.value) : 6.0;
+        const speed = spdSld ? parseFloat(spdSld.value) : 2.5;
+        if (sVal) sVal.innerText = pSize.toFixed(1); 
+        if (spdVal) spdVal.innerText = speed.toFixed(2);
+        
+        const bgShift = Math.sin(2 * Math.PI * (timestamp / 10000)); 
+        if (bgLayer) bgLayer.style.setProperty('--pulse-ratio', (50 + bgShift * 38) + '%');
+
+        angle += speed * dt;
+        
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+        const cX = w / 2, cY = h * 0.35;
+        const starR = 40, orbitR = w * 0.35;
+
+        // 計算行星軌道座標
+        const pX = cX + Math.cos(angle) * orbitR;
+        const pZ = Math.sin(angle); // Z深度，大於0時在恆星前方產生凌日
+        const pY = cY;
+
+        // 計算光變曲線
+        let currentLight = 100.0;
+        if (pZ > 0) { 
+            const dist = Math.abs(pX - cX);
+            if (dist < starR + pSize) {
+                // 遮擋程度
+                let overlap = Math.max(0, 1 - (dist / (starR)));
+                // 光度下降與半徑平方(面積)成正比
+                currentLight -= (pSize * pSize * 0.15) * overlap; 
+            }
+        }
+
+        // 紀錄光變歷史並平移陣列
+        lightHistory.push(currentLight);
+        lightHistory.shift();
+
+        // 畫出行星 (若在恆星後方)
+        if (pZ < 0) {
+            ctx.fillStyle = '#000';
+            ctx.beginPath(); ctx.arc(pX, pY, pSize, 0, Math.PI*2); ctx.fill();
+        }
+
+        // 畫出發光的恆星
+        const starGrad = ctx.createRadialGradient(cX, cY, 0, cX, cY, starR);
+        starGrad.addColorStop(0, '#ffffff');
+        starGrad.addColorStop(0.2, '#ffea00');
+        starGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = starGrad;
+        ctx.beginPath(); ctx.arc(cX, cY, starR * 2.5, 0, Math.PI*2); ctx.fill();
+
+        // 畫出行星 (若在恆星前方產生凌日)
+        if (pZ >= 0) {
+            ctx.fillStyle = '#000';
+            ctx.beginPath(); ctx.arc(pX, pY, pSize, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = 'rgba(0,242,255,0.4)'; ctx.lineWidth = 1; ctx.stroke();
+        }
+
+        // --- 繪製光變曲線面板 ---
+        const specX = w * 0.1, specY = h * 0.88, specW = w * 0.8, specH = h * 0.25;
+        
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.3)'; ctx.strokeRect(specX, specY - specH, specW, specH);
+        ctx.fillStyle = 'rgba(0, 242, 255, 0.05)'; ctx.fillRect(specX, specY - specH, specW, specH);
+
+        // 100% 基準線
+        ctx.beginPath(); ctx.moveTo(specX, specY - specH * 0.8); ctx.lineTo(specX + specW, specY - specH * 0.8);
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.setLineDash([2, 2]); ctx.stroke(); ctx.setLineDash([]);
+
+        // 繪製連續光變曲線
+        ctx.beginPath();
+        ctx.strokeStyle = '#00f2ff';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        
+        for (let i = 0; i < lightHistory.length; i++) {
+            let x = specX + (i / lightHistory.length) * specW;
+            let val = lightHistory[i];
+            let y = specY - ((val - 60) / 40) * specH; 
+            
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        ctx.fillStyle = currentLight < 99.9 ? '#ffcc00' : '#00f2ff';
+        ctx.font = '10px monospace';
+        ctx.fillText(currentLight < 99.9 ? `>> TRANSIT_DETECTED: FLUX ${currentLight.toFixed(2)}%` : `>> REALTIME_FLUX: ${currentLight.toFixed(2)}%`, specX, specY - specH - 8);
+        
+        requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+    
+    // 初始化外星人閒置行為
+    document.querySelectorAll('.pixel-mascot').forEach(el => { 
+        const triggerNext = () => { setTimeout(() => { 
+            if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') { 
+                const action = Math.random() > 0.5 ? 'idle-jump' : 'idle-color'; 
+                el.classList.add(action); 
+                setTimeout(() => el.classList.remove(action), action === 'idle-jump' ? 800 : 2000); 
+            } triggerNext(); 
+        }, 5000 + Math.random() * 5000); }; triggerNext(); 
+    });
+
+    initHologramReveal();
+</script>
+</body>
+</html>
