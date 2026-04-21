@@ -251,6 +251,29 @@
             box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
         }
 
+        .image-citation {
+            text-align: right;
+            font-size: 0.75em;
+            color: rgba(0, 242, 255, 0.5);
+            margin-top: -15px;
+            margin-bottom: 25px;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .image-citation a {
+            color: rgba(0, 242, 255, 0.8);
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(0, 242, 255, 0.4);
+            transition: all 0.3s;
+        }
+
+        .image-citation a:hover {
+            color: var(--neon-blue);
+            border-bottom: 1px solid var(--neon-blue);
+            text-shadow: 0 0 5px rgba(0, 242, 255, 0.5);
+        }
+
         .image-placeholder {
             background: rgba(0, 242, 255, 0.08);
             border: 1px dashed rgba(0, 242, 255, 0.4);
@@ -549,12 +572,17 @@
             <div class="black-hole" id="bh-s1" style="left: 6px; top: 6px;"></div>
 
             <h2>何謂都普勒效應</h2>
-            <p>在浩瀚宇宙中，光波與聲波一樣，皆遵循著<span class="highlight">「都卜勒效應」</span>的物理法則。當發波源與觀測者產生相對運動時，波的頻率便會發生改變。就如同救護車呼嘯而過：接近時警笛聲尖銳（高頻），遠離時則轉為低沉（低頻）。</p>
+            <p>在浩瀚宇宙中，光波與聲波一樣，皆遵循著<span
+                    class="highlight">「都卜勒效應」</span>的物理法則。當發波源與觀測者產生相對運動時，波的頻率便會發生改變。就如同救護車呼嘯而過：接近時警笛聲尖銳（高頻），遠離時則轉為低沉（低頻）。
+            </p>
 
             <div class="image-placeholder" style="display:none;">[ Image of 都卜勒效應原理示意圖 ]</div>
-            <img src="Geoscience Astronomy.gif" alt="都卜勒效應示意圖" class="tech-image" onerror="this.style.display='none'; this.previousElementSibling.style.display='block';">
+            <img src="Geoscience Astronomy.gif" alt="都卜勒效應示意圖" class="tech-image"
+                onerror="this.style.display='none'; this.previousElementSibling.style.display='block';">
+            <div class="image-citation">Source: <a href="Javalab" target="_blank">[]</a></div>
 
-            <p>將此原理套用於恆星觀測，我們便能捕捉恆星的細微動態：當恆星向我們靠近時，其發出的光波會被壓縮，光譜特徵線將朝高頻的藍色端移動，稱為<span class="highlight">「藍移 (Blue Shift)」</span>；反之，若恆星遠離，光波被拉長，光譜線便會朝低頻的紅色端移動，稱為<span class="highlight">「紅移 (Red Shift)」</span>。</p>
+            <p>將此原理套用於恆星觀測，我們便能捕捉恆星的細微動態：當恆星向我們靠近時，其發出的光波會被壓縮，光譜特徵線將朝高頻的藍色端移動，稱為<span class="highlight">「藍移 (Blue
+                    Shift)」</span>；反之，若恆星遠離，光波被拉長，光譜線便會朝低頻的紅色端移動，稱為<span class="highlight">「紅移 (Red Shift)」</span>。</p>
 
             <!-- 徑向速度模擬器 -->
             <div class="canvas-container"><canvas id="wobbleCanvas"></canvas></div>
@@ -585,21 +613,27 @@
 
             <h2>教具演示：重力牽引與共同質心</h2>
             <p>為了將抽象的重力牽引轉化為肉眼可見的物理模型，我們設計了此套實體模擬教具。<br>
-            <span class="highlight">>> 系統配置：</span>以「大球」代表母恆星，「小球」代表環繞的系外行星。</p>
-            
+                <span class="highlight">>> 系統配置：</span>以「大球」代表母恆星，「小球」代表環繞的系外行星。
+            </p>
+
             <p><span class="highlight">[ 狀態一：單一恆星 ]</span><br>當系統中僅存在恆星（大球）時，系統的質量中心完美落在球體正中央。此時恆星將保持絕對穩定，無任何軌道晃動。</p>
 
-            <p><span class="highlight">[ 狀態二：行星介入 ]</span><br>當系外行星（小球）加入系統並開始公轉，其微小但不可忽視的質量會拉扯整個系統，使得<span class="highlight">「共同質心 (Common Center of Mass)」</span>往小球方向偏移。當我們推動系統，您將觀察到恆星（大球）正繞著這個偏移的質心發生週期性的<span class="highlight">「晃動 (Wobble)」</span>。</p>
+            <p><span class="highlight">[ 狀態二：行星介入 ]</span><br>當系外行星（小球）加入系統並開始公轉，其微小但不可忽視的質量會拉扯整個系統，使得<span
+                    class="highlight">「共同質心 (Common Center of
+                    Mass)」</span>往小球方向偏移。當我們推動系統，您將觀察到恆星（大球）正繞著這個偏移的質心發生週期性的<span class="highlight">「晃動
+                    (Wobble)」</span>。</p>
 
             <div class="image-placeholder">[ 請置入：實體教具操作照片 ]</div>
-            <img src="S__4857858.jpg" alt="實體教具照片" class="tech-image" onerror="this.style.display='none'; this.previousElementSibling.style.display='block';">
+            <img src="S__4857858.jpg" alt="實體教具照片" class="tech-image"
+                onerror="this.style.display='none'; this.previousElementSibling.style.display='block';">
+            <div class="image-citation">Source: <a href="#" target="_blank">Grok</a></div>
 
             <p>這正是科學家尋找系外行星的關鍵思維：即使我們無法直接「看見」黯淡的行星，只要觀測到恆星的規律晃動，便能<span class="highlight">「間接證實」</span>行星的存在。</p>
         </section>
 
         <section id="section-3">
-            <div class="pixel-mascot" id="mascot-s3"
-                style="left: 20px; animation: peek-bounce 1.2s infinite alternate;" onclick="mascotStep(this)">
+            <div class="pixel-mascot" id="mascot-s3" style="left: 20px; animation: peek-bounce 1.2s infinite alternate;"
+                onclick="mascotStep(this)">
                 <div class="mascot-body" style="background: var(--tech-cyan);">
                     <div class="mascot-eyes"></div>
                 </div>
@@ -608,12 +642,16 @@
             <div class="black-hole" id="bh-s3" style="left: 6px; top: 6px;"></div>
 
             <h2>何謂徑向速度法</h2>
-            <p>結合前述的「都卜勒效應」與「共同質心晃動」，便構成了尋找系外行星的強大武器——<span class="highlight">「徑向速度法 (Radial Velocity Method)」</span>。當恆星因為行星的重力牽引而在視線方向上產生靠近與遠離的晃動時，其光譜便會呈現週期性的紅移與藍移。</p>
+            <p>結合前述的「都卜勒效應」與「共同質心晃動」，便構成了尋找系外行星的強大武器——<span class="highlight">「徑向速度法 (Radial Velocity
+                    Method)」</span>。當恆星因為行星的重力牽引而在視線方向上產生靠近與遠離的晃動時，其光譜便會呈現週期性的紅移與藍移。</p>
 
             <div class="image-placeholder">[ Image of 恆星光譜偏移與徑向速度曲線 ]</div>
             <img src="Exoplanet Doppler Spectroscopy.gif" alt="徑向速度法光譜偏移示意圖" class="tech-image">
+            <div class="image-citation">Source: <a href="#" target="_blank">台北市立天文科學教育館</a></div>
 
-            <p>此探測方法具備極強的<span class="highlight">「質量效應」</span>：環繞的行星質量越大、距離恆星越近，恆星的晃動幅度與光譜位移就越劇烈。科學家藉由精密解析這些光譜變化，即可反向推算出該行星的<span class="highlight">公轉週期</span>與<span class="highlight">最低質量</span>。</p>
+            <p>此探測方法具備極強的<span
+                    class="highlight">「質量效應」</span>：環繞的行星質量越大、距離恆星越近，恆星的晃動幅度與光譜位移就越劇烈。科學家藉由精密解析這些光譜變化，即可反向推算出該行星的<span
+                    class="highlight">公轉週期</span>與<span class="highlight">最低質量</span>。</p>
 
             <p>然而，此技術存在觀測極限：若行星軌道平面剛好與我們的視線完全垂直（面對面觀測），恆星便不會產生視線方向的位移，我們將無法偵測到任何都卜勒訊號。</p>
         </section>
@@ -630,11 +668,14 @@
             <div class="black-hole" id="bh-s4" style="left: 50%; margin-left: -32px; top: 6px;"></div>
 
             <h2>首顆被發現的系外行星：51 Pegasi b</h2>
-            <p>1995年，天文學家米歇爾·馬約爾 (Michel Mayor) 與迪迪埃·奎洛茲 (Didier Queloz) 正是利用徑向速度法，在飛馬座 51 (51 Pegasi) 這顆類太陽恆星旁，發現了人類史上第一顆圍繞主序星運行的系外行星——<span class="highlight">51 Pegasi b</span>。</p>
+            <p>1995年，天文學家米歇爾·馬約爾 (Michel Mayor) 與迪迪埃·奎洛茲 (Didier Queloz) 正是利用徑向速度法，在飛馬座 51 (51 Pegasi)
+                這顆類太陽恆星旁，發現了人類史上第一顆圍繞主序星運行的系外行星——<span class="highlight">51 Pegasi b</span>。</p>
 
             <div class="image-placeholder">[ Image of 51 Pegasi b 藝術想像圖 ]</div>
+            <div class="image-citation">Source: <a href="#" target="_blank">[請填寫引用來源]</a></div>
 
-            <p>這顆行星打破了當時科學界的認知：它的質量約為木星的一半，但公轉軌道極端靠近母恆星，週期僅短短的 4.2 天，表面溫度高達攝氏 1000 度以上。這類巨大且高溫的氣體行星，開啟了<span class="highlight">「熱木星 (Hot Jupiter)」</span>的全新分類。</p>
+            <p>這顆行星打破了當時科學界的認知：它的質量約為木星的一半，但公轉軌道極端靠近母恆星，週期僅短短的 4.2 天，表面溫度高達攝氏 1000 度以上。這類巨大且高溫的氣體行星，開啟了<span
+                    class="highlight">「熱木星 (Hot Jupiter)」</span>的全新分類。</p>
 
             <p>這項顛覆性的重大發現，為人類探索宇宙生命的可能性立下了里程碑，兩位科學家也因此成就榮獲 <span class="highlight">2019 年諾貝爾物理學獎</span>的肯定。</p>
         </section>
@@ -654,7 +695,9 @@
                     class="highlight">波形的疊加</span>就像潮汐圖：長週期（大波浪）代表主要影響源或週期較長的行星；短週期（細碎起伏）代表距離更近、公轉更快的行星。</p>
 
             <div class="image-placeholder" style="display:none;">[ Image of 潮汐週期性示例或波形疊加圖 ]</div>
-            <img src="460450.jpg" alt="波形疊加示意圖" class="tech-image" onerror="this.style.display='none'; this.previousElementSibling.style.display='block';">
+            <img src="460450.jpg" alt="波形疊加示意圖" class="tech-image"
+                onerror="this.style.display='none'; this.previousElementSibling.style.display='block';">
+            <div class="image-citation">Source: <a href="#" target="_blank">翰林雲端學院</a></div>
 
             <p>科學家會利用<span class="highlight">數學拆解（如傅立葉轉換）</span>，將雜亂的曲線分離出不同頻率的波。這類週期性的調幅現象可以幫助我們推算出系統內各行星的軌道共振或交互作用。
             </p>
