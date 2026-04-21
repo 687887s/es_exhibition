@@ -501,35 +501,59 @@
         
         // 繪製系統質心與軌道線，增加模擬的科學背景 (在沒有行星的情況下)
         ctx.beginPath();
+        ctx.globalAlpha = 0.5;
         ctx.ellipse(cX, cY, wobbleAmp, 4, 0, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#00f2ff";
+        ctx.lineWidth = 2;
         ctx.stroke();
-
+        ctx.globalAlpha = 1;
         ctx.beginPath();
         ctx.moveTo(cX - 8, cY); ctx.lineTo(cX + 8, cY);
         ctx.moveTo(cX, cY - 8); ctx.lineTo(cX, cY + 8);
         ctx.strokeStyle = 'rgba(0, 242, 255, 0.6)';
         ctx.stroke();
         
-        // 徑向速度 (Doppler)：在左右端點(位移極大值)時，速度向量與視線最平行，強度最強。
-        const dopplerIntensity = Math.cos(angle) * (mS / 15.0); 
+        // 1. 物理強度計算：引入非線性補償 (Math.pow)，讓低質量時的變化更顯眼
+        const mFactor = mS / 15.0;
+        const rawIntensity = Math.cos(angle); 
+        const dopplerIntensity = rawIntensity * mFactor;
 
-        const starGrad = ctx.createRadialGradient(sX, cY, 5, sX, cY, starR); 
-        const shiftHue = -dopplerIntensity * 100; // 藍移(負值)加色相變藍
-        starGrad.addColorStop(0, '#fff'); 
-        starGrad.addColorStop(0.3, `hsl(${45 + shiftHue}, 100%, 50%)`); 
-        starGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = starGrad; ctx.beginPath(); ctx.arc(sX, cY, starR, 0, Math.PI*2); ctx.fill();
-
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)'; ctx.strokeRect(10, 10, w - 20, h - 20);
-        ctx.font = '10px monospace';
-        if (Math.abs(dopplerIntensity) > 0.1) {
-            const isRed = dopplerIntensity > 0;
-            ctx.fillStyle = isRed ? '#ff3300' : '#00aaff';
-            ctx.fillText(isRed ? '>> STATUS: REDSHIFT (MOVING AWAY)' : '>> STATUS: BLUESHIFT (APPROACHING)', 20, 25);
+        // 2. 色相映射邏輯：解決色相錯誤與中間點問題
+        let starHue;
+        const baseHue = 50; // 中間點：黃白色
+        
+        if (dopplerIntensity >= 0) {
+            // 紅移方向：50 (黃) -> 0 (紅)
+            // 限制最大位移不超過 50，防止進入紫色區 (>300 或 <0)
+            starHue = baseHue - (dopplerIntensity * 50);
+        } else {
+            // 藍移方向：50 (黃) -> 210 (純藍)
+            // 權重放大 (160)，確保低質量時也能明顯偏藍
+            starHue = baseHue + (Math.abs(dopplerIntensity) * 160);
         }
 
+        // 3. 繪製恆星發光
+        const starGrad = ctx.createRadialGradient(sX, cY, 5, sX, cY, starR);
+        starGrad.addColorStop(0, '#fff'); // 中心保持白色（高溫）
+        starGrad.addColorStop(0.3, `hsl(${starHue}, 100%, 60%)`); 
+        starGrad.addColorStop(1, 'transparent');
+        
+        ctx.fillStyle = starGrad;
+        ctx.beginPath();
+        ctx.arc(sX, cY, starR * 1.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. HUD 狀態文字：與實際顏色同步
+        ctx.font = '12px monospace';
+        if (Math.abs(dopplerIntensity) > 0.05) {
+            const isRed = dopplerIntensity > 0;
+            ctx.fillStyle = isRed ? '#ff4444' : '#44aaff';
+            const statusText = isRed ? '>> STATUS: REDSHIFT (MOVING AWAY)' : '>> STATUS: BLUESHIFT (APPROACHING)';
+            ctx.fillText(statusText, 20, 25);
+            
+            // 額外增加速度向量指示 (可選)
+            ctx.fillText(`RV_VECTOR: ${(dopplerIntensity * 50).toFixed(2)} km/s`, 20, 40);
+        }
         // 光譜分析條同步
         const specX = w * 0.1, specY = h * 0.82, specW = w * 0.8, specH = 32;
         const rb = ctx.createLinearGradient(specX, 0, specX + specW, 0); 
