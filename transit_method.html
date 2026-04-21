@@ -2,18 +2,19 @@
 <html lang="zh-TW">
 <head>
     <!-- 
-      檔案狀態：凌日法精確還原與 Bug 修復版 (Transit Method - ID Crash Fix)
-      風格：科技、未來主義、全息螢幕 (Holographic UI)
+      檔案狀態：正式稿 + 全息立體融合版 (Tech Edition - Holographic Fusion)
+      風格：科技、未來主義風格 (HUD / Tech / Futuristic)
       修訂內容：
-      1. 致命 Bug 消除：徹底修正 HTML 與 JS 標籤不匹配的問題 (transitCanvas/sizeSlider 等)。
-      2. 凌日法內容恢復：重建正確的凌日法文字、圖片預留區以及光變曲線模擬器。
-      3. 全息立體展開：保留寬鬆觸發與 4px 實心陰影彈出特效。
-      4. 外星人防遮擋：精確控制 z-index (Header: 8000, Section: 3500)，確保跨區塊穿梭不被遮擋。
+      1. 基準還原：完全保留使用者提供的原始凌日法模擬（光變曲線陣列、發光恆星）、文本與呼吸背景。
+      2. 視覺強化：無縫注入「全息激光展開」動畫，並在最後一刻彈出 4px 實心陰影。
+      3. 層級與歸位：外星人跳躍時動態提升 z-index 避免遮擋，並精確還原 origStyle 確保不位移。
+      4. 觸發優化：使用 300px 寬鬆觸發條件，解決頂部區塊無法顯示的問題。
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>尋找星海中的微光：凌日法</title>
+    <title>捕捉宇宙的閃爍：凌日法</title>
     
+    <!-- MathJax 配置 -->
     <script>
         window.MathJax = {
             tex: {
@@ -36,9 +37,7 @@
             --tech-cyan: rgba(0, 242, 255, 0.6);
             --text-color: #e0faff;
             --bg-deep: #010408;
-            --bg-color-red: #440000;
-            --bg-color-blue: #001144;
-            --pulse-ratio: 50%;
+            --pulse-opacity: 1;
         }
 
         body {
@@ -52,23 +51,20 @@
             overflow-x: hidden;
         }
 
-        /* 氛圍背景 */
+        /* 數位網格背景 */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            background-image: 
-                linear-gradient(rgba(0, 242, 255, 0.15) 2px, transparent 2px),
-                linear-gradient(90deg, rgba(0, 242, 255, 0.15) 2px, transparent 2px),
-                linear-gradient(145deg, 
-                    var(--bg-color-red) 0%, 
-                    var(--bg-color-red) calc(var(--pulse-ratio) - 45%), 
-                    var(--bg-color-blue) calc(var(--pulse-ratio) + 45%), 
-                    var(--bg-color-blue) 100%
-                );
+            background: 
+                linear-gradient(rgba(0, 242, 255, 0.25) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.25) 2px, transparent 2px),
+                radial-gradient(circle at center, #235a91 0%, #010408 100%);
             background-size: 30px 30px, 30px 30px, 100% 100%;
+            opacity: var(--pulse-opacity);
         }
 
+        /* 掃描線效果 */
         body::after {
             content: "";
             position: fixed;
@@ -77,31 +73,42 @@
                         linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.04));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
-            z-index: 7000;
+            z-index: 4000;
         }
 
         header {
-            position: sticky; top: 0; z-index: 4000;
-            background: rgba(5, 10, 16, 0.95); backdrop-filter: blur(10px);
-            padding: 15px 4vw; text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 3000;
+            background: rgba(5, 10, 16, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 4vw;
+            text-align: center;
             border-bottom: 2px solid var(--neon-blue);
             box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
         }
 
-        h1 { color: var(--neon-blue); font-size: 1.4em; text-shadow: 0 0 10px rgba(0, 242, 255, 0.8); font-weight: 900; margin: 0; letter-spacing: 3px; }
+        h1 { 
+            color: var(--neon-blue); 
+            font-size: 1.4em; 
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.8); 
+            font-weight: 900; 
+            margin: 0; 
+            letter-spacing: 3px;
+        }
 
-        .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 20px 0; position: relative; }
+        .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 40px 0 20px 0; }
 
-        /* --- 全息展開動畫區塊 --- */
+        /* --- 全息展開動畫區塊 (保留原本色彩，加入特效) --- */
         section {
-            background: rgba(10, 20, 30, 0.75);
-            backdrop-filter: blur(10px);
-            margin-bottom: 120px;
-            padding: 40px 30px;
+            background: rgba(10, 20, 30, 0.45);
+            backdrop-filter: blur(8px);
+            margin-bottom: 60px; 
+            padding: 30px 20px;
             border: 1px solid var(--tech-cyan);
-            position: relative; 
+            position: relative;
             
-            /* 初始狀態：中間的一段引導雷射線，等待觸發 */
+            /* 全息初始狀態：中間的一段引導雷射線 */
             opacity: 0.6;
             clip-path: inset(49.5% 35% 49.5% 35%);
             filter: drop-shadow(0 0 10px var(--neon-blue)) brightness(1.5);
@@ -138,10 +145,11 @@
                 opacity: 1;
             }
             100% { 
-                clip-path: inset(-500% -500% -500% -500%); /* 完全釋放邊界 */
+                /* 完全釋放邊界防外星人裁切，向左上偏移，彈出 4px 實心陰影 */
+                clip-path: inset(-500% -500% -500% -500%); 
                 filter: brightness(1); 
-                transform: translate(-4px, -4px); /* 彈出偏移 */
-                box-shadow: 4px 4px 0px var(--tech-cyan); /* 生成實心陰影 */
+                transform: translate(-4px, -4px); 
+                box-shadow: 4px 4px 0px var(--tech-cyan); 
                 opacity: 1; 
             }
         }
@@ -150,93 +158,217 @@
         section::after {
             content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             border-top: 1px solid var(--neon-blue); border-bottom: 1px solid var(--neon-blue);
-            pointer-events: none;
-            opacity: 0.3; transition: opacity 1s;
+            pointer-events: none; opacity: 0.3; transition: opacity 1s;
         }
         section.is-active::after { opacity: 0.6; }
 
-        section::before { 
-            content: ""; position: absolute; top: -1px; left: -1px; width: 18px; height: 18px; 
-            border-top: 3px solid var(--neon-blue); border-left: 3px solid var(--neon-blue); 
+        /* 左上角科幻標記 */
+        section::before {
+            content: ""; position: absolute; top: -1px; left: -1px;
+            width: 15px; height: 15px;
+            border-top: 3px solid var(--neon-blue); border-left: 3px solid var(--neon-blue);
             opacity: 0; transition: opacity 0.5s 1.2s; z-index: 2;
         }
         section.is-active::before { opacity: 1; }
 
-        h2 { color: var(--vibrant-gold); margin-top: 0; font-size: 1.3em; display: flex; align-items: center; text-transform: uppercase; }
+        h2 { 
+            color: var(--vibrant-gold); 
+            margin-top: 0; 
+            font-size: 1.25em; 
+            display: flex; 
+            align-items: center;
+            text-transform: uppercase;
+        }
         h2::before { content: ">> "; color: var(--neon-blue); font-family: monospace; margin-right: 5px; }
 
         .highlight { color: var(--neon-blue); font-family: monospace; font-weight: bold; }
 
         .image-placeholder {
-            background: rgba(0, 242, 255, 0.08); border: 1px dashed rgba(0, 242, 255, 0.4); margin: 25px 0;
-            padding: 60px 20px; text-align: center; color: var(--neon-blue); font-size: 0.8em; text-transform: uppercase; letter-spacing: 2px;
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px dashed rgba(0, 242, 255, 0.4);
+            margin: 20px 0;
+            padding: 50px 20px;
+            text-align: center;
+            color: var(--neon-blue);
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .canvas-container {
-            margin: 25px -30px; background: rgba(0, 0, 0, 0.95); position: relative;
-            border-top: 1px solid var(--tech-cyan); border-bottom: 1px solid var(--tech-cyan); overflow: hidden; line-height: 0;
+            margin: 20px -20px;
+            background: rgba(0, 0, 0, 0.85);
+            position: relative;
+            border-top: 1px solid var(--tech-cyan);
+            border-bottom: 1px solid var(--tech-cyan);
+            overflow: hidden;
+            line-height: 0;
         }
+
         canvas { display: block; width: 100%; height: auto; }
 
         .controls {
-            padding: 25px; background: rgba(6, 14, 22, 0.95); border-bottom: 1px solid var(--tech-cyan); margin: 0 -30px -40px -30px;
+            padding: 20px;
+            background: rgba(6, 14, 22, 0.9); 
+            border-bottom: 1px solid var(--tech-cyan);
+            margin: 0 -20px 20px -20px;
         }
-        .control-item { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
-        .control-label { font-size: 0.85em; color: var(--neon-blue); display: flex; justify-content: space-between; font-family: monospace; }
 
-        input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: #1a3040; outline: none; touch-action: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 22px; background: var(--neon-blue); border: 1px solid white; cursor: pointer; box-shadow: 0 0 10px var(--neon-blue); }
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            font-size: 0.8em;
+            color: var(--neon-blue);
+            display: flex;
+            justify-content: space-between;
+            font-family: monospace;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 3px;
+            background: #1a3040;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 10px;
+            height: 20px;
+            background: var(--neon-blue);
+            border: 1px solid white;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
 
         .formula-card {
-            font-size: 1.05em; color: var(--vibrant-gold); text-align: center; margin: 25px 0; padding: 20px 15px; background: rgba(0, 242, 255, 0.15); border: 1px solid var(--tech-cyan);
+            font-size: 1.05em;
+            color: var(--vibrant-gold);
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px 15px;
+            background: rgba(0, 242, 255, 0.15);
+            border: 1px solid var(--tech-cyan);
         }
 
-        /* 波形追蹤者 */
+        details { background: rgba(0, 0, 0, 0.5); margin: 25px -20px -30px -20px; border-top: 1px solid var(--tech-cyan); }
+        summary { padding: 15px 20px; font-weight: bold; color: var(--neon-blue); cursor: pointer; display: flex; justify-content: space-between; font-family: monospace; }
+        .details-content { padding: 15px 20px; font-size: 0.9em; color: #ccc; }
+
+        /* 像素外星人基礎 */
         .pixel-mascot {
-            position: absolute; width: 36px; height: 22px; z-index: 10; top: -26px; cursor: pointer;
-            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s; filter: drop-shadow(0 0 8px var(--neon-blue)); -webkit-tap-highlight-color: transparent;
+            position: absolute;
+            width: 32px;
+            height: 24px;
+            z-index: 10; 
+            top: -24px; 
+            cursor: pointer;
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 8px var(--neon-blue));
+            -webkit-tap-highlight-color: transparent;
         }
-        .pixel-mascot.active { z-index: 6000 !important; }
+
+        .pixel-mascot.active {
+            filter: drop-shadow(0 0 15px var(--neon-blue));
+        }
 
         .mascot-body {
-            width: 100%; height: 100%; background: var(--neon-blue); position: relative;
-            box-shadow: -4px 4px 0 var(--neon-blue), 4px 4px 0 var(--neon-blue), -8px 4px 0 var(--neon-blue), 8px 4px 0 var(--neon-blue), 0 -4px 0 var(--neon-blue);
+            width: 100%;
+            height: 100%;
+            background: var(--neon-blue);
+            position: relative;
+            box-shadow: 
+                -4px 4px 0 var(--neon-blue), 
+                4px 4px 0 var(--neon-blue),
+                -8px 8px 0 var(--neon-blue),
+                8px 8px 0 var(--neon-blue);
         }
-        .mascot-eyes { position: absolute; top: 4px; left: 4px; right: 4px; height: 6px; display: flex; justify-content: space-around; pointer-events: none; }
-        .mascot-eyes::before, .mascot-eyes::after { content: ""; width: 6px; height: 6px; background: #000; animation: blink 4s infinite; }
-        @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
-        .mascot-body::after { content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 4px; height: 10px; background: var(--neon-blue); animation: ant-p 0.5s infinite alternate; }
-        @keyframes ant-p { from { height: 5px; opacity: 0.6; } to { height: 12px; opacity: 1; } }
 
-        .black-hole {
-            position: absolute; width: 64px; height: 20px; background: #000; border-radius: 50%;
-            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff; z-index: 5;
-            transform: scale(0); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; opacity: 0;
+        .mascot-eyes {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            height: 4px;
+            display: flex;
+            justify-content: space-around;
         }
-        .black-hole.visible { transform: scale(1); opacity: 1; }
+        .mascot-eyes::before, .mascot-eyes::after {
+            content: "";
+            width: 4px;
+            height: 4px;
+            background: #000;
+            animation: eye-blink 3s infinite;
+        }
+
+        @keyframes eye-blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        /* 黑洞特效 */
+        .black-hole {
+            position: absolute;
+            width: 48px;
+            height: 12px;
+            background: #000;
+            border-radius: 50%;
+            box-shadow: 0 0 15px 2px var(--neon-blue);
+            z-index: -2;
+            transform: scale(0);
+            transition: transform 0.5s ease-out;
+            pointer-events: none;
+        }
+        .black-hole.visible { transform: scale(1); }
 
         .mascot-label {
-            font-size: 9px; font-family: monospace; color: var(--neon-blue); position: absolute; top: -22px; left: 50%;
-            transform: translateX(-50%); background: rgba(0,0,0,0.85); padding: 2px 6px; border: 1px solid var(--neon-blue); white-space: nowrap; pointer-events: none;
+            font-size: 9px;
+            font-family: monospace;
+            color: var(--neon-blue);
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 1px 4px;
+            border: 1px solid var(--neon-blue);
+            white-space: nowrap;
+            pointer-events: none;
         }
-
-        @keyframes idle-f { 0% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-40px) rotate(180deg) scale(1.1); } 100% { transform: translateY(0) rotate(360deg) scale(1); } }
-        .pixel-mascot.idle-jump { animation: idle-f 0.8s ease-in-out !important; }
-        .pixel-mascot.idle-color .mascot-body { filter: hue-rotate(180deg) brightness(1.3); transition: filter 0.5s; }
 
         @keyframes peek-bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+        @keyframes peek-slide { 0% { transform: translateX(-10px); } 100% { transform: translateX(10px); } }
 
-        .back-nav { text-align: center; margin: 60px 0; }
+        .back-nav { text-align: center; margin: 40px 0; }
         .back-btn { 
-            color: var(--neon-blue); text-decoration: none; font-size: 1em; border: 1px solid var(--neon-blue); 
-            padding: 18px 40px; text-transform: uppercase; letter-spacing: 4px; transition: all 0.3s;
-            font-family: monospace; background: rgba(0, 242, 255, 0.05);
+            color: var(--neon-blue); 
+            text-decoration: none; 
+            font-size: 0.9em; 
+            border: 1px solid var(--neon-blue); 
+            padding: 15px 35px; 
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.3s;
+            font-family: monospace;
+            background: rgba(0, 242, 255, 0.05);
         }
-        .back-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 25px var(--neon-blue); }
+        .back-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 20px var(--neon-blue); }
 
         footer { 
-            text-align: center; padding: 60px 20px; font-size: 0.75em; color: #446688; background: #010305; 
-            letter-spacing: 4px; font-family: monospace; border-top: 1px solid rgba(0, 242, 255, 0.2);
+            text-align: center; 
+            padding: 60px 20px; 
+            font-size: 0.75em; 
+            color: #446688; 
+            background: #010305; 
+            letter-spacing: 4px;
+            font-family: monospace;
+            border-top: 1px solid rgba(0, 242, 255, 0.2);
         }
     </style>
 </head>
@@ -245,109 +377,172 @@
 <div class="bg-layer" id="bgLayer"></div>
 
 <header id="mainHeader">
-    <h1>尋找星海中的微光</h1>
-    <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">TRANSIT_METHOD_ANALYSIS_UNIT_042</p>
+    <h1>捕捉宇宙的閃爍</h1>
+    <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">TRANSIT_METHOD_ANALYSIS_UNIT_117</p>
     
-    <div class="pixel-mascot" id="mascot-header" style="right: 20px; top: 10px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
-        <div class="mascot-body"><div class="mascot-eyes"></div></div>
-        <div class="mascot-label">PHOTON_WATCHER</div>
+    <div class="pixel-mascot" style="right: 20px; top: 10px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
+        <div class="mascot-body">
+            <div class="mascot-eyes"></div>
+        </div>
+        <div class="mascot-label">HUB_SENTRY</div>
+        <div class="black-hole" style="left:-8px; top:12px;"></div>
     </div>
-    <div class="black-hole" id="bh-header" style="right: 8px; top: 28px;"></div>
 </header>
 
 <div class="container">
-    <section id="section-1", style="margin:120px 0px 120px 0px">
-        <div class="pixel-mascot" id="mascot-s1" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotStep(this)">
-            <div class="mascot-body" style="background: var(--vibrant-gold);"><div class="mascot-eyes"></div></div>
-            <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">ECLIPSE_ALPHA</div>
+    <!-- Section 1 -->
+    <section, style = "margin:120px 0px 120px 0px">
+        <div class="pixel-mascot" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotStep(this)">
+            <div class="mascot-body" style="background: var(--vibrant-gold);">
+                <div class="mascot-eyes"></div>
+            </div>
+            <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">UNIT_ALPHA</div>
+            <div class="black-hole" style="left:-8px; top:12px;"></div>
         </div>
-        <div class="black-hole" id="bh-s1" style="left: 6px; top: 6px;"></div>
 
+        <div class="image-placeholder">[ Image of 凌日法示意圖 ]</div>
         <h2>什麼是「凌日法」？</h2>
-        <p>當系外行星的軌道面剛好與我們的視線平行時，行星在繞行母恆星的過程中，會從恆星前方經過，這個現象稱為<span class="highlight">「凌日 (Transit)」</span>。</p>
+        <p>
+            想像在黑夜中有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，你會發現探照燈的亮度瞬間稍微變暗。
+        </p>
+        <p>
+            這種光度變化繪出的曲線稱為<span class="highlight">「光變曲線」(Light Curve)</span>。它是目前發現系外行星數量最多的技術。
+        </p>
         
-        <div class="image-placeholder">[attachment_0](attachment)</div>
+        <div class="image-placeholder">[ Image of 系外行星 WASP-96b 凌日測得的光變曲線 ]</div>
 
-        <p>這就像是一隻飛蛾從路燈前飛過，會短暫地遮擋住一點點光線。天文學家透過極其精密的儀器，測量恆星亮度的微小下降，就能推斷出行星的存在。</p>
-
-        <!-- 正確的凌日法模擬器 -->
-        <div class="canvas-container"><canvas id="transitCanvas"></canvas></div>
+        <div class="canvas-container">
+            <canvas id="transitCanvas"></canvas>
+        </div>
         
         <div class="controls">
             <div class="control-item">
-                <div class="control-label"><span>行星半徑 (影響遮擋面積與光度下降)</span><span id="sizeVal" style="color:white">6.0</span></div>
-                <!-- 正確的凌日法 Slider IDs -->
-                <input type="range" id="sizeSlider" min="2" max="15" value="6" step="0.1">
+                <div class="control-label">
+                    <span>SYS_OBJECT_SIZE</span>
+                    <span id="sizeVal" style="color:white">12.0</span>
+                </div>
+                <input type="range" id="sizeSlider" min="5" max="25" value="12" step="0.1">
             </div>
             <div class="control-item">
-                <div class="control-label"><span>公轉速度 (影響凌日發生頻率)</span><span id="speedVal" style="color:white">2.50</span></div>
-                <input type="range" id="speedSlider" min="0.5" max="8" value="2.5" step="0.1">
+                <div class="control-label">
+                    <span>SYS_ORBIT_VEL</span>
+                    <span id="speedVal" style="color:white">5.00</span>
+                </div>
+                <input type="range" id="speedSlider" min="0.5" max="10" value="5" step="0.05">
             </div>
         </div>
     </section>
-    
-    <section id="section-2">
-        <div class="pixel-mascot" id="mascot-s2" style="right: 20px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
-            <div class="mascot-body"><div class="mascot-eyes"></div></div>
-            <div class="mascot-label">CURVE_BETA</div>
+
+    <!-- Section 2 -->
+    <section>
+        <div class="pixel-mascot" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
+            <div class="mascot-body">
+                <div class="mascot-eyes"></div>
+            </div>
+            <div class="mascot-label">UNIT_BETA</div>
+            <div class="black-hole" style="left:-8px; top:12px;"></div>
         </div>
-        <div class="black-hole" id="bh-s2" style="right: 6px; top: 6px;"></div>
+
+        <h2>數據資訊分析</h2>
         
-        <h2>宇宙偵探：星光密碼</h2>
-        <p>透過長時間觀測恆星的光度變化，我們可以繪製出<span class="highlight">「光變曲線 (Light Curve)」</span>。當行星經過恆星前方時，曲線會呈現出獨特的 U 型凹陷。</p>
+        <p><strong>1. 偵測行星存在</strong></p>
+        <p>觀測到週期性的下降「坑洞」即確認凌日現象。</p>
 
-        <div class="formula-card">$$\frac{\Delta F}{F} \approx \left(\frac{R_p}{R_*}\right)^2$$</div>
+        <p><strong>2. 幾何尺寸計算</strong></p>
+        <p>行星遮擋比例決定了坑的深度。公式：</p>
+        <div class="formula-card">
+            $$\text{Depth} = \left(\frac{R_{planet}}{R_{star}}\right)^2$$
+        </div>
+        
+        <div class="image-placeholder">[ Image of TRAPPIST-1 不同大小行星的光變曲線對比 ]</div>
 
-        <p>這個光度的下降比例（$\Delta F/F$），直接對應到行星半徑與恆星半徑的面積比。這意味著，光度掉得越多，這顆行星的體積就越大！</p>
+        <p><strong>3. 軌道力學推演</strong></p>
+        <p>依週期 $T$ 計算軌道半徑 $a$，判斷是否位於<span class="highlight">適居帶 (Habitable Zone)</span>。</p>
 
-        <div class="image-placeholder">[attachment_1](attachment)</div>
+        <p><strong>4. 大氣光譜分析</strong></p>
+        <p>恆星光穿過行星大氣邊緣，化學分子會吸收特定波長。分析<span class="highlight">「光譜指紋」</span>即可解析大氣組成。</p>
+        
+        <div class="image-placeholder">[ Image of 透過凌日法探測系外行星大氣原理圖 ]</div>
     </section>
 
-    <section id="section-3">
-        <div class="pixel-mascot" id="mascot-s3" style="left: 50%; margin-left: -18px; animation: peek-bounce 2s infinite alternate ease-in-out;" onclick="mascotStep(this)">
-            <div class="mascot-body" style="background: #fff;"><div class="mascot-eyes"></div></div>
-            <div class="mascot-label" style="color:#fff; border-color:#fff">KEPLER_UNIT</div>
+    <!-- Section 3 -->
+    <section>
+        <div class="pixel-mascot" style="left: 50%; margin-left: -16px; animation: peek-slide 2s infinite alternate ease-in-out;" onclick="mascotStep(this)">
+            <div class="mascot-body" style="background: #fff;">
+                <div class="mascot-eyes"></div>
+            </div>
+            <div class="mascot-label" style="color:#fff; border-color:#fff">UNIT_GAMMA</div>
+            <div class="black-hole" style="left:-8px; top:12px;"></div>
         </div>
-        <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -32px; top: 6px;"></div>
 
-        <h2>發現的里程碑：克卜勒與 TESS</h2>
-        <p>凌日法是目前尋找系外行星最高效的方法。<span class="highlight">克卜勒太空望遠鏡 (Kepler)</span> 服役期間，利用此方法發現了超過 2,600 顆確認的系外行星。</p>
-        
-        <div class="image-placeholder">[attachment_2](attachment)</div>
-
-        <p>目前，新一代的<span class="highlight">凌日系外行星巡天衛星 (TESS)</span> 正在掃描幾乎整個天空，尋找距離我們更近、更明亮的恆星周圍的行星，為未來的詹姆斯·韋伯太空望遠鏡 (JWST) 提供絕佳的觀測目標。</p>
-        
-        <div class="image-placeholder">[attachment_3](attachment)</div>
+        <h2>ARDUINO 探測系統</h2>
+        <p>
+            教具使用高亮度燈箱模擬恆星，行星模型進行公轉。透過 <span class="highlight">Arduino</span> 與精密光度感測器，執行高頻率數據採樣（Sampling）。
+        </p>
+        <details>
+            <summary>SYSTEM_LOG: SENSITIVITY_0.01%</summary>
+            <div class="details-content">
+                實際觀測變幅僅為 0.01%。系統透過優化演算法，捕捉細微電壓變化並即時轉譯為數位光變曲線。
+            </div>
+        </details>
     </section>
 
-    <div class="back-nav"><a href="index.html" class="back-btn">Return to Sector 0</a></div>
+    <div class="back-nav">
+        <a href="index.html" class="back-btn">Return to Sector 0</a>
+    </div>
 </div>
 
-<footer id="mainFooter">EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.042</footer>
+<footer>
+    [ TERMINAL_STATUS: ACTIVE ]<br>
+    EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.117
+</footer>
 
 <script>
-    // --- 正確綁定凌日法專用的 Canvas 與 Control IDs ---
-    const canvas = document.getElementById('transitCanvas'), ctx = canvas.getContext('2d');
-    const headerEl = document.getElementById('mainHeader'), footerEl = document.getElementById('mainFooter'), bgLayer = document.getElementById('bgLayer');
-    const sSld = document.getElementById('sizeSlider'), spdSld = document.getElementById('speedSlider');
-    const sVal = document.getElementById('sizeVal'), spdVal = document.getElementById('speedVal');
+    const canvas = document.getElementById('transitCanvas');
+    const ctx = canvas.getContext('2d');
+    const bgLayer = document.getElementById('bgLayer');
+    
+    const sizeSlider = document.getElementById('sizeSlider');
+    const speedSlider = document.getElementById('speedSlider');
+    const sizeVal = document.getElementById('sizeVal');
+    const speedVal = document.getElementById('speedVal');
 
-    let lastTimestamp = null, angle = 0;
-    // 初始化光變歷史數據陣列，全為 100% 亮度
-    const lightHistory = new Array(150).fill(100.0);
+    const RGB_NEON_BLUE = '0, 242, 255'; 
+    const COLOR_VIBRANT_GOLD = '#ffcc00';
 
-    // --- 強化版全息展開監測邏輯 (使用 px 確保最上方 Block 能觸發) ---
+    let planetR = parseFloat(sizeSlider.value);
+    let speedMult = parseFloat(speedSlider.value);
+    let points = []; 
+    const starR = 60; 
+    const breathPeriod = 6.0; 
+
+    let lastTimestamp = performance.now();
+    let currentOrbitAngle = 0; 
+
+    let highlightTimer = 0;
+    const HOLD_DURATION = 500;       
+    const DECAY_DURATION = 800;      
+    let isInteracting = false; 
+
+    const startHighlight = () => { isInteracting = true; };
+    const endHighlight = () => { 
+        if (isInteracting) {
+            isInteracting = false; 
+            highlightTimer = Date.now(); 
+        }
+    };
+
+    // --- 全息展開監測邏輯 (寬鬆 300px 觸發區) ---
     function initHologramReveal() {
         const observerOptions = {
             threshold: 0,
-            rootMargin: "300px 0px 300px 0px" // 上下放寬 300px，確保畫面一載入就觸發頂部區塊
+            rootMargin: "300px 0px 300px 0px" 
         };
         
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-active');
-                    // 一旦展開即保持狀態
                     observer.unobserve(entry.target);
                 }
             });
@@ -358,112 +553,151 @@
         });
     }
 
-    // --- 外星人嚴格邊界與層級修復邏輯 ---
+    // --- 外星人步進互動與精準歸位修復邏輯 ---
     async function mascotStep(el) {
         if (el.dataset.moving === 'true') return;
-        el.dataset.moving = 'true'; el.classList.add('active'); 
-        
-        const hH = headerEl.offsetHeight, fH = footerEl.offsetHeight;
-        const viewW = window.innerWidth, viewH = window.innerHeight;
-        
-        const zIndexBlock = el.closest('section') || el.closest('header');
-        const parentBlock = el.closest('section') || document.body;
-        const blockRect = parentBlock.getBoundingClientRect();
         
         let step = parseInt(el.dataset.step || '0');
+        el.dataset.moving = 'true';
+        el.classList.add('active'); 
+        
+        const zIndexBlock = el.closest('section') || el.closest('header');
 
+        // 捕捉原位座標（僅第一次點擊時執行）
         if (step === 0) {
-            el.style.animation = "none";
-            const r = el.getBoundingClientRect();
-            el.dataset.homeVPX = r.left;
-            el.dataset.homeVPY = r.top;
+            const rect = el.getBoundingClientRect();
+            const parentRect = el.offsetParent.getBoundingClientRect();
+            el.dataset.homeX = rect.left - parentRect.left;
+            el.dataset.homeY = rect.top - parentRect.top;
             
-            // 備份原本的 Inline Style
+            // 備份原本的 Inline Style 以便後續精確還原 (防止 CSS 佈局被破壞)
             el.dataset.origStyle = el.getAttribute('style') || ""; 
             
+            // 精確提升層級，跨越區塊時不被遮擋
             if (zIndexBlock) {
-                // 區分容器層級提升
                 if (zIndexBlock.tagName.toLowerCase() === 'header') {
                     zIndexBlock.style.zIndex = "8000"; // Header 外星人最頂層
                 } else {
-                    zIndexBlock.style.zIndex = "3500"; // Section 外星人高於其他 Section 但不遮擋 Header
+                    zIndexBlock.style.zIndex = "3500"; // Section 外星人高於其他 Section 但低於 Header
                 }
             }
+
+            el.style.transition = "none";
+            el.style.animation = "none";
+            el.style.left = el.dataset.homeX + 'px';
+            el.style.top = el.dataset.homeY + 'px';
+            el.style.transform = 'translate(0, 0)';
             el.offsetHeight; 
         }
 
-        step++; el.dataset.step = step;
+        step++;
+        el.dataset.step = step;
 
         if (step <= 2) {
-            const pad = 60;
-            const minX = Math.max(blockRect.left + pad, pad);
-            const maxX = Math.min(blockRect.right - pad, viewW - pad);
-            const minY = Math.max(hH + pad, blockRect.top + pad);
-            const maxY = Math.min(viewH - fH - pad, blockRect.bottom - pad);
-
-            const targetX = minX + Math.random() * (maxX - minX);
-            const targetY = minY + Math.random() * (maxY - minY);
-
-            const tx = targetX - parseFloat(el.dataset.homeVPX);
-            const ty = targetY - parseFloat(el.dataset.homeVPY);
+            // 跳躍到隨機位置
+            const rx = (Math.random() - 0.5) * (window.innerWidth * 0.7);
+            const ry = (Math.random() - 0.5) * (window.innerHeight * 0.4);
+            const rot = (Math.random() - 0.5) * 40;
             
-            el.style.transition = "transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
-            el.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random()-0.5)*40}deg) scale(1.1)`;
+            el.style.transition = "transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
+            el.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg) scale(1.1)`;
+            
             setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
         } 
-        else {
-            const escX = (Math.random() > 0.5 ? 1 : -1) * viewW * 1.3;
-            el.style.transition = "transform 1.2s ease-in, opacity 0.5s ease-in";
-            el.style.transform = `translate(${escX}px, 0px) rotate(720deg) scale(0.1)`;
-            el.style.opacity = "0"; 
+        else if (step === 3) {
+            // 1. 逃離螢幕
+            const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
+            el.style.transition = "transform 1.2s ease-in";
+            el.style.transform = `translate(${escapeX}px, 0px) rotate(180deg) scale(0.3)`;
+            
             await new Promise(r => setTimeout(r, 1500));
 
-            const bhId = el.id.replace('mascot', 'bh');
-            const bh = document.getElementById(bhId);
-            el.style.transition = "none"; 
-            el.style.transform = "translate(0, 50px)"; 
-            el.offsetHeight;
+            // 2. 原位出現黑洞 (黑洞位於 Mascot 內部)
+            const bh = el.querySelector('.black-hole');
+            el.style.transition = "none";
+            el.style.transform = "translate(0, 25px)"; // 先藏在黑洞下方
+            bh.classList.add('visible');
+            await new Promise(r => setTimeout(r, 600));
 
-            bh.classList.add('visible'); await new Promise(r => setTimeout(r, 800));
+            // 3. 探頭從黑洞出現並左右看
+            el.style.transition = "transform 0.8s ease-out";
+            el.style.transform = "translate(0, 8px)"; // 探頭一半
+            await new Promise(r => setTimeout(r, 800));
+            
+            el.style.transform = "translate(0, 8px) rotate(-15deg)"; // 左看
+            await new Promise(r => setTimeout(r, 500));
+            el.style.transform = "translate(0, 8px) rotate(15deg)"; // 右看
+            await new Promise(r => setTimeout(r, 500));
+            el.style.transform = "translate(0, 8px) rotate(0deg)"; // 擺正
+            await new Promise(r => setTimeout(r, 300));
 
-            el.style.opacity = "1";
-            el.style.transition = "transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1)";
-            el.style.transform = "translate(0, 12px)"; await new Promise(r => setTimeout(r, 1200));
-            el.style.transform = "translate(0, 12px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
-            el.style.transform = "translate(0, 12px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
-            el.style.transform = "translate(0, 12px) rotate(0deg)"; await new Promise(r => setTimeout(r, 300));
-            el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            el.style.transform = "translate(0, -15px)"; await new Promise(r => setTimeout(r, 300));
+            // 4. 跳出黑洞歸位
+            el.style.transition = "transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+            el.style.transform = "translate(0, -10px)"; // 向上跳
+            await new Promise(r => setTimeout(r, 300));
             
-            bh.classList.remove('visible'); el.style.transform = "translate(0, 0)"; 
+            bh.classList.remove('visible'); // 黑洞消失
+            el.style.transform = "translate(0, 0)"; // 落下
             
+            // 恢復所有屬性
             setTimeout(() => {
-                // 精確還原 Inline Style 確保不發生錯位
                 el.setAttribute('style', el.dataset.origStyle);
-                el.classList.remove('active'); el.dataset.step = '0'; el.dataset.moving = 'false';
+                el.classList.remove('active');
+                el.dataset.step = '0';
+                el.dataset.moving = 'false';
                 
+                // 還原層級
                 if (zIndexBlock) {
                     zIndexBlock.style.zIndex = "";
                 }
-            }, 600);
+            }, 500);
         }
     }
 
-    // --- 畫布自適應 ---
+    sizeSlider.addEventListener('pointerdown', startHighlight);
+    speedSlider.addEventListener('pointerdown', startHighlight);
+    window.addEventListener('pointerup', endHighlight);
+    window.addEventListener('pointercancel', endHighlight);
+
     function resize() {
         const width = canvas.clientWidth;
         if (width === 0) return;
-        canvas.width = width * window.devicePixelRatio; 
-        canvas.height = (width * 0.95) * window.devicePixelRatio; 
+        canvas.width = width * window.devicePixelRatio;
+        canvas.height = (width * 0.8) * window.devicePixelRatio; 
         ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
     window.addEventListener('resize', resize);
-    
-    // --- 模擬器繪製：凌日法物理模擬 (Transit & Light Curve) ---
+    resize();
+
+    // 繪製帶有螢光特效的行星
+    function drawPlanetInstance(pX, pY, radius, opacity, intensity, isTransit) {
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        
+        if (intensity > 0.5) {
+            ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${intensity * 0.6})`;
+            ctx.strokeRect(pX - radius - 5, pY - radius - 5, radius*2 + 10, radius*2 + 10);
+        }
+
+        ctx.beginPath(); 
+        ctx.arc(pX, pY, radius, 0, Math.PI*2);
+        
+        if (intensity > 0) {
+            ctx.shadowBlur = 25 * intensity;
+            ctx.shadowColor = `rgba(${RGB_NEON_BLUE}, ${intensity})`;
+            ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${intensity})`;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+        }
+        
+        ctx.fillStyle = '#000';
+        ctx.fill();
+        ctx.restore();
+    }
+
+    // --- 使用者原始凌日法模擬繪製邏輯 ---
     function draw(timestamp) {
-        timestamp = timestamp || performance.now();
-        if (!lastTimestamp) { lastTimestamp = timestamp; resize(); }
-        const dt = (timestamp - lastTimestamp) / 1000; 
+        const dt = (timestamp - lastTimestamp) / 1000;
         lastTimestamp = timestamp;
 
         if (canvas.clientWidth > 0 && Math.abs(canvas.width - Math.floor(canvas.clientWidth * window.devicePixelRatio)) > 2) {
@@ -478,110 +712,130 @@
             return;
         }
 
-        // 取值保護
-        const pSize = sSld ? parseFloat(sSld.value) : 6.0;
-        const speed = spdSld ? parseFloat(spdSld.value) : 2.5;
-        if (sVal) sVal.innerText = pSize.toFixed(1); 
-        if (spdVal) spdVal.innerText = speed.toFixed(2);
+        planetR = parseFloat(sizeSlider.value);
+        speedMult = parseFloat(speedSlider.value);
         
-        const bgShift = Math.sin(2 * Math.PI * (timestamp / 10000)); 
-        if (bgLayer) bgLayer.style.setProperty('--pulse-ratio', (50 + bgShift * 38) + '%');
+        sizeVal.innerText = planetR.toFixed(1);
+        speedVal.innerText = speedMult.toFixed(2);
 
-        angle += speed * dt;
+        const angularVelocity = (2 * Math.PI * (speedMult * 0.5)) / 12.0;
+        currentOrbitAngle += angularVelocity * dt;
+        currentOrbitAngle %= (2 * Math.PI); 
+
+        const orbitRadius = w * 0.45;
+        const planetX = (w / 2) + Math.cos(currentOrbitAngle) * orbitRadius;
+        const planetZ = Math.sin(currentOrbitAngle); 
         
-        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
-        const cX = w / 2, cY = h * 0.35;
-        const starR = 40, orbitR = w * 0.35;
+        const dist = Math.abs(planetX - w/2); 
+        const totalContactRadius = starR + planetR; 
+        const fullInsideRadius = starR - planetR;   
+        
+        let brightness = 1.0;
+        const maxDepth = (planetR * planetR) / (starR * starR);
+        let inTransit = false;
 
-        // 計算行星軌道座標
-        const pX = cX + Math.cos(angle) * orbitR;
-        const pZ = Math.sin(angle); // Z深度，大於0時在恆星前方產生凌日
-        const pY = cY;
-
-        // 計算光變曲線
-        let currentLight = 100.0;
-        if (pZ > 0) { 
-            const dist = Math.abs(pX - cX);
-            if (dist < starR + pSize) {
-                // 遮擋程度
-                let overlap = Math.max(0, 1 - (dist / (starR)));
-                // 光度下降與半徑平方(面積)成正比
-                currentLight -= (pSize * pSize * 0.15) * overlap; 
+        if (planetZ > 0) { 
+            if (dist < totalContactRadius) {
+                inTransit = true;
+                if (dist < fullInsideRadius) {
+                    brightness = 1.0 - maxDepth;
+                } else {
+                    const normDist = (dist - fullInsideRadius) / (totalContactRadius - fullInsideRadius);
+                    const smoothFactor = (Math.cos(normDist * Math.PI) + 1) / 2;
+                    brightness = 1.0 - (maxDepth * smoothFactor);
+                }
             }
         }
 
-        // 紀錄光變歷史並平移陣列
-        lightHistory.push(currentLight);
-        lightHistory.shift();
+        points.push({ x: w * 0.95, y: brightness });
+        if (points.length > 600) points.shift();
+        points.forEach(p => p.x -= 1.4);
 
-        // 畫出行星 (若在恆星後方)
-        if (pZ < 0) {
-            ctx.fillStyle = '#000';
-            ctx.beginPath(); ctx.arc(pX, pY, pSize, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, w, h);
+
+        const sX = w / 2, sY = h * 0.3; 
+
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)';
+        ctx.strokeRect(10, 10, w - 20, h - 20);
+        ctx.fillStyle = inTransit ? '#ff4400' : 'rgba(0, 242, 255, 0.7)';
+        ctx.font = '10px monospace';
+        ctx.fillText(inTransit ? '>> EVENT: TRANSIT_ACTIVE' : '>> STATUS: SCANNING_FIELD', 20, 25);
+
+        let hIntensity = 0;
+        if (isInteracting) {
+            hIntensity = 1.0;
+        } else {
+            const elapsed = Date.now() - highlightTimer;
+            if (elapsed < HOLD_DURATION) {
+                hIntensity = 1.0; 
+            } else if (elapsed < HOLD_DURATION + DECAY_DURATION) {
+                const decayProgress = (elapsed - HOLD_DURATION) / DECAY_DURATION;
+                hIntensity = 1 - Math.pow(decayProgress, 3);
+            }
         }
 
-        // 畫出發光的恆星
-        const starGrad = ctx.createRadialGradient(cX, cY, 0, cX, cY, starR);
-        starGrad.addColorStop(0, '#ffffff');
-        starGrad.addColorStop(0.2, '#ffea00');
+        ctx.save();
+        ctx.strokeStyle = hIntensity > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.3 + hIntensity * 0.4})` : 'rgba(0, 242, 255, 0.15)';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.ellipse(sX, sY, orbitRadius * 0.5, 6, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        const px = sX + (planetX - w/2) * 0.5;
+        if (planetZ <= 0) drawPlanetInstance(px, sY, planetR, 0.3, hIntensity, false);
+
+        const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
+        starGrad.addColorStop(0, '#fff');
+        starGrad.addColorStop(0.3, '#ffcc00');
         starGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = starGrad;
-        ctx.beginPath(); ctx.arc(cX, cY, starR * 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
 
-        // 畫出行星 (若在恆星前方產生凌日)
-        if (pZ >= 0) {
-            ctx.fillStyle = '#000';
-            ctx.beginPath(); ctx.arc(pX, pY, pSize, 0, Math.PI*2); ctx.fill();
-            ctx.strokeStyle = 'rgba(0,242,255,0.4)'; ctx.lineWidth = 1; ctx.stroke();
-        }
+        if (planetZ > 0) drawPlanetInstance(px, sY, planetR, 1.0, hIntensity, inTransit);
 
-        // --- 繪製光變曲線面板 ---
-        const specX = w * 0.1, specY = h * 0.88, specW = w * 0.8, specH = h * 0.25;
+        const graphX = w * 0.05, graphY = h * 0.6, graphW = w * 0.9, graphH = h * 0.3;
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)';
+        ctx.strokeRect(graphX, graphY, graphW, graphH);
         
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.3)'; ctx.strokeRect(specX, specY - specH, specW, specH);
-        ctx.fillStyle = 'rgba(0, 242, 255, 0.05)'; ctx.fillRect(specX, specY - specH, specW, specH);
-
-        // 100% 基準線
-        ctx.beginPath(); ctx.moveTo(specX, specY - specH * 0.8); ctx.lineTo(specX + specW, specY - specH * 0.8);
-        ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.setLineDash([2, 2]); ctx.stroke(); ctx.setLineDash([]);
-
-        // 繪製連續光變曲線
         ctx.beginPath();
-        ctx.strokeStyle = '#00f2ff';
-        ctx.lineWidth = 2;
-        ctx.lineJoin = 'round';
-        
-        for (let i = 0; i < lightHistory.length; i++) {
-            let x = specX + (i / lightHistory.length) * specW;
-            let val = lightHistory[i];
-            let y = specY - ((val - 60) / 40) * specH; 
-            
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
+        ctx.strokeStyle = 'rgba(0, 242, 255, 0.15)';
+        for(let i=1; i<4; i++) {
+            ctx.moveTo(graphX, graphY + graphH * i / 4);
+            ctx.lineTo(graphX + graphW, graphY + graphH * i / 4);
         }
         ctx.stroke();
 
-        ctx.fillStyle = currentLight < 99.9 ? '#ffcc00' : '#00f2ff';
-        ctx.font = '10px monospace';
-        ctx.fillText(currentLight < 99.9 ? `>> TRANSIT_DETECTED: FLUX ${currentLight.toFixed(2)}%` : `>> REALTIME_FLUX: ${currentLight.toFixed(2)}%`, specX, specY - specH - 8);
-        
+        ctx.strokeStyle = COLOR_VIBRANT_GOLD;
+        ctx.lineWidth = 2.5;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = COLOR_VIBRANT_GOLD;
+        ctx.beginPath();
+        points.forEach((p, i) => {
+            const drawX = graphX + (p.x - (w * 0.05));
+            const drawY = graphY + (1.0 - p.y) * 450 + 35; 
+            if (drawX > graphX && drawX < graphX + graphW) {
+                if (i === 0) ctx.moveTo(drawX, drawY);
+                else ctx.lineTo(drawX, drawY);
+            }
+        });
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // 背景呼吸燈效果同步
+        const breathAngle = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
+        const breath = (Math.sin(breathAngle) + 1) / 2;
+        bgLayer.style.setProperty('--pulse-opacity', 0.15 + (breath * 0.95));
+
         requestAnimationFrame(draw);
     }
-
-    requestAnimationFrame(draw);
     
-    // 初始化外星人閒置行為
-    document.querySelectorAll('.pixel-mascot').forEach(el => { 
-        const triggerNext = () => { setTimeout(() => { 
-            if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') { 
-                const action = Math.random() > 0.5 ? 'idle-jump' : 'idle-color'; 
-                el.classList.add(action); 
-                setTimeout(() => el.classList.remove(action), action === 'idle-jump' ? 800 : 2000); 
-            } triggerNext(); 
-        }, 5000 + Math.random() * 5000); }; triggerNext(); 
-    });
+    requestAnimationFrame(draw);
 
+    // 啟動全息監視器
     initHologramReveal();
 </script>
+
 </body>
 </html>
