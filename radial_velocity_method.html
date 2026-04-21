@@ -516,7 +516,7 @@
         const dopplerIntensity = Math.cos(angle) * (mS / 15.0); 
 
         const starGrad = ctx.createRadialGradient(sX, cY, 5, sX, cY, starR); 
-        const shiftHue = -dopplerIntensity * 60; // 藍移(負值)加色相變藍
+        const shiftHue = -dopplerIntensity * 100; // 藍移(負值)加色相變藍
         starGrad.addColorStop(0, '#fff'); 
         starGrad.addColorStop(0.3, `hsl(${45 + shiftHue}, 100%, 50%)`); 
         starGrad.addColorStop(1, 'transparent');
