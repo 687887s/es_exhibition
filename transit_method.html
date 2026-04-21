@@ -133,6 +133,15 @@
 
         .highlight { color: var(--neon-blue); font-family: monospace; font-weight: bold; }
 
+        .tech-image {
+            max-width: 100%; /* 確保圖片寬度不超過父容器 */
+            height: auto; /* 維持比例 */
+            display: block;
+            margin: 20px auto; /* 上下邊距 20px，左右置中 */
+            border: 1px solid var(--tech-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+        }
+        
         .image-placeholder {
             background: rgba(0, 242, 255, 0.1); border: 1px dashed rgba(0, 242, 255, 0.4); margin: 20px 0;
             padding: 50px 20px; text-align: center; color: var(--neon-blue); font-size: 0.8em; text-transform: uppercase; letter-spacing: 2px;
