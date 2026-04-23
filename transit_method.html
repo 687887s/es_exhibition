@@ -43,11 +43,15 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
             background: var(--bg-deep);
             color: var(--text-color);
-            line-height: 1.6;
+            line-height: 1.8;
             margin: 0;
             padding: 0;
             min-height: 100vh;
             overflow-x: hidden;
+        }
+
+        p {
+            margin-bottom: 1.5em;
         }
 
         .bg-layer {
@@ -83,13 +87,19 @@
 
         h1 { color: var(--neon-blue); font-size: 1.4em; text-shadow: 0 0 10px rgba(0, 242, 255, 0.8); font-weight: 900; margin: 0; letter-spacing: 3px; }
 
-        .container { width: 92vw; max-width: 650px; margin: 0 auto; padding: 20px 0; position: relative; }
+        .container {
+            width: 92vw;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 0;
+            position: relative;
+        }
 
         section {
             background: rgba(10, 20, 30, 0.45);
-            backdrop-filter: blur(8px);
-            margin: 60px auto; 
-            padding: 30px 20px;
+            backdrop-filter: blur(10px);
+            margin: 100px auto; 
+            padding: 60px 45px;
             border: 1px solid var(--tech-cyan);
             position: relative;
             z-index: 10;
@@ -128,18 +138,68 @@
         }
         section.is-active::before { opacity: 1; }
 
-        h2 { color: var(--vibrant-gold); margin-top: 0; font-size: 1.25em; display: flex; align-items: center; text-transform: uppercase; }
+        h2 {
+            color: var(--vibrant-gold);
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
+        }
         h2::before { content: ">> "; color: var(--neon-blue); font-family: monospace; margin-right: 5px; }
 
-        .highlight { color: var(--neon-blue); font-family: monospace; font-weight: bold; }
+        .highlight {
+            color: var(--neon-blue);
+            font-weight: bold;
+        }
 
         .tech-image {
-            max-width: 100%; /* 確保圖片寬度不超過父容器 */
-            height: auto; /* 維持比例 */
+            max-width: 100%;
+            height: auto;
             display: block;
-            margin: 20px auto; /* 上下邊距 20px，左右置中 */
+            margin: 40px auto;
             border: 1px solid var(--tech-cyan);
             box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+        }
+
+        .image-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: -25px 0 35px 0;
+            font-size: 0.75em;
+            gap: 20px;
+        }
+
+        .image-caption {
+            color: #88aacc;
+            flex: 1;
+            line-height: 1.5;
+        }
+
+        .image-citation {
+            color: #557799;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .image-citation a {
+            color: #557799;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(85, 119, 153, 0.3);
+            transition: all 0.3s;
+        }
+
+        .image-citation a:hover {
+            color: var(--neon-blue);
+            border-bottom: 1px solid var(--neon-blue);
+            text-shadow: 0 0 5px rgba(0, 242, 255, 0.5);
+        }
+
+        .image-citation b {
+            color: rgba(0, 242, 255, 0.8);
+            text-decoration: none;
         }
         
         .image-placeholder {
@@ -148,12 +208,27 @@
         }
 
         .canvas-container {
-            margin: 20px -20px; background: rgba(0, 0, 0, 0.85); position: relative;
-            border-top: 1px solid var(--tech-cyan); border-bottom: 1px solid var(--tech-cyan); overflow: hidden; line-height: 0;
+            margin: 30px -45px;
+            background: rgba(0, 0, 0, 0.85);
+            position: relative;
+            border-top: 1px solid var(--tech-cyan);
+            border-bottom: 1px solid var(--tech-cyan);
+            overflow: hidden;
+            line-height: 0;
         }
-        canvas { display: block; width: 100%; height: auto; }
 
-        .controls { padding: 20px; background: rgba(6, 14, 22, 0.9); border-bottom: 1px solid var(--tech-cyan); margin: 0 -20px 20px -20px; }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .controls {
+            padding: 30px;
+            background: rgba(6, 14, 22, 0.9);
+            border-bottom: 1px solid var(--tech-cyan);
+            margin: 0 -45px -60px -45px;
+        }
         .control-item { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
         .control-label { font-size: 0.8em; color: var(--neon-blue); display: flex; justify-content: space-between; font-family: monospace; }
 
@@ -214,6 +289,52 @@
             text-align: center; padding: 60px 20px; font-size: 0.75em; color: #446688; background: #010305; 
             letter-spacing: 4px; font-family: monospace; border-top: 1px solid rgba(0, 242, 255, 0.2);
         }
+
+        /* --- 手機排版 (Mobile Responsive) --- */
+        @media (max-width: 768px) {
+            section {
+                padding: 30px 15px;
+                margin: 40px auto;
+            }
+
+            h2 {
+                font-size: 1.15em;
+            }
+
+            .image-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .image-caption,
+            .image-citation {
+                max-width: 100% !important;
+                text-align: left;
+            }
+
+            .pixel-mascot {
+                transform: scale(0.75);
+            }
+
+            #mascot-s2,
+            #mascot-s5 {
+                right: 5px !important;
+            }
+
+            #mascot-s1,
+            #mascot-s3 {
+                left: 5px !important;
+            }
+
+            .canvas-container {
+                margin: 25px -15px;
+            }
+
+            .controls {
+                margin: 0 -15px -30px -15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -240,11 +361,19 @@
         <div class="black-hole" id="bh-s1" style="left:4px; top:6px;"></div>
 
         <img src="Gemini_Generated_Image_c9zvhfc9zvhfc9zv.png" alt="凌日法示意圖" class="tech-image">
-        <h2>什麼是「凌日法」？</h2>
-        <p>想像在黑夜中有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，你會發現探照燈的亮度瞬間稍微變暗。</p>
-        <p>這種光度變化繪出的曲線稱為<span class="highlight">「光變曲線」(Light Curve)</span>。它是目前發現系外行星數量最多的技術。</p>
+        <div class="image-meta">
+            <div class="image-caption">行星通過恆星前方時，會造成觀測到的亮度規律下降</div>
+            <div class="image-citation">Source: <b>Gemini AI</b></div>
+        </div>
+        <h2>凌日法：宇宙級的「擋光遊戲」！</h2>
+        <p>想像一下，在漆黑的夜晚有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，雖然它很小，但你會發現燈光在那一瞬間稍微變暗了那麼一點點！</p>
+        <p>天文學家就是靠捕捉這種極其微弱的「閃爍」，來抓到躲在遠方的系外行星。這種亮度隨時間變化的曲線，我們稱為<span class="highlight">「光變曲線」(Light Curve)</span>。這可是目前幫我們找到最多外星兄弟的神奇技術喔！</p>
         
         <img src="Gemini_Generated_Image_hknlkxhknlkxhknl.png" alt="系外行星 WASP-96b 凌日測得的光變曲線" class="tech-image">
+        <div class="image-meta">
+            <div class="image-caption">詹姆斯·韋伯太空望遠鏡捕捉到的系外行星 WASP-96b 凌日光譜曲線</div>
+            <div class="image-citation">Source: <b>NASA / Webb</b></div>
+        </div>
 
         <div class="canvas-container">
             <canvas id="transitCanvas"></canvas>
@@ -275,12 +404,17 @@
         </div>
         <div class="black-hole" id="bh-s2" style="right:14px; top:6px;"></div>
 
-        <h2>數據資訊分析</h2>
-        <p><strong>1. 偵測行星存在</strong></p>
+        <h2>從光影中解碼：行星有多大？</h2>
+        <p><strong>1. 找出那個「擋光」的嫌疑犯</strong></p>
+        <p>當行星擋住恆星的光時，變暗的程度（凌日深度）其實就洩漏了它的身材秘密！行星越大，擋住的光就越多。我們可以利用這個簡單的公式來推算行星的大小：</p>
         <div class="formula-card">
-            $$\text{Depth} = \left(\frac{R_{planet}}{R_{star}}\right)^2$$
+            $$\text{凌日深度} = \left(\frac{\text{行星半徑}}{\text{恆星半徑}}\right)^2$$
         </div>
         <img src="Gemini_Generated_Image_oity2soity2soity (1).png" alt="不同行星大小的光變曲線" class="tech-image">
+        <div class="image-meta">
+            <div class="image-caption">不同大小的行星造成的亮度下降幅度（深度）明顯不同</div>
+            <div class="image-citation">Source: <b>Gemini AI</b></div>
+        </div>
     </section>
 
     <section id="section3">
@@ -292,8 +426,8 @@
         </div>
         <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -32px; top:6px;"></div>
 
-        <h2>ARDUINO 探測系統</h2>
-        <p>教具使用高亮度燈箱模擬恆星。透過 <span class="highlight">Arduino</span> 與精密光度感測器，執行高頻率數據採樣（Sampling）。</p>
+        <h2>我們的迷你觀測站：Arduino 探測系統</h2>
+        <p>為了讓你親身體驗，我們用高亮度燈箱打造了一顆「人造恆星」！透過 <span class="highlight">Arduino</span> 大腦搭配超級靈敏的光度感測器，我們能以極快的速度捕捉每一絲光影變化，完美模擬天文學家在太空中的觀測任務！</p>
         <details>
             <summary>SYSTEM_LOG: SENSITIVITY_0.01%</summary>
             <div class="details-content">實際觀測變幅僅為 0.01%。系統透過優化演算法捕捉細微光度變化。</div>
