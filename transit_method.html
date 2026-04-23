@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <!-- 
       檔案狀態：物理模擬與外星人互動完全體版 (Blueprint Simulation Sync)
@@ -13,7 +14,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>捕捉宇宙的閃爍：凌日法</title>
-    
+
     <script>
         window.MathJax = {
             tex: {
@@ -24,12 +25,14 @@
         };
     </script>
     <script type="text/javascript" id="MathJax-script" async
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-    </script>
-    
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+        </script>
+
     <style>
-        * { box-sizing: border-box; }
-        
+        * {
+            box-sizing: border-box;
+        }
+
         :root {
             --vibrant-gold: #ffcc00;
             --neon-blue: #00f2ff;
@@ -56,9 +59,12 @@
 
         .bg-layer {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: -1;
-            background: 
+            background:
                 linear-gradient(rgba(0, 242, 255, 0.25) 2px, transparent 2px),
                 linear-gradient(90deg, rgba(0, 242, 255, 0.25) 2px, transparent 2px),
                 radial-gradient(circle at center, #235a91 0%, #010408 100%);
@@ -69,23 +75,37 @@
         body::after {
             content: "";
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.04));
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.04));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
             z-index: 9999;
         }
 
         header {
-            position: sticky; top: 0; z-index: 9000;
-            background: rgba(5, 10, 16, 0.95); backdrop-filter: blur(10px);
-            padding: 15px 4vw; text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 9000;
+            background: rgba(5, 10, 16, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 4vw;
+            text-align: center;
             border-bottom: 2px solid var(--neon-blue);
             box-shadow: 0 5px 30px rgba(0, 242, 255, 0.4);
         }
 
-        h1 { color: var(--neon-blue); font-size: 1.4em; text-shadow: 0 0 10px rgba(0, 242, 255, 0.8); font-weight: 900; margin: 0; letter-spacing: 3px; }
+        h1 {
+            color: var(--neon-blue);
+            font-size: 1.4em;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.8);
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: 3px;
+        }
 
         .container {
             width: 92vw;
@@ -98,7 +118,7 @@
         section {
             background: rgba(10, 20, 30, 0.45);
             backdrop-filter: blur(10px);
-            margin: 100px auto; 
+            margin: 100px auto;
             padding: 60px 45px;
             border: 1px solid var(--tech-cyan);
             position: relative;
@@ -117,26 +137,73 @@
         }
 
         @keyframes hologramExpandDetailed {
-            0% { clip-path: inset(49.5% 35% 49.5% 35%); filter: brightness(2); transform: translate(0, 0); box-shadow: 0px 0px 0px transparent; }
-            40% { clip-path: inset(49.5% -30px 49.5% -30px); filter: brightness(3); transform: translate(0, 0); box-shadow: 0px 0px 0px transparent; opacity: 1; }
-            85% { clip-path: inset(-50px -30px -30px -30px); filter: brightness(1); transform: translate(0, 0); box-shadow: 0px 0px 0px transparent; opacity: 1; }
-            100% { clip-path: inset(-500% -500% -500% -500%); filter: brightness(1); transform: translate(-4px, -4px); box-shadow: 4px 4px 0px var(--tech-cyan); opacity: 1; }
+            0% {
+                clip-path: inset(49.5% 35% 49.5% 35%);
+                filter: brightness(2);
+                transform: translate(0, 0);
+                box-shadow: 0px 0px 0px transparent;
+            }
+
+            40% {
+                clip-path: inset(49.5% -30px 49.5% -30px);
+                filter: brightness(3);
+                transform: translate(0, 0);
+                box-shadow: 0px 0px 0px transparent;
+                opacity: 1;
+            }
+
+            85% {
+                clip-path: inset(-50px -30px -30px -30px);
+                filter: brightness(1);
+                transform: translate(0, 0);
+                box-shadow: 0px 0px 0px transparent;
+                opacity: 1;
+            }
+
+            100% {
+                clip-path: inset(-500% -500% -500% -500%);
+                filter: brightness(1);
+                transform: translate(-4px, -4px);
+                box-shadow: 4px 4px 0px var(--tech-cyan);
+                opacity: 1;
+            }
         }
 
         section::after {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border-top: 1px solid var(--neon-blue); border-bottom: 1px solid var(--neon-blue);
-            pointer-events: none; opacity: 0.3; transition: opacity 1s;
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-top: 1px solid var(--neon-blue);
+            border-bottom: 1px solid var(--neon-blue);
+            pointer-events: none;
+            opacity: 0.3;
+            transition: opacity 1s;
         }
-        section.is-active::after { opacity: 0.6; }
+
+        section.is-active::after {
+            opacity: 0.6;
+        }
 
         section::before {
-            content: ""; position: absolute; top: -1px; left: -1px;
-            width: 15px; height: 15px;
-            border-top: 3px solid var(--neon-blue); border-left: 3px solid var(--neon-blue);
-            opacity: 0; transition: opacity 0.5s 1.2s; z-index: 2;
+            content: "";
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 15px;
+            height: 15px;
+            border-top: 3px solid var(--neon-blue);
+            border-left: 3px solid var(--neon-blue);
+            opacity: 0;
+            transition: opacity 0.5s 1.2s;
+            z-index: 2;
         }
-        section.is-active::before { opacity: 1; }
+
+        section.is-active::before {
+            opacity: 1;
+        }
 
         h2 {
             color: var(--vibrant-gold);
@@ -147,7 +214,13 @@
             align-items: center;
             text-transform: uppercase;
         }
-        h2::before { content: ">> "; color: var(--neon-blue); font-family: monospace; margin-right: 5px; }
+
+        h2::before {
+            content: ">> ";
+            color: var(--neon-blue);
+            font-family: monospace;
+            margin-right: 5px;
+        }
 
         .highlight {
             color: var(--neon-blue);
@@ -201,10 +274,17 @@
             color: rgba(0, 242, 255, 0.8);
             text-decoration: none;
         }
-        
+
         .image-placeholder {
-            background: rgba(0, 242, 255, 0.1); border: 1px dashed rgba(0, 242, 255, 0.4); margin: 20px 0;
-            padding: 50px 20px; text-align: center; color: var(--neon-blue); font-size: 0.8em; text-transform: uppercase; letter-spacing: 2px;
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px dashed rgba(0, 242, 255, 0.4);
+            margin: 20px 0;
+            padding: 50px 20px;
+            text-align: center;
+            color: var(--neon-blue);
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .canvas-container {
@@ -229,65 +309,217 @@
             border-bottom: 1px solid var(--tech-cyan);
             margin: 0 -45px -60px -45px;
         }
-        .control-item { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-        .control-label { font-size: 0.8em; color: var(--neon-blue); display: flex; justify-content: space-between; font-family: monospace; }
 
-        input[type="range"] { -webkit-appearance: none; width: 100%; height: 3px; background: #1a3040; outline: none; touch-action: none; }
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            font-size: 0.8em;
+            color: var(--neon-blue);
+            display: flex;
+            justify-content: space-between;
+            font-family: monospace;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 3px;
+            background: #1a3040;
+            outline: none;
+            touch-action: none;
+        }
+
         input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 10px; height: 20px; background: var(--neon-blue);
-            border: 1px solid white; cursor: pointer; box-shadow: 0 0 10px var(--neon-blue);
+            -webkit-appearance: none;
+            width: 10px;
+            height: 20px;
+            background: var(--neon-blue);
+            border: 1px solid white;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-blue);
         }
 
         .formula-card {
-            font-size: 1.05em; color: var(--vibrant-gold); text-align: center; margin: 20px 0;
-            padding: 20px 15px; background: rgba(0, 242, 255, 0.15); border: 1px solid var(--tech-cyan);
+            font-size: 1.05em;
+            color: var(--vibrant-gold);
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px 15px;
+            background: rgba(0, 242, 255, 0.15);
+            border: 1px solid var(--tech-cyan);
         }
 
-        details { background: rgba(0, 0, 0, 0.5); margin: 25px -20px -30px -20px; border-top: 1px solid var(--tech-cyan); }
-        summary { padding: 15px 20px; font-weight: bold; color: var(--neon-blue); cursor: pointer; display: flex; justify-content: space-between; font-family: monospace; }
-        .details-content { padding: 15px 20px; font-size: 0.9em; color: #ccc; }
+        details {
+            background: rgba(0, 0, 0, 0.5);
+            margin: 25px -20px -30px -20px;
+            border-top: 1px solid var(--tech-cyan);
+        }
+
+        summary {
+            padding: 15px 20px;
+            font-weight: bold;
+            color: var(--neon-blue);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            font-family: monospace;
+        }
+
+        .details-content {
+            padding: 15px 20px;
+            font-size: 0.9em;
+            color: #ccc;
+        }
 
         /* --- 外星人系統樣式 --- */
         .pixel-mascot {
-            position: absolute; width: 32px; height: 24px; z-index: 20; top: -24px; cursor: pointer;
-            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1); filter: drop-shadow(0 0 8px var(--neon-blue)); -webkit-tap-highlight-color: transparent;
+            position: absolute;
+            width: 32px;
+            height: 24px;
+            z-index: 20;
+            top: -24px;
+            cursor: pointer;
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 8px var(--neon-blue));
+            -webkit-tap-highlight-color: transparent;
         }
-        .pixel-mascot.active { filter: drop-shadow(0 0 15px var(--neon-blue)); }
+
+        .pixel-mascot.active {
+            filter: drop-shadow(0 0 15px var(--neon-blue));
+        }
 
         .mascot-body {
-            width: 100%; height: 100%; background: var(--neon-blue); position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--neon-blue);
+            position: relative;
             box-shadow: -4px 4px 0 var(--neon-blue), 4px 4px 0 var(--neon-blue), -8px 8px 0 var(--neon-blue), 8px 8px 0 var(--neon-blue);
         }
-        .mascot-eyes { position: absolute; top: 4px; left: 4px; right: 4px; height: 4px; display: flex; justify-content: space-around; }
-        .mascot-eyes::before, .mascot-eyes::after { content: ""; width: 4px; height: 4px; background: #000; animation: eye-blink 3s infinite; }
-        @keyframes eye-blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+
+        .mascot-eyes {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            height: 4px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .mascot-eyes::before,
+        .mascot-eyes::after {
+            content: "";
+            width: 4px;
+            height: 4px;
+            background: #000;
+            animation: eye-blink 3s infinite;
+        }
+
+        @keyframes eye-blink {
+
+            0%,
+            90%,
+            100% {
+                transform: scaleY(1);
+            }
+
+            95% {
+                transform: scaleY(0.1);
+            }
+        }
 
         .black-hole {
-            position: absolute; width: 64px; height: 20px; background: #000; border-radius: 50%;
-            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff; z-index: -1;
-            transform: scale(0); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; opacity: 0;
+            position: absolute;
+            width: 64px;
+            height: 20px;
+            background: #000;
+            border-radius: 50%;
+            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff;
+            z-index: -1;
+            transform: scale(0);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            opacity: 0;
         }
-        .black-hole.visible { transform: scale(1); opacity: 1; }
+
+        .black-hole.visible {
+            transform: scale(1);
+            opacity: 1;
+        }
 
         .mascot-label {
-            font-size: 9px; font-family: monospace; color: var(--neon-blue); position: absolute; top: -15px; left: 50%;
-            transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 1px 4px; border: 1px solid var(--neon-blue); white-space: nowrap; pointer-events: none;
+            font-size: 9px;
+            font-family: monospace;
+            color: var(--neon-blue);
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1px 4px;
+            border: 1px solid var(--neon-blue);
+            white-space: nowrap;
+            pointer-events: none;
         }
 
-        @keyframes peek-bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
-        @keyframes peek-slide { 0% { transform: translateX(-10px); } 100% { transform: translateX(10px); } }
+        @keyframes peek-bounce {
+            from {
+                transform: translateY(0);
+            }
 
-        .back-nav { text-align: center; margin: 40px 0; }
-        .back-btn { 
-            color: var(--neon-blue); text-decoration: none; font-size: 0.9em; border: 1px solid var(--neon-blue); 
-            padding: 15px 35px; text-transform: uppercase; letter-spacing: 3px; transition: all 0.3s;
-            font-family: monospace; background: rgba(0, 242, 255, 0.05);
+            to {
+                transform: translateY(-5px);
+            }
         }
-        .back-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 20px var(--neon-blue); }
 
-        footer { 
-            text-align: center; padding: 60px 20px; font-size: 0.75em; color: #446688; background: #010305; 
-            letter-spacing: 4px; font-family: monospace; border-top: 1px solid rgba(0, 242, 255, 0.2);
+        @keyframes peek-slide {
+            0% {
+                transform: translateX(-10px);
+            }
+
+            100% {
+                transform: translateX(10px);
+            }
+        }
+
+        .back-nav {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .back-btn {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 0.9em;
+            border: 1px solid var(--neon-blue);
+            padding: 15px 35px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.3s;
+            font-family: monospace;
+            background: rgba(0, 242, 255, 0.05);
+        }
+
+        .back-btn:hover {
+            background: var(--neon-blue);
+            color: black;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 0.75em;
+            color: #446688;
+            background: #010305;
+            letter-spacing: 4px;
+            font-family: monospace;
+            border-top: 1px solid rgba(0, 242, 255, 0.2);
         }
 
         /* --- 手機排版 (Mobile Responsive) --- */
@@ -337,323 +569,344 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="bg-layer" id="bgLayer"></div>
+    <div class="bg-layer" id="bgLayer"></div>
 
-<header id="mainHeader">
-    <h1>捕捉宇宙的閃爍</h1>
-    <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">TRANSIT_METHOD_ANALYSIS_UNIT_117</p>
-    
-    <div class="pixel-mascot" id="mascot-header" style="right: 30px; top: 50px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
-        <div class="mascot-body"><div class="mascot-eyes"></div></div>
-        <div class="mascot-label">HUB_SENTRY</div>
-    </div>
-    <div class="black-hole" id="bh-header" style="right:14.5px; top:76px;"></div>
-</header>
+    <header id="mainHeader">
+        <h1>捕捉宇宙的閃爍</h1>
+        <p
+            style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">
+            TRANSIT_METHOD_ANALYSIS_UNIT_117</p>
 
-<div class="container">
-    <section id="section1">
-        <div class="pixel-mascot" id="mascot-s1" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotStep(this)">
-            <div class="mascot-body" style="background: var(--vibrant-gold);"><div class="mascot-eyes"></div></div>
-            <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">UNIT_ALPHA</div>
-        </div>
-        <div class="black-hole" id="bh-s1" style="left:4px; top:6px;"></div>
-
-        <img src="Gemini_Generated_Image_c9zvhfc9zvhfc9zv.png" alt="凌日法示意圖" class="tech-image">
-        <div class="image-meta">
-            <div class="image-caption">行星通過恆星前方時，會造成觀測到的亮度規律下降</div>
-            <div class="image-citation">Source: <b>Gemini AI</b></div>
-        </div>
-        <h2>凌日法：宇宙級的「擋光遊戲」！</h2>
-        <p>想像一下，在漆黑的夜晚有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，雖然它很小，但你會發現燈光在那一瞬間稍微變暗了那麼一點點！</p>
-        <p>天文學家就是靠捕捉這種極其微弱的「閃爍」，來抓到躲在遠方的系外行星。這種亮度隨時間變化的曲線，我們稱為<span class="highlight">「光變曲線」(Light Curve)</span>。這可是目前幫我們找到最多外星兄弟的神奇技術喔！</p>
-        
-        <img src="Gemini_Generated_Image_hknlkxhknlkxhknl.png" alt="系外行星 WASP-96b 凌日測得的光變曲線" class="tech-image">
-        <div class="image-meta">
-            <div class="image-caption">詹姆斯·韋伯太空望遠鏡捕捉到的系外行星 WASP-96b 凌日光譜曲線</div>
-            <div class="image-citation">Source: <b>NASA / Webb</b></div>
-        </div>
-
-        <div class="canvas-container">
-            <canvas id="transitCanvas"></canvas>
-        </div>
-        
-        <div class="controls">
-            <div class="control-item">
-                <div class="control-label">
-                    <span>SYS_OBJECT_SIZE</span>
-                    <span id="sizeVal" style="color:white">12.0</span>
-                </div>
-                <input type="range" id="sizeSlider" min="5" max="25" value="12" step="0.1">
-            </div>
-            <div class="control-item">
-                <div class="control-label">
-                    <span>SYS_ORBIT_VEL</span>
-                    <span id="speedVal" style="color:white">5.00</span>
-                </div>
-                <input type="range" id="speedSlider" min="0.5" max="10" value="5" step="0.05">
-            </div>
-        </div>
-    </section>
-
-    <section id="section2">
-        <div class="pixel-mascot" id="mascot-s2" style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
-            <div class="mascot-body"><div class="mascot-eyes"></div></div>
-            <div class="mascot-label">UNIT_BETA</div>
-        </div>
-        <div class="black-hole" id="bh-s2" style="right:14px; top:6px;"></div>
-
-        <h2>從光影中解碼：行星有多大？</h2>
-        <p><strong>1. 找出那個「擋光」的嫌疑犯</strong></p>
-        <p>當行星擋住恆星的光時，變暗的程度（凌日深度）其實就洩漏了它的身材秘密！行星越大，擋住的光就越多。我們可以利用這個簡單的公式來推算行星的大小：</p>
-        <div class="formula-card">
-            $$\text{凌日深度} = \left(\frac{\text{行星半徑}}{\text{恆星半徑}}\right)^2$$
-        </div>
-        <img src="Gemini_Generated_Image_oity2soity2soity (1).png" alt="不同行星大小的光變曲線" class="tech-image">
-        <div class="image-meta">
-            <div class="image-caption">不同大小的行星造成的亮度下降幅度（深度）明顯不同</div>
-            <div class="image-citation">Source: <b>Gemini AI</b></div>
-        </div>
-    </section>
-
-    <section id="section3">
-        <div class="pixel-mascot" id="mascot-s3" style="left: 50%; margin-left: -16px; animation: peek-slide 2s infinite alternate ease-in-out;" onclick="mascotStep(this)">
-            <div class="mascot-body" style="background: #fff;">
+        <div class="pixel-mascot" id="mascot-header"
+            style="right: 30px; top: 50px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
+            <div class="mascot-body">
                 <div class="mascot-eyes"></div>
             </div>
-            <div class="mascot-label" style="color:#fff; border-color:#fff">UNIT_GAMMA</div>
+            <div class="mascot-label">HUB_SENTRY</div>
         </div>
-        <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -32px; top:6px;"></div>
+        <div class="black-hole" id="bh-header" style="right:14.5px; top:76px;"></div>
+    </header>
 
-        <h2>我們的迷你觀測站：Arduino 探測系統</h2>
-        <p>為了讓你親身體驗，我們用高亮度燈箱打造了一顆「人造恆星」！透過 <span class="highlight">Arduino</span> 大腦搭配超級靈敏的光度感測器，我們能以極快的速度捕捉每一絲光影變化，完美模擬天文學家在太空中的觀測任務！</p>
-        <details>
-            <summary>SYSTEM_LOG: SENSITIVITY_0.01%</summary>
-            <div class="details-content">實際觀測變幅僅為 0.01%。系統透過優化演算法捕捉細微光度變化。</div>
-        </details>
-    </section>
+    <div class="container">
+        <section id="section1">
+            <div class="pixel-mascot" id="mascot-s1" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;"
+                onclick="mascotStep(this)">
+                <div class="mascot-body" style="background: var(--vibrant-gold);">
+                    <div class="mascot-eyes"></div>
+                </div>
+                <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">UNIT_ALPHA
+                </div>
+            </div>
+            <div class="black-hole" id="bh-s1" style="left:4px; top:6px;"></div>
 
-    <div class="back-nav">
-        <a href="index.html" class="back-btn">Return to Sector 0</a>
+            <img src="Gemini_Generated_Image_c9zvhfc9zvhfc9zv.png" alt="凌日法示意圖" class="tech-image">
+            <div class="image-meta">
+                <div class="image-caption">行星通過恆星前方時，會造成觀測到的亮度規律下降</div>
+                <div class="image-citation">Source: <b>Gemini AI</b></div>
+            </div>
+            <h2>凌日法：宇宙級的「擋光遊戲」！</h2>
+            <p>想像一下，在漆黑的夜晚有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span
+                    class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，雖然它很小，但你會發現燈光在那一瞬間稍微變暗了那麼一點點！</p>
+            <p>天文學家就是靠捕捉這種極其微弱的「閃爍」，來抓到躲在遠方的系外行星。這種亮度隨時間變化的曲線，我們稱為<span class="highlight">「光變曲線」(Light
+                    Curve)</span>。這可是目前幫我們找到最多外星兄弟的神奇技術喔！</p>
+
+            <img src="Gemini_Generated_Image_hknlkxhknlkxhknl.png" alt="系外行星 WASP-96b 凌日測得的光變曲線" class="tech-image">
+            <div class="image-meta">
+                <div class="image-caption">詹姆斯·韋伯太空望遠鏡捕捉到的系外行星 WASP-96b 凌日光譜曲線</div>
+                <div class="image-citation">Source: <b>Gemini AI</b></div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="transitCanvas"></canvas>
+            </div>
+
+            <div class="controls">
+                <div class="control-item">
+                    <div class="control-label">
+                        <span>SYS_OBJECT_SIZE</span>
+                        <span id="sizeVal" style="color:white">12.0</span>
+                    </div>
+                    <input type="range" id="sizeSlider" min="5" max="25" value="12" step="0.1">
+                </div>
+                <div class="control-item">
+                    <div class="control-label">
+                        <span>SYS_ORBIT_VEL</span>
+                        <span id="speedVal" style="color:white">5.00</span>
+                    </div>
+                    <input type="range" id="speedSlider" min="0.5" max="10" value="5" step="0.05">
+                </div>
+            </div>
+        </section>
+
+        <section id="section2">
+            <div class="pixel-mascot" id="mascot-s2"
+                style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
+                <div class="mascot-body">
+                    <div class="mascot-eyes"></div>
+                </div>
+                <div class="mascot-label">UNIT_BETA</div>
+            </div>
+            <div class="black-hole" id="bh-s2" style="right:14px; top:6px;"></div>
+
+            <h2>從光影中解碼：行星有多大？</h2>
+            <p><strong>1. 找出那個「擋光」的嫌疑犯</strong></p>
+            <p>當行星擋住恆星的光時，變暗的程度（凌日深度）其實就洩漏了它的身材秘密！行星越大，擋住的光就越多。我們可以利用這個簡單的公式來推算行星的大小：</p>
+            <div class="formula-card">
+                $$\text{凌日深度} = \left(\frac{\text{行星半徑}}{\text{恆星半徑}}\right)^2$$
+            </div>
+            <img src="Gemini_Generated_Image_oity2soity2soity (1).png" alt="不同行星大小的光變曲線" class="tech-image">
+            <div class="image-meta">
+                <div class="image-caption">不同大小的行星造成的亮度下降幅度（深度）明顯不同</div>
+                <div class="image-citation">Source: <b>Gemini AI</b></div>
+            </div>
+        </section>
+
+        <section id="section3">
+            <div class="pixel-mascot" id="mascot-s3"
+                style="left: 50%; margin-left: -16px; animation: peek-slide 2s infinite alternate ease-in-out;"
+                onclick="mascotStep(this)">
+                <div class="mascot-body" style="background: #fff;">
+                    <div class="mascot-eyes"></div>
+                </div>
+                <div class="mascot-label" style="color:#fff; border-color:#fff">UNIT_GAMMA</div>
+            </div>
+            <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -32px; top:6px;"></div>
+
+            <h2>我們的迷你觀測站：Arduino 探測系統</h2>
+            <p>為了讓你親身體驗，我們用高亮度燈箱打造了一顆「人造恆星」！透過 <span class="highlight">Arduino</span>
+                大腦搭配超級靈敏的光度感測器，我們能以極快的速度捕捉每一絲光影變化，完美模擬天文學家在太空中的觀測任務！</p>
+            <details>
+                <summary>SYSTEM_LOG: SENSITIVITY_0.01%</summary>
+                <div class="details-content">實際觀測變幅僅為 0.01%。系統透過優化演算法捕捉細微光度變化。</div>
+            </details>
+        </section>
+
+        <div class="back-nav">
+            <a href="index.html" class="back-btn">Return to Sector 0</a>
+        </div>
     </div>
-</div>
 
-<footer id="mainFooter">EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.117</footer>
+    <footer id="mainFooter">EST. 2024 EARTH SCIENCE EXHIBITION // ASTRO_UNIT.117</footer>
 
-<script>
-    const canvas = document.getElementById('transitCanvas');
-    const ctx = canvas.getContext('2d');
-    const bgLayer = document.getElementById('bgLayer');
-    const headerEl = document.getElementById('mainHeader');
-    const sizeSlider = document.getElementById('sizeSlider');
-    const speedSlider = document.getElementById('speedSlider');
-    const sizeVal = document.getElementById('sizeVal');
-    const speedVal = document.getElementById('speedVal');
+    <script>
+        const canvas = document.getElementById('transitCanvas');
+        const ctx = canvas.getContext('2d');
+        const bgLayer = document.getElementById('bgLayer');
+        const headerEl = document.getElementById('mainHeader');
+        const sizeSlider = document.getElementById('sizeSlider');
+        const speedSlider = document.getElementById('speedSlider');
+        const sizeVal = document.getElementById('sizeVal');
+        const speedVal = document.getElementById('speedVal');
 
-    const RGB_NEON_BLUE = '0, 242, 255'; 
-    const COLOR_VIBRANT_GOLD = '#ffcc00';
+        const RGB_NEON_BLUE = '0, 242, 255';
+        const COLOR_VIBRANT_GOLD = '#ffcc00';
 
-    let points = []; 
-    const starR = 60; 
-    const breathPeriod = 10.0; 
+        let points = [];
+        const starR = 60;
+        const breathPeriod = 10.0;
 
-    let lastTimestamp = performance.now();
-    let currentOrbitAngle = 0; 
-    let highlightTimer = 0, isInteracting = false; 
-    const HOLD_DURATION = 500, DECAY_DURATION = 800;
+        let lastTimestamp = performance.now();
+        let currentOrbitAngle = 0;
+        let highlightTimer = 0, isInteracting = false;
+        const HOLD_DURATION = 500, DECAY_DURATION = 800;
 
-    // --- 精確外星人互動系統 (藍本同步) ---
-    async function mascotStep(el) {
-        if (el.dataset.moving === 'true') return;
-        let step = parseInt(el.dataset.step || '0');
-        el.dataset.moving = 'true'; el.classList.add('active'); 
-        
-        const zIndexBlock = el.closest('section') || el.closest('header');
+        // --- 精確外星人互動系統 (藍本同步) ---
+        async function mascotStep(el) {
+            if (el.dataset.moving === 'true') return;
+            let step = parseInt(el.dataset.step || '0');
+            el.dataset.moving = 'true'; el.classList.add('active');
 
-        if (step === 0) {
-            el.style.animation = "none";
-            const r = el.getBoundingClientRect();
-            el.dataset.homeVPX = r.left; el.dataset.homeVPY = r.top;
-            el.dataset.curTX = "0"; el.dataset.curTY = "0";
-            el.dataset.origStyle = el.getAttribute('style') || ""; 
-            
-            if (zIndexBlock) {
-                // Header 最頂層 (9500)，Section 僅升至 1000 以免蓋過 Header
-                if (zIndexBlock.tagName.toLowerCase() === 'header') zIndexBlock.style.zIndex = "9500";
-                else zIndexBlock.style.zIndex = "1000";
+            const zIndexBlock = el.closest('section') || el.closest('header');
+
+            if (step === 0) {
+                el.style.animation = "none";
+                const r = el.getBoundingClientRect();
+                el.dataset.homeVPX = r.left; el.dataset.homeVPY = r.top;
+                el.dataset.curTX = "0"; el.dataset.curTY = "0";
+                el.dataset.origStyle = el.getAttribute('style') || "";
+
+                if (zIndexBlock) {
+                    // Header 最頂層 (9500)，Section 僅升至 1000 以免蓋過 Header
+                    if (zIndexBlock.tagName.toLowerCase() === 'header') zIndexBlock.style.zIndex = "9500";
+                    else zIndexBlock.style.zIndex = "1000";
+                }
+                el.offsetHeight;
             }
-            el.offsetHeight; 
-        }
 
-        step++; el.dataset.step = step;
+            step++; el.dataset.step = step;
 
-        if (step <= 2) {
-            const containerRect = zIndexBlock.getBoundingClientRect();
-            const minJump = 150, pad = 40;
-            let tx, ty, dist;
-            let currentTX = parseFloat(el.dataset.curTX), currentTY = parseFloat(el.dataset.curTY);
-            let homeVPX = parseFloat(el.dataset.homeVPX), homeVPY = parseFloat(el.dataset.homeVPY);
+            if (step <= 2) {
+                const containerRect = zIndexBlock.getBoundingClientRect();
+                const minJump = 150, pad = 40;
+                let tx, ty, dist;
+                let currentTX = parseFloat(el.dataset.curTX), currentTY = parseFloat(el.dataset.curTY);
+                let homeVPX = parseFloat(el.dataset.homeVPX), homeVPY = parseFloat(el.dataset.homeVPY);
 
-            let attempts = 0;
-            do {
-                const targetX = containerRect.left + pad + Math.random() * (containerRect.width - pad * 2);
-                const targetY = containerRect.top + pad + Math.random() * (containerRect.height - pad * 2);
-                tx = targetX - homeVPX; ty = targetY - homeVPY;
-                dist = Math.sqrt(Math.pow(tx - currentTX, 2) + Math.pow(ty - currentTY, 2));
-                attempts++;
-            } while (dist < minJump && attempts < 25);
+                let attempts = 0;
+                do {
+                    const targetX = containerRect.left + pad + Math.random() * (containerRect.width - pad * 2);
+                    const targetY = containerRect.top + pad + Math.random() * (containerRect.height - pad * 2);
+                    tx = targetX - homeVPX; ty = targetY - homeVPY;
+                    dist = Math.sqrt(Math.pow(tx - currentTX, 2) + Math.pow(ty - currentTY, 2));
+                    attempts++;
+                } while (dist < minJump && attempts < 25);
 
-            el.dataset.curTX = tx.toString(); el.dataset.curTY = ty.toString();
-            el.style.transition = "transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
-            el.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random()-0.5)*40}deg) scale(1.1)`;
-            setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
-        } 
-        else {
-            const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
-            el.style.transition = "transform 1.2s ease-in, opacity 0.5s ease-in";
-            el.style.transform = `translate(${escapeX}px, 0px) rotate(720deg) scale(0.1)`;
-            el.style.opacity = "0"; 
-            await new Promise(r => setTimeout(r, 1500));
-
-            const bhId = el.id.replace('mascot', 'bh');
-            const bh = document.getElementById(bhId);
-            el.style.transition = "none"; el.style.transform = "translate(0, 25px)"; 
-            bh.classList.add('visible'); await new Promise(r => setTimeout(r, 600));
-
-            el.style.opacity = "1";
-            el.style.transition = "transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1)";
-            el.style.transform = "translate(0, 8px)"; await new Promise(r => setTimeout(r, 800));
-            el.style.transform = "translate(0, 8px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
-            el.style.transform = "translate(0, 8px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
-            el.style.transform = "translate(0, 8px) rotate(0deg)"; await new Promise(r => setTimeout(r, 300));
-            el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            el.style.transform = "translate(0, -15px)"; await new Promise(r => setTimeout(r, 300));
-            bh.classList.remove('visible'); el.style.transform = "translate(0, 0)"; 
-            
-            setTimeout(() => {
-                el.setAttribute('style', el.dataset.origStyle);
-                el.classList.remove('active'); el.dataset.step = '0'; el.dataset.moving = 'false';
-                if (zIndexBlock) zIndexBlock.style.zIndex = "";
-            }, 600);
-        }
-    }
-
-    // --- 物理模擬核心：藍本絕對還原 (450 縮放, 1.4 位移) ---
-    function draw(timestamp) {
-        const dt = (timestamp - lastTimestamp) / 1000;
-        lastTimestamp = timestamp;
-
-        if (canvas.clientWidth > 0 && Math.abs(canvas.width - Math.floor(canvas.clientWidth * window.devicePixelRatio)) > 2) resize();
-        const w = canvas.width / window.devicePixelRatio, h = canvas.height / window.devicePixelRatio;
-        if (w === 0 || h === 0) { requestAnimationFrame(draw); return; }
-
-        let planetR = parseFloat(sizeSlider.value);
-        let speedMult = parseFloat(speedSlider.value);
-        sizeVal.innerText = planetR.toFixed(1);
-        speedVal.innerText = speedMult.toFixed(2);
-
-        // 角速度與相位計算
-        const angularVelocity = (2 * Math.PI * (speedMult * 0.5)) / 12.0;
-        currentOrbitAngle += angularVelocity * dt;
-        currentOrbitAngle %= (2 * Math.PI); 
-
-        const orbitRadius = w * 0.45;
-        const planetX = (w / 2) + Math.cos(currentOrbitAngle) * orbitRadius;
-        const planetZ = Math.sin(currentOrbitAngle); 
-        const dist = Math.abs(planetX - w/2); 
-        
-        let brightness = 1.0;
-        const contact = starR + planetR, inside = starR - planetR, maxDepth = (planetR * planetR) / (starR * starR);
-        let inTransit = false;
-
-        if (planetZ > 0 && dist < contact) {
-            inTransit = true;
-            if (dist < inside) brightness = 1.0 - maxDepth;
+                el.dataset.curTX = tx.toString(); el.dataset.curTY = ty.toString();
+                el.style.transition = "transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
+                el.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random() - 0.5) * 40}deg) scale(1.1)`;
+                setTimeout(() => { el.dataset.moving = 'false'; }, 1500);
+            }
             else {
-                const nD = (dist - inside) / (contact - inside);
-                brightness = 1.0 - (maxDepth * (Math.cos(nD * Math.PI) + 1) / 2);
+                const escapeX = (Math.random() > 0.5 ? 1 : -1) * window.innerWidth * 1.5;
+                el.style.transition = "transform 1.2s ease-in, opacity 0.5s ease-in";
+                el.style.transform = `translate(${escapeX}px, 0px) rotate(720deg) scale(0.1)`;
+                el.style.opacity = "0";
+                await new Promise(r => setTimeout(r, 1500));
+
+                const bhId = el.id.replace('mascot', 'bh');
+                const bh = document.getElementById(bhId);
+                el.style.transition = "none"; el.style.transform = "translate(0, 25px)";
+                bh.classList.add('visible'); await new Promise(r => setTimeout(r, 600));
+
+                el.style.opacity = "1";
+                el.style.transition = "transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1)";
+                el.style.transform = "translate(0, 8px)"; await new Promise(r => setTimeout(r, 800));
+                el.style.transform = "translate(0, 8px) rotate(-15deg)"; await new Promise(r => setTimeout(r, 500));
+                el.style.transform = "translate(0, 8px) rotate(15deg)"; await new Promise(r => setTimeout(r, 500));
+                el.style.transform = "translate(0, 8px) rotate(0deg)"; await new Promise(r => setTimeout(r, 300));
+                el.style.transition = "transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                el.style.transform = "translate(0, -15px)"; await new Promise(r => setTimeout(r, 300));
+                bh.classList.remove('visible'); el.style.transform = "translate(0, 0)";
+
+                setTimeout(() => {
+                    el.setAttribute('style', el.dataset.origStyle);
+                    el.classList.remove('active'); el.dataset.step = '0'; el.dataset.moving = 'false';
+                    if (zIndexBlock) zIndexBlock.style.zIndex = "";
+                }, 600);
             }
         }
 
-        points.push({ x: w * 0.95, y: brightness });
-        if (points.length > 600) points.shift();
-        points.forEach(p => p.x -= 1.4); // 絕對還原 1.4 平移
+        // --- 物理模擬核心：藍本絕對還原 (450 縮放, 1.4 位移) ---
+        function draw(timestamp) {
+            const dt = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
 
-        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
-        const sX = w / 2, sY = h * 0.3; 
+            if (canvas.clientWidth > 0 && Math.abs(canvas.width - Math.floor(canvas.clientWidth * window.devicePixelRatio)) > 2) resize();
+            const w = canvas.width / window.devicePixelRatio, h = canvas.height / window.devicePixelRatio;
+            if (w === 0 || h === 0) { requestAnimationFrame(draw); return; }
 
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)'; ctx.strokeRect(10, 10, w - 20, h - 20);
-        ctx.fillStyle = brightness < 0.999 ? '#ff4400' : 'rgba(0, 242, 255, 0.7)';
-        ctx.font = '10px monospace'; ctx.fillText(brightness < 0.999 ? '>> EVENT: TRANSIT_ACTIVE' : '>> STATUS: SCANNING_FIELD', 20, 25);
+            let planetR = parseFloat(sizeSlider.value);
+            let speedMult = parseFloat(speedSlider.value);
+            sizeVal.innerText = planetR.toFixed(1);
+            speedVal.innerText = speedMult.toFixed(2);
 
-        let hIntensity = 0;
-        const elapsed = Date.now() - highlightTimer;
-        if (isInteracting || elapsed < HOLD_DURATION) hIntensity = 1.0;
-        else if (elapsed < HOLD_DURATION + DECAY_DURATION) hIntensity = 1 - Math.pow((elapsed - HOLD_DURATION) / DECAY_DURATION, 3);
+            // 角速度與相位計算
+            const angularVelocity = (2 * Math.PI * (speedMult * 0.5)) / 12.0;
+            currentOrbitAngle += angularVelocity * dt;
+            currentOrbitAngle %= (2 * Math.PI);
 
-        ctx.save();
-        ctx.strokeStyle = hIntensity > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.3 + hIntensity * 0.4})` : 'rgba(0, 242, 255, 0.15)';
-        ctx.setLineDash([5, 5]); ctx.beginPath(); ctx.ellipse(sX, sY, orbitRadius * 0.5, 6, 0, 0, Math.PI * 2); ctx.stroke();
-        ctx.restore();
+            const orbitRadius = w * 0.45;
+            const planetX = (w / 2) + Math.cos(currentOrbitAngle) * orbitRadius;
+            const planetZ = Math.sin(currentOrbitAngle);
+            const dist = Math.abs(planetX - w / 2);
 
-        if (planetZ <= 0) drawPlanet(sX + (planetX - w/2) * 0.5, sY, planetR, 0.3, hIntensity, false);
-        const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
-        starGrad.addColorStop(0, '#fff'); starGrad.addColorStop(0.3, '#ffcc00'); starGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = starGrad; ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI*2); ctx.fill();
-        if (planetZ > 0) drawPlanet(sX + (planetX - w/2) * 0.5, sY, planetR, 1.0, hIntensity, inTransit);
+            let brightness = 1.0;
+            const contact = starR + planetR, inside = starR - planetR, maxDepth = (planetR * planetR) / (starR * starR);
+            let inTransit = false;
 
-        // 絕對還原 450 縮放倍率
-        const graphX = w * 0.05, graphY = h * 0.6, graphW = w * 0.9, graphH = h * 0.3;
-        ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)'; ctx.strokeRect(graphX, graphY, graphW, graphH);
-        ctx.strokeStyle = COLOR_VIBRANT_GOLD; ctx.lineWidth = 2.5; ctx.shadowBlur = 10; ctx.shadowColor = COLOR_VIBRANT_GOLD;
-        ctx.beginPath();
-        points.forEach((p, i) => {
-            const dX = graphX + (p.x - (w * 0.05));
-            const dY = graphY + (1.0 - p.y) * 450 + 35; 
-            if (dX > graphX && dX < graphX + graphW) { if (i === 0) ctx.moveTo(dX, dY); else ctx.lineTo(dX, dY); }
+            if (planetZ > 0 && dist < contact) {
+                inTransit = true;
+                if (dist < inside) brightness = 1.0 - maxDepth;
+                else {
+                    const nD = (dist - inside) / (contact - inside);
+                    brightness = 1.0 - (maxDepth * (Math.cos(nD * Math.PI) + 1) / 2);
+                }
+            }
+
+            points.push({ x: w * 0.95, y: brightness });
+            if (points.length > 600) points.shift();
+            points.forEach(p => p.x -= 1.4); // 絕對還原 1.4 平移
+
+            ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+            const sX = w / 2, sY = h * 0.3;
+
+            ctx.strokeStyle = 'rgba(0, 242, 255, 0.2)'; ctx.strokeRect(10, 10, w - 20, h - 20);
+            ctx.fillStyle = brightness < 0.999 ? '#ff4400' : 'rgba(0, 242, 255, 0.7)';
+            ctx.font = '10px monospace'; ctx.fillText(brightness < 0.999 ? '>> EVENT: TRANSIT_ACTIVE' : '>> STATUS: SCANNING_FIELD', 20, 25);
+
+            let hIntensity = 0;
+            const elapsed = Date.now() - highlightTimer;
+            if (isInteracting || elapsed < HOLD_DURATION) hIntensity = 1.0;
+            else if (elapsed < HOLD_DURATION + DECAY_DURATION) hIntensity = 1 - Math.pow((elapsed - HOLD_DURATION) / DECAY_DURATION, 3);
+
+            ctx.save();
+            ctx.strokeStyle = hIntensity > 0 ? `rgba(${RGB_NEON_BLUE}, ${0.3 + hIntensity * 0.4})` : 'rgba(0, 242, 255, 0.15)';
+            ctx.setLineDash([5, 5]); ctx.beginPath(); ctx.ellipse(sX, sY, orbitRadius * 0.5, 6, 0, 0, Math.PI * 2); ctx.stroke();
+            ctx.restore();
+
+            if (planetZ <= 0) drawPlanet(sX + (planetX - w / 2) * 0.5, sY, planetR, 0.3, hIntensity, false);
+            const starGrad = ctx.createRadialGradient(sX, sY, 5, sX, sY, starR);
+            starGrad.addColorStop(0, '#fff'); starGrad.addColorStop(0.3, '#ffcc00'); starGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = starGrad; ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI * 2); ctx.fill();
+            if (planetZ > 0) drawPlanet(sX + (planetX - w / 2) * 0.5, sY, planetR, 1.0, hIntensity, inTransit);
+
+            // 絕對還原 450 縮放倍率
+            const graphX = w * 0.05, graphY = h * 0.6, graphW = w * 0.9, graphH = h * 0.3;
+            ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)'; ctx.strokeRect(graphX, graphY, graphW, graphH);
+            ctx.strokeStyle = COLOR_VIBRANT_GOLD; ctx.lineWidth = 2.5; ctx.shadowBlur = 10; ctx.shadowColor = COLOR_VIBRANT_GOLD;
+            ctx.beginPath();
+            points.forEach((p, i) => {
+                const dX = graphX + (p.x - (w * 0.05));
+                const dY = graphY + (1.0 - p.y) * 450 + 35;
+                if (dX > graphX && dX < graphX + graphW) { if (i === 0) ctx.moveTo(dX, dY); else ctx.lineTo(dX, dY); }
+            });
+            ctx.stroke(); ctx.shadowBlur = 0;
+
+            const bA = (2 * Math.PI * (timestamp / 1000)) / breathPeriod;
+            bgLayer.style.setProperty('--pulse-opacity', 0.15 + ((Math.sin(bA) + 1) / 2 * 0.95));
+            requestAnimationFrame(draw);
+        }
+
+        function drawPlanet(pX, pY, r, op, hI, isT) {
+            ctx.save(); ctx.globalAlpha = op;
+            if (hI > 0.5) { ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${hI * 0.6})`; ctx.strokeRect(pX - r - 5, pY - r - 5, r * 2 + 10, r * 2 + 10); }
+            ctx.beginPath(); ctx.arc(pX, pY, r, 0, Math.PI * 2);
+            if (hI > 0) { ctx.shadowBlur = 25 * hI; ctx.shadowColor = `rgba(${RGB_NEON_BLUE}, ${hI})`; ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${hI})`; ctx.lineWidth = 2.5; ctx.stroke(); }
+            ctx.fillStyle = '#000'; ctx.fill(); ctx.restore();
+        }
+
+        function resize() {
+            const width = canvas.clientWidth; if (width === 0) return;
+            canvas.width = width * window.devicePixelRatio; canvas.height = (width * 0.8) * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+
+        function initHologramReveal() {
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-active'); obs.unobserve(entry.target); } });
+            }, { threshold: 0, rootMargin: "400px 0px 400px 0px" });
+            document.querySelectorAll('section').forEach(s => obs.observe(s));
+        }
+
+        sizeSlider.addEventListener('input', () => isInteracting = true);
+        speedSlider.addEventListener('input', () => isInteracting = true);
+        window.addEventListener('pointerup', () => { if (isInteracting) { isInteracting = false; highlightTimer = Date.now(); } });
+        window.addEventListener('resize', resize); resize(); requestAnimationFrame(draw); initHologramReveal();
+
+        document.querySelectorAll('.pixel-mascot').forEach(el => {
+            const t = () => {
+                setTimeout(() => {
+                    if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') {
+                        const a = Math.random() > 0.5 ? 'idle-jump' : 'idle-color';
+                        el.classList.add(a); setTimeout(() => el.classList.remove(a), a === 'idle-jump' ? 800 : 2000);
+                    } t();
+                }, 5000 + Math.random() * 5000);
+            }; t();
         });
-        ctx.stroke(); ctx.shadowBlur = 0;
-
-        const bA = (2 * Math.PI * (timestamp/1000)) / breathPeriod;
-        bgLayer.style.setProperty('--pulse-opacity', 0.15 + ((Math.sin(bA) + 1) / 2 * 0.95));
-        requestAnimationFrame(draw);
-    }
-
-    function drawPlanet(pX, pY, r, op, hI, isT) {
-        ctx.save(); ctx.globalAlpha = op;
-        if (hI > 0.5) { ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${hI * 0.6})`; ctx.strokeRect(pX-r-5, pY-r-5, r*2+10, r*2+10); }
-        ctx.beginPath(); ctx.arc(pX, pY, r, 0, Math.PI*2);
-        if (hI > 0) { ctx.shadowBlur = 25*hI; ctx.shadowColor = `rgba(${RGB_NEON_BLUE}, ${hI})`; ctx.strokeStyle = `rgba(${RGB_NEON_BLUE}, ${hI})`; ctx.lineWidth = 2.5; ctx.stroke(); }
-        ctx.fillStyle = '#000'; ctx.fill(); ctx.restore();
-    }
-
-    function resize() {
-        const width = canvas.clientWidth; if (width === 0) return;
-        canvas.width = width * window.devicePixelRatio; canvas.height = (width * 0.8) * window.devicePixelRatio; 
-        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    }
-
-    function initHologramReveal() {
-        const obs = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-active'); obs.unobserve(entry.target); } });
-        }, { threshold: 0, rootMargin: "400px 0px 400px 0px" });
-        document.querySelectorAll('section').forEach(s => obs.observe(s));
-    }
-
-    sizeSlider.addEventListener('input', () => isInteracting = true); 
-    speedSlider.addEventListener('input', () => isInteracting = true);
-    window.addEventListener('pointerup', () => { if (isInteracting) { isInteracting = false; highlightTimer = Date.now(); } });
-    window.addEventListener('resize', resize); resize(); requestAnimationFrame(draw); initHologramReveal();
-
-    document.querySelectorAll('.pixel-mascot').forEach(el => { 
-        const t = () => { setTimeout(() => { 
-            if ((el.dataset.step || '0') === '0' && el.dataset.moving !== 'true') { 
-                const a = Math.random() > 0.5 ? 'idle-jump' : 'idle-color'; 
-                el.classList.add(a); setTimeout(() => el.classList.remove(a), a === 'idle-jump' ? 800 : 2000); 
-            } t(); 
-        }, 5000 + Math.random() * 5000); }; t(); 
-    });
-</script>
+    </script>
 </body>
+
 </html>
