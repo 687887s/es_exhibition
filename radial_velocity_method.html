@@ -851,6 +851,12 @@
                 if (lx > specX && lx < specX + specW) { ctx.beginPath(); ctx.moveTo(lx, specY); ctx.lineTo(lx, specY + specH); ctx.stroke(); }
             });
             ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = '9px monospace'; ctx.fillText('HOLOGRAPHIC_PHYSICS_SYNC: ACTIVE', specX, specY - 8);
+
+            // 動態背景更新 (呼吸感)
+            const breathPeriod = 12000;
+            const bA = (2 * Math.PI * (timestamp / 1000)) / breathPeriod;
+            bgLayer.style.setProperty('--pulse-ratio', (50 + Math.sin(bA) * 25) + '%');
+
             requestAnimationFrame(draw);
         }
         requestAnimationFrame(draw);
