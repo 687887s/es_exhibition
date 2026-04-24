@@ -615,7 +615,7 @@
         <h1>捕捉宇宙的律動</h1>
         <p
             style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">
-            RADIAL_VELOCITY_ANALYSIS_UNIT_A1</p>
+            RADIAL_VELOCITY_ANALYSIS</p>
 
         <div class="pixel-mascot" id="mascot-header"
             style="right: 30px; top: 50px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
@@ -791,14 +791,13 @@
                     class="highlight">波形疊加</span>。這就像是在看海浪：那些起伏很大的「大波浪」，代表著跑得慢或是特別重的行星；而上面那些密密麻麻的「小碎浪」，就是離恆星很近、跑得飛快的小行星啦！
             </p>
 
-            <div class="image-placeholder" style="display:none;">[ Image of 潮汐週期性示例或波形疊加圖 ]</div>
-            <!-- <img src="460450.jpg" alt="波形疊加示意圖" class="tech-image" -->
-            <!-- onerror="this.style.display='none'; this.previousElementSibling.style.display='block';"> -->
+            <!-- 疊加波形模擬器 -->
+            <div class="canvas-container">
+                <canvas id="superpositionCanvas"></canvas>
+            </div>
             <div class="image-meta">
-                <div class="image-caption">[請填寫圖說]</div>
-                <div class="image-citation">Source: <a
-                        href="https://www.ehanlin.com.tw/app/keyword/%E9%AB%98%E4%B8%AD/%E7%89%A9%E7%90%86/%E8%81%B2%E6%B3%A2%E7%9A%84%E9%83%BD%E5%8D%9C%E5%8B%92%E6%95%88%E6%87%89.html"
-                        target="_blank">翰林雲端學院</a></div>
+                <div class="image-caption">模擬多顆行星造成的複雜徑向速度曲線（波形疊加）</div>
+                <div class="image-citation">Source: <b>2026 Earth Science Exhibition</b></div>
             </div>
 
             <p>要破解這團混亂的訊號，科學家必須使出<span
@@ -1060,6 +1059,69 @@
         }
 
         requestAnimationFrame(draw);
+
+        // --- 疊加波形模擬器 (Section 5) ---
+        const multiCanvas = document.getElementById('superpositionCanvas'), mCtx = multiCanvas.getContext('2d');
+        let multiPoints = [];
+        let multiAngle1 = 0, multiAngle2 = 0;
+
+        function resizeMulti() {
+            const w = multiCanvas.clientWidth; if (w === 0) return;
+            multiCanvas.width = w * window.devicePixelRatio;
+            multiCanvas.height = (w * 0.6) * window.devicePixelRatio;
+            mCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+
+        function drawMulti(timestamp) {
+            if (multiCanvas.clientWidth > 0 && Math.abs(multiCanvas.width - Math.floor(multiCanvas.clientWidth * window.devicePixelRatio)) > 2) resizeMulti();
+            const w = multiCanvas.width / window.devicePixelRatio, h = multiCanvas.height / window.devicePixelRatio;
+            if (w === 0 || h === 0) { requestAnimationFrame(drawMulti); return; }
+
+            const dt = 0.016; 
+            multiAngle1 += 2.0 * dt; 
+            multiAngle2 += 7.5 * dt; 
+
+            const v1 = Math.sin(multiAngle1) * 0.6;
+            const v2 = Math.sin(multiAngle2) * 0.25;
+            const combinedV = v1 + v2;
+
+            multiPoints.push({ x: w * 0.95, y: combinedV });
+            if (multiPoints.length > 500) multiPoints.shift();
+            multiPoints.forEach(p => p.x -= 1.8);
+
+            const grad = mCtx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, 'rgba(255, 68, 68, 0.25)'); 
+            grad.addColorStop(0.5, 'rgba(0, 0, 0, 1)');      
+            grad.addColorStop(1, 'rgba(68, 170, 255, 0.25)'); 
+            mCtx.fillStyle = grad; mCtx.fillRect(0, 0, w, h);
+
+            mCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; mCtx.setLineDash([5, 5]);
+            mCtx.beginPath(); mCtx.moveTo(0, h/2); mCtx.lineTo(w, h/2); mCtx.stroke();
+            mCtx.setLineDash([]);
+
+            mCtx.strokeStyle = '#fff'; mCtx.lineWidth = 2.5; mCtx.shadowBlur = 12; mCtx.shadowColor = '#fff';
+            mCtx.beginPath();
+            multiPoints.forEach((p, i) => {
+                const dx = p.x;
+                const dy = (h/2) - (p.y * h * 0.4); 
+                if (dx > 0) { if (i === 0) mCtx.moveTo(dx, dy); else mCtx.lineTo(dx, dy); }
+            });
+            mCtx.stroke(); mCtx.shadowBlur = 0;
+
+            mCtx.font = '10px monospace';
+            mCtx.fillStyle = '#ff4444'; mCtx.fillText('REDSHIFT (+)', 15, 25);
+            mCtx.fillStyle = '#44aaff'; mCtx.fillText('BLUESHIFT (-)', 15, h - 15);
+            
+            const currentVText = (combinedV * 100).toFixed(1);
+            mCtx.fillStyle = combinedV > 0 ? '#ff4444' : '#44aaff';
+            mCtx.fillText(`REAL_TIME_RV: ${combinedV > 0 ? '+' : ''}${currentVText} m/s`, w - 160, 25);
+
+            requestAnimationFrame(drawMulti);
+        }
+
+        window.addEventListener('resize', resizeMulti);
+        resizeMulti();
+        requestAnimationFrame(drawMulti);
 
         // 初始化外星人閒置行為
         document.querySelectorAll('.pixel-mascot').forEach(el => {
