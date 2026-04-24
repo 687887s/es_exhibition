@@ -910,11 +910,11 @@
             // 修正：動態縮放倍率以適應不同螢幕高度，並加上裁切保護以免超出框線
             const graphX = w * 0.05, graphY = h * 0.6, graphW = w * 0.9, graphH = h * 0.3;
             ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)'; ctx.strokeRect(graphX, graphY, graphW, graphH);
-            
+
             ctx.save();
             // 建立裁切區域
             ctx.beginPath(); ctx.rect(graphX, graphY, graphW, graphH); ctx.clip();
-            
+
             ctx.strokeStyle = COLOR_VIBRANT_GOLD; ctx.lineWidth = 2.5; ctx.shadowBlur = 10; ctx.shadowColor = COLOR_VIBRANT_GOLD;
             ctx.beginPath();
             points.forEach((p, i) => {
