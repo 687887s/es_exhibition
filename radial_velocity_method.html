@@ -62,8 +62,8 @@
                 linear-gradient(90deg, rgba(0, 242, 255, 0.15) 2px, transparent 2px),
                 linear-gradient(145deg,
                     var(--bg-color-red) 0%,
-                    var(--bg-color-red) calc(var(--pulse-ratio) - 45%),
-                    var(--bg-color-blue) calc(var(--pulse-ratio) + 45%),
+                    var(--bg-color-red) calc(var(--pulse-ratio) - 25%),
+                    var(--bg-color-blue) calc(var(--pulse-ratio) + 25%),
                     var(--bg-color-blue) 100%);
             background-size: 30px 30px, 30px 30px, 100% 100%;
         }
@@ -852,10 +852,11 @@
             });
             ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = '9px monospace'; ctx.fillText('HOLOGRAPHIC_PHYSICS_SYNC: ACTIVE', specX, specY - 8);
 
-            // 動態背景更新 (呼吸感)
-            const breathPeriod = 12000;
-            const bA = (2 * Math.PI * (timestamp / 1000)) / breathPeriod;
-            bgLayer.style.setProperty('--pulse-ratio', (50 + Math.sin(bA) * 25) + '%');
+            // 動態背景更新 (紅藍移模擬)
+            const cyclePeriod = 10000;
+            const bA = (2 * Math.PI * (timestamp / 1000)) / cyclePeriod;
+            // 讓 --pulse-ratio 產生較大幅度的擺盪，模擬光譜紅藍移的動態感
+            bgLayer.style.setProperty('--pulse-ratio', (50 + Math.sin(bA) * 60) + '%');
 
             requestAnimationFrame(draw);
         }
