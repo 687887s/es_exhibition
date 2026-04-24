@@ -83,13 +83,13 @@
                 linear-gradient(90deg, rgba(255, 0, 0, 0.008), rgba(0, 255, 0, 0.005), rgba(0, 255, 0, 0.008));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
-            z-index: 7000;
+            z-index: 9999;
         }
 
         header {
             position: sticky;
             top: 0;
-            z-index: 4000;
+            z-index: 9000;
             background: rgba(5, 10, 16, 0.95);
             backdrop-filter: blur(10px);
             padding: 15px 4vw;
@@ -122,6 +122,7 @@
             padding: 60px 45px;
             border: 1px solid var(--tech-cyan);
             position: relative;
+            z-index: 10;
             opacity: 0.6;
             clip-path: inset(49.5% 35% 49.5% 35%);
             filter: drop-shadow(0 0 10px var(--neon-blue)) brightness(1.5);
@@ -612,26 +613,24 @@
     <div class="bg-layer" id="bgLayer"></div>
 
     <header id="mainHeader">
-        <div class="container">
-            <h1>捕捉宇宙的閃爍<br>─凌日法─</h1>
-            <p
-                style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">
-                TRANSIT_METHOD_ANALYSIS</p>
+        <h1>捕捉宇宙的閃爍<br>─凌日法─</h1>
+        <p
+            style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">
+            TRANSIT_METHOD_ANALYSIS</p>
 
-            <div class="pixel-mascot" id="mascot-header"
-                style="right: 30px; top: 50px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
-                <div class="mascot-body">
-                    <div class="mascot-eyes"></div>
-                </div>
-                <div class="mascot-label">HUB_SENTRY</div>
+        <div class="pixel-mascot" id="mascot-header"
+            style="right: 50px; top: 50px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
+            <div class="mascot-body">
+                <div class="mascot-eyes"></div>
             </div>
-            <div class="black-hole" id="bh-header" style="right:16px; top:76px;"></div>
+            <div class="mascot-label">HUB_SENTRY</div>
         </div>
+        <div class="black-hole" id="bh-header" style="right:36px; top:76px;"></div>
     </header>
 
     <div class="container">
         <section id="section1">
-            <div class="pixel-mascot" id="mascot-s1" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;"
+            <div class="pixel-mascot" id="mascot-s1" style="left: 50px; animation: peek-bounce 0.6s infinite alternate;"
                 onclick="mascotStep(this)">
                 <div class="mascot-body" style="background: var(--vibrant-gold);">
                     <div class="mascot-eyes"></div>
@@ -639,7 +638,7 @@
                 <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">UNIT_ALPHA
                 </div>
             </div>
-            <div class="black-hole" id="bh-s1" style="left:4px; top:6px;"></div>
+            <div class="black-hole" id="bh-s1" style="left:36px; top:6px;"></div>
 
             <h2>凌日法：宇宙級的「擋光遊戲」！</h2>
             <p>想像一下，在漆黑的夜晚有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span
@@ -677,13 +676,13 @@
 
         <section id="section2">
             <div class="pixel-mascot" id="mascot-s2"
-                style="right: 30px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
+                style="right: 50px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
                 <div class="mascot-body">
                     <div class="mascot-eyes"></div>
                 </div>
                 <div class="mascot-label">UNIT_BETA</div>
             </div>
-            <div class="black-hole" id="bh-s2" style="right:6px; top:6px;"></div>
+            <div class="black-hole" id="bh-s2" style="right:36px; top:6px;"></div>
 
             <h2>從光影中解碼：行星有多大？</h2>
             <p><strong>1. 它跑得有多快？公轉速度與軌道</strong></p>
@@ -705,14 +704,14 @@
 
         <section id="section3">
             <div class="pixel-mascot" id="mascot-s3"
-                style="left: 20px; animation: peek-slide 2s infinite alternate ease-in-out;"
+                style="left: 50%; margin-left: -18px; animation: peek-slide 2s infinite alternate ease-in-out;"
                 onclick="mascotStep(this)">
                 <div class="mascot-body" style="background: #fff;">
                     <div class="mascot-eyes"></div>
                 </div>
                 <div class="mascot-label" style="color:#fff; border-color:#fff">UNIT_GAMMA</div>
             </div>
-            <div class="black-hole" id="bh-s3" style="left: 6px; top:6px;"></div>
+            <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -32px; top:6px;"></div>
 
             <h2>它的大氣層有什麼？光譜的指紋</h2>
             <p><strong>大氣層的濾鏡：</strong> 當行星經過恆星前方時，恆星發出的光會穿過行星邊緣的大氣層。大氣中的化學分子（例如水蒸氣、氧氣、甚至甲烷）會吸收特定顏色的光。</p>
@@ -741,13 +740,13 @@
 
         <section id="section4">
             <div class="pixel-mascot" id="mascot-s4"
-                style="right: 20px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
+                style="right: 50px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
                 <div class="mascot-body" style="background: var(--neon-blue);">
                     <div class="mascot-eyes"></div>
                 </div>
                 <div class="mascot-label">UNIT_DELTA</div>
             </div>
-            <div class="black-hole" id="bh-s4" style="right:6px; top:6px;"></div>
+            <div class="black-hole" id="bh-s4" style="right:36px; top:6px;"></div>
 
             <h2>凌日法教具</h2>
             <p>在展場中，我們用燈箱代表恆星，並讓模型行星繞其運動。而 <span class="highlight">光度計</span> 就是我們敏銳的眼睛，捕捉肉眼難以察覺的細微光影閃爍！</p>
