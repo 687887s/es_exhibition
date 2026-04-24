@@ -392,20 +392,20 @@
             <div class="canvas-container"><canvas id="superpositionCanvas"></canvas></div>
             <div class="controls">
                 <div class="control-item">
-                    <div class="control-label"><span style="color:var(--vibrant-gold)">行星 A 質量 (低頻)</span><span id="mValA" style="color:white">6.0</span></div>
+                    <div class="control-label"><span style="color:white">行星 A 質量 (低頻)</span><span id="mValA" style="color:white">6.0</span></div>
                     <input type="range" id="mSldA" min="1" max="15" value="6" step="0.1">
                 </div>
                 <div class="control-item">
-                    <div class="control-label"><span style="color:var(--vibrant-gold)">行星 A 速度</span><span id="sValA" style="color:white">2.00</span></div>
+                    <div class="control-label"><span style="color:white">行星 A 速度</span><span id="sValA" style="color:white">2.00</span></div>
                     <input type="range" id="sSldA" min="0.5" max="10" value="2" step="0.1">
                 </div>
                 <div style="width:100%; height:1px; background:rgba(255,255,255,0.1); margin:10px 0;"></div>
                 <div class="control-item">
-                    <div class="control-label"><span style="color:var(--tech-cyan)">行星 B 質量 (高頻)</span><span id="mValB" style="color:white">2.5</span></div>
+                    <div class="control-label"><span style="color:white">行星 B 質量 (高頻)</span><span id="mValB" style="color:white">2.5</span></div>
                     <input type="range" id="mSldB" min="1" max="15" value="2.5" step="0.1">
                 </div>
                 <div class="control-item">
-                    <div class="control-label"><span style="color:var(--tech-cyan)">行星 B 速度</span><span id="sValB" style="color:white">7.50</span></div>
+                    <div class="control-label"><span style="color:white">行星 B 速度</span><span id="sValB" style="color:white">7.50</span></div>
                     <input type="range" id="sSldB" min="0.5" max="15" value="7.5" step="0.1">
                 </div>
             </div>
@@ -577,8 +577,8 @@
                 mCtx.font = '10px monospace'; mCtx.fillStyle = 'rgba(255,255,255,0.6)'; mCtx.fillText(label, 15, yCenter - trackH/2 + 20);
             };
             drawTrack(trackH * 0.5, multiPointsCombined, 'COMBINED SIGNAL (SUPERPOSITION)', '#fff');
-            drawTrack(trackH * 1.5, multiPointsA, 'COMPONENT A (LOW FREQUENCY)', 'var(--vibrant-gold)');
-            drawTrack(trackH * 2.5, multiPointsB, 'COMPONENT B (HIGH FREQUENCY)', 'var(--tech-cyan)');
+            drawTrack(trackH * 1.5, multiPointsA, 'COMPONENT A (LOW FREQUENCY)', '#fff');
+            drawTrack(trackH * 2.5, multiPointsB, 'COMPONENT B (HIGH FREQUENCY)', '#fff');
             mCtx.strokeStyle = 'rgba(0, 242, 255, 0.3)'; mCtx.lineWidth = 1; mCtx.beginPath(); mCtx.moveTo(0, trackH); mCtx.lineTo(w, trackH); mCtx.stroke();
             mCtx.beginPath(); mCtx.moveTo(0, trackH * 2); mCtx.lineTo(w, trackH * 2); mCtx.stroke();
             const curVal = (combinedV * 100).toFixed(1); mCtx.font = '10px monospace'; mCtx.fillStyle = combinedV > 0 ? '#ff4444' : '#44aaff'; mCtx.fillText(`RV: ${combinedV > 0 ? '+' : ''}${curVal} m/s`, w - 110, 25);
