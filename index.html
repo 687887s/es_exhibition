@@ -18,7 +18,10 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #000;
+            /* 將背景圖與亮度調整直接寫在 body 上，確保不被遮擋 */
+            background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
+                        url('bg.png?v=2') no-repeat center center fixed;
+            background-size: cover;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
             display: flex;
             flex-direction: column;
@@ -27,29 +30,17 @@
             color: white;
         }
 
-        /* 核心背景：宇宙深空圖 */
-        .bg-layer {
+        /* 暗角效果 (Vignette) - 使用偽元素確保在最上層但又不遮擋內容 */
+        body::after {
+            content: '';
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -3;
-            background: #02040a url('bg.png') no-repeat center center;
-            background-size: cover;
-            filter: brightness(0.4);
-        }
-
-        /* 暗角效果 (Vignette) */
-        .vignette {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+            background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 0.8) 100%);
             pointer-events: none;
+            z-index: 1;
         }
 
         .stars-container {
@@ -58,7 +49,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            z-index: 2;
             background: transparent;
             pointer-events: none;
         }
@@ -72,46 +63,21 @@
         }
 
         @keyframes twinkle {
-
-            0%,
-            100% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 1;
-                transform: scale(1.2);
-            }
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* 流星飛行路徑動畫 */
+        /* 流星飛行路徑 */
         @keyframes flight-path {
-            0% {
-                transform: translate(0, 0) scale(0);
-                opacity: 0;
-            }
-
-            5% {
-                opacity: 1;
-                transform: translate(-10px, 7px) scale(1);
-            }
-
-            100% {
-                transform: translate(-1500px, 1050px) scale(1);
-                opacity: 0;
-            }
+            0% { transform: translate(0, 0) scale(0); opacity: 0; }
+            5% { opacity: 1; transform: translate(-10px, 7px) scale(1); }
+            100% { transform: translate(-1500px, 1050px) scale(1); opacity: 0; }
         }
 
-        /* 外星人自轉動畫 */
+        /* 外星人自轉 */
         @keyframes alien-spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .meteor-wrapper {
@@ -136,7 +102,7 @@
             background-size: cover;
             background-position: center;
             border-radius: 50%;
-            box-shadow: 0 0 20px var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
             animation: alien-spin 2s linear infinite;
         }
 
@@ -174,7 +140,7 @@
         .enter-btn {
             padding: 15px 40px;
             border: 1px solid var(--neon-blue);
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
             color: var(--neon-blue);
             font-size: 1.1em;
             text-decoration: none;
@@ -202,26 +168,18 @@
             font-size: 0.8em;
             color: #555;
             letter-spacing: 1px;
+            z-index: 10;
         }
 
         @media (max-width: 600px) {
-            h1 {
-                font-size: 1.8em;
-                letter-spacing: 3px;
-            }
-
-            p {
-                font-size: 0.85em;
-                letter-spacing: 1px;
-            }
+            h1 { font-size: 1.8em; letter-spacing: 3px; }
+            p { font-size: 0.85em; letter-spacing: 1px; }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="bg-layer"></div>
-    <div class="vignette"></div>
     <div class="stars-container" id="stars"></div>
 
     <div class="portal">
@@ -257,28 +215,23 @@
 
         function createMeteor() {
             const isAlien = Math.random() > 0.6;
-
-            // 創建飛行路徑容器
             const wrapper = document.createElement('div');
             wrapper.className = 'meteor-wrapper';
             wrapper.style.top = Math.random() * 50 + '%';
             wrapper.style.left = (Math.random() * 30 + 70) + '%';
-
-            // 創建內容 (流星或外星人)
+            
             const content = document.createElement('div');
             if (isAlien) {
                 content.className = 'alien-meteor';
             } else {
                 content.className = 'shooting-star';
             }
-
+            
             wrapper.appendChild(content);
             starsContainer.appendChild(wrapper);
-
             setTimeout(() => wrapper.remove(), 4000);
         }
 
-        // 隨機間隔產生
         (function meteorLoop() {
             const next = 2000 + Math.random() * 5000;
             setTimeout(() => {
