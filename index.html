@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -10,7 +11,8 @@
             --accent-gold: #ffcc00;
         }
 
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -44,8 +46,17 @@
         }
 
         @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
         }
 
         .portal {
@@ -91,11 +102,13 @@
             box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
             display: inline-block;
             cursor: pointer;
-            width: 180px; /* 固定寬度讓按鈕視覺一致 */
+            width: 180px;
+            /* 固定寬度讓按鈕視覺一致 */
             -webkit-tap-highlight-color: transparent;
         }
 
-        .enter-btn:hover, .enter-btn:active {
+        .enter-btn:hover,
+        .enter-btn:active {
             background: var(--neon-blue);
             color: #000;
             box-shadow: 0 0 30px var(--neon-blue);
@@ -110,41 +123,43 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="stars-container" id="stars"></div>
+    <div class="stars-container" id="stars"></div>
 
-<div class="portal">
-    <h1>捕捉宇宙的脈動</h1>
-    <p>—— 地科展天文股 ——</p>
-    
-    <div class="btn-group">
-        <a href="radial_velocity_method.html" class="enter-btn">徑向速度法</a>
-        <a href="transit_method.html" class="enter-btn">凌日法</a>
+    <div class="portal">
+        <h1>捕捉宇宙的脈動</h1>
+        <p>—— 2026 Earth Science Exhibition ——</p>
+
+        <div class="btn-group">
+            <a href="radial_velocity_method.html" class="enter-btn">徑向速度法</a>
+            <a href="transit_method.html" class="enter-btn">凌日法</a>
+        </div>
     </div>
-</div>
 
-<footer>
-    © 2024 地科 117 級 天文股
-</footer>
+    <footer>
+        © 2026 Earth Science Exhibition
+    </footer>
 
-<script>
-    const starsContainer = document.getElementById('stars');
-    const starCount = 100;
+    <script>
+        const starsContainer = document.getElementById('stars');
+        const starCount = 100;
 
-    for (let i = 0; i < starCount; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        const size = Math.random() * 2 + 1 + 'px';
-        star.style.width = size;
-        star.style.height = size;
-        star.style.top = Math.random() * 100 + '%';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
-        star.style.animationDelay = Math.random() * 5 + 's';
-        starsContainer.appendChild(star);
-    }
-</script>
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2 + 1 + 'px';
+            star.style.width = size;
+            star.style.height = size;
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+            star.style.animationDelay = Math.random() * 5 + 's';
+            starsContainer.appendChild(star);
+        }
+    </script>
 
 </body>
+
 </html>
