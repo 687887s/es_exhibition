@@ -18,9 +18,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            /* 直接將背景圖設在 body，避免被其他層遮擋 */
-            background: #000 url('bg.png') no-repeat center center;
-            background-size: cover;
+            background-color: #000;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
             display: flex;
             flex-direction: column;
@@ -29,14 +27,39 @@
             color: white;
         }
 
-        /* 星場疊加層 (確保背景透明，不遮擋 body 背景) */
+        /* 核心背景：宇宙深空圖 (降低亮度) */
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -3;
+            background: url('bg.png') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.4);
+        }
+
+        /* 暗角效果 (Vignette) */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+        }
+
+        /* 星場疊加層 */
         .stars-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
+            z-index: -1;
             background: transparent;
             pointer-events: none;
         }
@@ -61,17 +84,34 @@
             height: 2px;
             background: linear-gradient(90deg, #fff, transparent);
             z-index: 5;
-            pointer-events: none;
-            opacity: 0;
             filter: drop-shadow(0 0 5px #fff);
             transform: rotate(-35deg);
             animation: shooting 3s linear forwards;
         }
 
+        /* 外星人流星 */
+        .alien-meteor {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-image: url('202007241643330.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            z-index: 5;
+            box-shadow: 0 0 15px var(--neon-blue);
+            animation: shooting 4s linear forwards, spinning 2s linear infinite;
+        }
+
         @keyframes shooting {
-            0% { transform: translate(0, 0) rotate(-35deg) scale(0); opacity: 0; }
-            10% { opacity: 1; transform: translate(-20px, 14px) rotate(-35deg) scale(1); }
-            100% { transform: translate(-1000px, 700px) rotate(-35deg) scale(1); opacity: 0; }
+            0% { transform: translate(0, 0) scale(0); opacity: 0; }
+            5% { opacity: 1; transform: translate(-10px, 7px) scale(1); }
+            100% { transform: translate(-1200px, 840px) scale(1); opacity: 0; }
+        }
+
+        @keyframes spinning {
+            from { transform: translate(var(--tx, 0), var(--ty, 0)) rotate(0deg); }
+            to { transform: translate(var(--tx, 0), var(--ty, 0)) rotate(360deg); }
         }
 
         .portal {
@@ -108,7 +148,7 @@
         .enter-btn {
             padding: 15px 40px;
             border: 1px solid var(--neon-blue);
-            background: rgba(0, 0, 0, 0.3); /* 半透明背景 */
+            background: rgba(0, 0, 0, 0.4);
             color: var(--neon-blue);
             font-size: 1.1em;
             text-decoration: none;
@@ -133,11 +173,10 @@
             position: absolute;
             bottom: 30px;
             font-size: 0.8em;
-            color: #666;
+            color: #555;
             letter-spacing: 1px;
         }
 
-        /* 手機版適配 */
         @media (max-width: 600px) {
             h1 { font-size: 1.8em; letter-spacing: 3px; }
             p { font-size: 0.85em; letter-spacing: 1px; }
@@ -147,6 +186,8 @@
 
 <body>
 
+    <div class="bg-layer"></div>
+    <div class="vignette"></div>
     <div class="stars-container" id="stars"></div>
 
     <div class="portal">
@@ -180,18 +221,27 @@
             starsContainer.appendChild(star);
         }
 
-        function createShootingStar() {
+        function createMeteor() {
+            const isAlien = Math.random() > 0.6;
             const star = document.createElement('div');
-            star.className = 'shooting-star';
-            star.style.top = Math.random() * 40 + '%';
+            
+            if (isAlien) {
+                star.className = 'alien-meteor';
+                // 由於動畫中有旋轉，我們需要處理 transform
+            } else {
+                star.className = 'shooting-star';
+            }
+            
+            star.style.top = Math.random() * 50 + '%';
             star.style.left = (Math.random() * 30 + 70) + '%';
             starsContainer.appendChild(star);
-            setTimeout(() => star.remove(), 3500);
+            
+            setTimeout(() => star.remove(), 4000);
         }
 
         setInterval(() => {
-            if (Math.random() > 0.4) createShootingStar();
-        }, 4000);
+            if (Math.random() > 0.4) createMeteor();
+        }, 3000);
     </script>
 
 </body>
