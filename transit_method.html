@@ -609,9 +609,9 @@
             </div>
             <h2>凌日法：宇宙級的「擋光遊戲」！</h2>
             <p>想像一下，在漆黑的夜晚有一盞超亮的<span class="highlight">探照燈（恆星）</span>，如果有一隻<span
-                    class="highlight">小蚊子（行星）</span>剛好飛過燈光正前方，雖然它很小，但你會發現燈光在那一瞬間稍微變暗了那麼一點點！</p>
-            <p>天文學家就是靠捕捉這種極其微弱的「閃爍」，來抓到躲在遠方的系外行星。這種亮度隨時間變化的曲線，我們稱為<span class="highlight">「光變曲線」(Light
-                    Curve)</span>。這可是目前幫我們找到最多外星兄弟的神奇技術喔！</p>
+                    class="highlight">小蚊子（行星）</span>剛好飛過燈泡正前方，雖然你看不清那隻蚊子，但你會發現探照燈的亮度在那一瞬間稍微變暗了那麼一點點！</p>
+            <p>科學家發現，這種亮度隨時間變化所匯出的曲線，專業術語叫做<span class="highlight">「光變曲線」(Light
+                    Curve)</span>。凌日法是目前發現系外行星數量最多的技術（著名的克卜勒太空望遠鏡 Kepler 就以此發現了數千顆行星），它不僅能偵測行星，還能讓我們測量行星的直徑。</span></p>
 
             <img src="Gemini_Generated_Image_hknlkxhknlkxhknl.png" alt="系外行星 WASP-96b 凌日測得的光變曲線" class="tech-image">
             <div class="image-meta">
@@ -652,10 +652,13 @@
             <div class="black-hole" id="bh-s2" style="right:14px; top:6px;"></div>
 
             <h2>從光影中解碼：行星有多大？</h2>
-            <p><strong>1. 找出那個「擋光」的嫌疑犯</strong></p>
-            <p>當行星擋住恆星的光時，變暗的程度（凌日深度）其實就洩漏了它的身材秘密！行星越大，擋住的光就越多。我們可以利用這個簡單的公式來推算行星的大小：</p>
+            <p><strong>1. 它跑得有多快？公轉速度與軌道</strong></p>
+            <p>如果光變曲線中的這個「坑」出現得很頻繁，代表這顆行星公轉速度很快。根據<span class="highlight">克卜勒第三定律</span>，我們能從兩次凌日的時間間隔計算出行星的軌道半徑，這對判斷行星是否位在<span class="highlight">「適居帶」</span>（生命可能存在的區域）至關重要。</p>
+            
+            <p><strong>2. 它是巨無霸還是小不點？</strong></p>
+            <p>當行星擋住恆星的光時，變暗的程度（凌日深度）其實就洩漏了它的身材秘密！行星越大，遮住的光就越多，光度曲線掉下去的「坑」就越深。我們可以利用這個圓形幾何公式來回推出行星的半徑：</p>
             <div class="formula-card">
-                $$\text{凌日深度} = \left(\frac{\text{行星半徑}}{\text{恆星半徑}}\right)^2$$
+                $$\text{亮度下降比例} = \left(\frac{\text{行星半徑}}{\text{恆星半徑}}\right)^2$$
             </div>
             <img src="Gemini_Generated_Image_oity2soity2soity (1).png" alt="不同行星大小的光變曲線" class="tech-image">
             <div class="image-meta">
@@ -675,13 +678,55 @@
             </div>
             <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -32px; top:6px;"></div>
 
-            <h2>我們的迷你觀測站：Arduino 探測系統</h2>
-            <p>為了讓你親身體驗，我們用高亮度燈箱打造了一顆「人造恆星」！透過 <span class="highlight">Arduino</span>
-                大腦搭配超級靈敏的光度感測器，我們能以極快的速度捕捉每一絲光影變化，完美模擬天文學家在太空中的觀測任務！</p>
+            <h2>它的大氣層有什麼？光譜的指紋</h2>
+            <p><strong>大氣層的濾鏡：</strong> 當行星經過恆星前方時，恆星發出的光會穿過行星邊緣的大氣層。大氣中的化學分子（例如水蒸氣、氧氣、甚至甲烷）會吸收特定顏色的光。</p>
+            <p>科學家分析這道被「過濾」過的光，就像在掃描商品的<span class="highlight">「條碼」</span>一樣，能分析出這顆遙遠行星是否有氧氣可以讓我們呼吸，或是充滿了有毒氣體。這就是光譜的指紋！</p>
+            
+            <img src="exoplanet_atmosphere_spectrum_diagram_1777004013185.png" alt="大氣光譜分析示意圖" class="tech-image">
+            <div class="image-meta">
+                <div class="image-caption">過濾後的恆星光線中包含了行星大氣的組成資訊</div>
+                <div class="image-citation">Source: <b>Antigravity AI Engine</b></div>
+            </div>
+        </section>
+
+        <section id="section4">
+            <div class="pixel-mascot" id="mascot-s4"
+                style="right: 20px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
+                <div class="mascot-body" style="background: var(--neon-blue);">
+                    <div class="mascot-eyes"></div>
+                </div>
+                <div class="mascot-label">UNIT_DELTA</div>
+            </div>
+            <div class="black-hole" id="bh-s4" style="right:4px; top:6px;"></div>
+
+            <h2>我們的凌日法教具：Arduino 探測系統</h2>
+            <p>在展場中，我們用燈箱＋燈泡代表恆星，並讓模型行星繞其運動。而 <span class="highlight">Arduino</span> 就是我們敏銳的眼睛，捕捉肉眼難以察覺的細微光影閃爍！</p>
+            
+            <p><strong>怎麼讀取觀測到的光變曲線？</strong></p>
+            <p>圖中的線由三個部分組成：</p>
+            <ol>
+                <li><span class="highlight">平坦的高線（基準光度）</span>：代表平均光度，當行星沒遮到光時的亮度。</li>
+                <li><span class="highlight">下陷的凹槽</span>：代表行星正在遮住光，凹槽越深，行星體積越大！</li>
+                <li><span class="highlight">凹槽的寬度</span>：代表行星經過的時間，寬度越長，代表行星通過的時間越久，可以用來計算公轉速度與軌道距離。</li>
+            </ol>
+            
+            <p>所以，這張圖就像是行星的<span class="highlight">「身分證」</span>，只要看這條線掉下去的深度跟長度，我們就能推算出它的大小與公轉秘密！</p>
+
             <details>
                 <summary>SYSTEM_LOG: SENSITIVITY_0.01%</summary>
                 <div class="details-content">實際觀測變幅僅為 0.01%。系統透過優化演算法捕捉細微光度變化。</div>
             </details>
+        </section>
+
+        <section id="references" style="background: rgba(10, 20, 30, 0.2); border-style: dashed; opacity: 0.8;">
+            <h2 style="font-size: 1.2em; color: var(--tech-cyan);">參考資料 / REFERENCES</h2>
+            <ul style="font-size: 0.85em; list-style: none; padding: 0; line-height: 2;">
+                <li>1. NASA. 〈Exoplanets〉. <a href="https://science.nasa.gov/exoplanets/" style="color:var(--neon-blue)">Link</a></li>
+                <li>2. The Planetary Society. 〈How to Search for Exoplanets〉. <a href="https://www.planetary.org/articles/how-to-search-for-exoplanets" style="color:var(--neon-blue)">Link</a></li>
+                <li>3. ESA (2019). 〈What is a transit?〉. <a href="https://www.esa.int/esearch?q=transit" style="color:var(--neon-blue)">Link</a></li>
+                <li>4. NASA. 〈Webb’s Impact on Exoplanet Research〉. <a href="https://reurl.cc/ovVe1M" style="color:var(--neon-blue)">Link</a></li>
+                <li>5. ESO (2017). 〈Light curves of the seven TRAPPIST-1 planets〉. <a href="https://www.eso.org/public/images/eso1706h/" style="color:var(--neon-blue)">Link</a></li>
+            </ul>
         </section>
 
         <div class="back-nav">
