@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>捕捉宇宙的脈動 | 天文股展覽</title>
+    <title>捕捉宇宙的脈動 | 地科展覽</title>
     <style>
         :root {
-            --neon-blue: #00d4ff;
+            --neon-blue: #00f2ff;
             --accent-gold: #ffcc00;
         }
 
@@ -18,13 +18,26 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #000;
+            background-color: #02040a;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
+        }
+
+        /* 深空背景圖 */
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: url('deep_space_background_1777050861196.png') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.7);
         }
 
         .stars-container {
@@ -34,7 +47,7 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, #001133 0%, #000 100%);
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
         }
 
         .star {
@@ -46,17 +59,27 @@
         }
 
         @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
 
-            0%,
-            100% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
+        /* 流星 */
+        .shooting-star {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, #fff, transparent);
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+            transform: rotate(-35deg);
+            animation: shooting 3s linear forwards;
+        }
 
-            50% {
-                opacity: 1;
-                transform: scale(1.2);
-            }
+        @keyframes shooting {
+            0% { transform: translate(0,0) rotate(-35deg) scale(0); opacity: 0; }
+            10% { opacity: 1; transform: translate(-20px, 14px) rotate(-35deg) scale(1); }
+            100% { transform: translate(-800px, 560px) rotate(-35deg) scale(1); opacity: 0; }
         }
 
         .portal {
@@ -66,22 +89,23 @@
         }
 
         h1 {
-            font-size: 2.2em;
-            letter-spacing: 5px;
+            font-size: 2.8em;
+            letter-spacing: 6px;
             margin: 0;
-            color: var(--neon-blue);
-            text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+            color: #fff;
+            text-shadow: 0 0 20px var(--neon-blue);
             font-weight: 800;
         }
 
         p {
-            font-size: 1em;
-            color: #aaa;
+            font-size: 1.1em;
+            color: var(--neon-blue);
             margin-top: 15px;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            font-family: monospace;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
         }
 
-        /* 按鈕群組容器 */
         .btn-group {
             display: flex;
             flex-direction: column;
@@ -93,32 +117,33 @@
         .enter-btn {
             padding: 15px 40px;
             border: 1px solid var(--neon-blue);
-            background: transparent;
+            background: rgba(0, 242, 255, 0.1);
             color: var(--neon-blue);
             font-size: 1.1em;
             text-decoration: none;
             border-radius: 50px;
             transition: all 0.3s;
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
             display: inline-block;
             cursor: pointer;
             width: 180px;
-            /* 固定寬度讓按鈕視覺一致 */
+            text-align: center;
             -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(5px);
         }
 
-        .enter-btn:hover,
-        .enter-btn:active {
+        .enter-btn:hover {
             background: var(--neon-blue);
             color: #000;
             box-shadow: 0 0 30px var(--neon-blue);
+            transform: scale(1.05);
         }
 
         footer {
             position: absolute;
             bottom: 30px;
             font-size: 0.8em;
-            color: #444;
+            color: rgba(255,255,255,0.4);
             letter-spacing: 1px;
         }
     </style>
@@ -126,6 +151,7 @@
 
 <body>
 
+    <div class="bg-image"></div>
     <div class="stars-container" id="stars"></div>
 
     <div class="portal">
@@ -158,8 +184,21 @@
             star.style.animationDelay = Math.random() * 5 + 's';
             starsContainer.appendChild(star);
         }
+
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            star.style.top = Math.random() * 50 + '%';
+            star.style.left = (Math.random() * 30 + 70) + '%';
+            starsContainer.appendChild(star);
+            setTimeout(() => star.remove(), 3500);
+        }
+
+        setInterval(() => {
+            if (Math.random() > 0.4) createShootingStar();
+        }, 3000);
     </script>
 
 </body>
 
-</html>
+</html>
