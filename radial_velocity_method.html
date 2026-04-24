@@ -855,8 +855,14 @@
             // 動態背景更新 (紅藍移模擬)
             const cyclePeriod = 10000;
             const bA = (2 * Math.PI * (timestamp / 1000)) / cyclePeriod;
-            // 讓 --pulse-ratio 產生較大幅度的擺盪，模擬光譜紅藍移的動態感
-            bgLayer.style.setProperty('--pulse-ratio', (50 + Math.sin(bA) * 60) + '%');
+            const shiftIntensity = (Math.sin(bA) + 1) / 2; // 0 (Blue) to 1 (Red)
+            
+            // 直接更新 CSS 變數顏色，達成真正的紅藍移感
+            const rVal = Math.floor(10 + shiftIntensity * 70);
+            const bVal = Math.floor(10 + (1 - shiftIntensity) * 70);
+            bgLayer.style.setProperty('--bg-color-red', `rgb(${rVal}, 0, 0)`);
+            bgLayer.style.setProperty('--bg-color-blue', `rgb(0, 5, ${bVal})`);
+            bgLayer.style.setProperty('--pulse-ratio', (50 + Math.sin(bA) * 30) + '%');
 
             requestAnimationFrame(draw);
         }
