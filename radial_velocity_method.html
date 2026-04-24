@@ -62,8 +62,8 @@
                 linear-gradient(90deg, rgba(0, 242, 255, 0.15) 2px, transparent 2px),
                 linear-gradient(145deg,
                     var(--bg-color-red) 0%,
-                    var(--bg-color-red) calc(var(--pulse-ratio) - 25%),
-                    var(--bg-color-blue) calc(var(--pulse-ratio) + 25%),
+                    var(--bg-color-red) calc(var(--pulse-ratio) - 15%),
+                    var(--bg-color-blue) calc(var(--pulse-ratio) + 15%),
                     var(--bg-color-blue) 100%);
             background-size: 30px 30px, 30px 30px, 100% 100%;
         }
@@ -857,12 +857,12 @@
             const bA = (2 * Math.PI * (timestamp / 1000)) / cyclePeriod;
             const shiftIntensity = (Math.sin(bA) + 1) / 2; // 0 (Blue) to 1 (Red)
             
-            // 直接更新 CSS 變數顏色，達成真正的紅藍移感
-            const rVal = Math.floor(10 + shiftIntensity * 70);
-            const bVal = Math.floor(10 + (1 - shiftIntensity) * 70);
+            // 加強顏色對比度，讓紅藍移更有感
+            const rVal = Math.floor(5 + shiftIntensity * 115);
+            const bVal = Math.floor(5 + (1 - shiftIntensity) * 115);
             bgLayer.style.setProperty('--bg-color-red', `rgb(${rVal}, 0, 0)`);
             bgLayer.style.setProperty('--bg-color-blue', `rgb(0, 5, ${bVal})`);
-            bgLayer.style.setProperty('--pulse-ratio', (50 + Math.sin(bA) * 30) + '%');
+            bgLayer.style.setProperty('--pulse-ratio', (50 + Math.sin(bA) * 45) + '%');
 
             requestAnimationFrame(draw);
         }
