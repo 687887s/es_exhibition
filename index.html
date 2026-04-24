@@ -27,7 +27,7 @@
             color: white;
         }
 
-        /* 核心背景：宇宙深空圖 (降低亮度) */
+        /* 核心背景：宇宙深空圖 */
         .bg-layer {
             position: fixed;
             top: 0;
@@ -35,7 +35,7 @@
             width: 100%;
             height: 100%;
             z-index: -3;
-            background: url('bg.png') no-repeat center center;
+            background: #02040a url('bg.png') no-repeat center center;
             background-size: cover;
             filter: brightness(0.4);
         }
@@ -48,11 +48,10 @@
             width: 100%;
             height: 100%;
             z-index: -2;
-            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
             pointer-events: none;
         }
 
-        /* 星場疊加層 */
         .stars-container {
             position: fixed;
             top: 0;
@@ -73,45 +72,72 @@
         }
 
         @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
         }
 
-        /* 流星 - 強化視覺效果 */
-        .shooting-star {
+        /* 流星飛行路徑動畫 */
+        @keyframes flight-path {
+            0% {
+                transform: translate(0, 0) scale(0);
+                opacity: 0;
+            }
+
+            5% {
+                opacity: 1;
+                transform: translate(-10px, 7px) scale(1);
+            }
+
+            100% {
+                transform: translate(-1500px, 1050px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* 外星人自轉動畫 */
+        @keyframes alien-spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .meteor-wrapper {
             position: absolute;
+            z-index: 5;
+            pointer-events: none;
+            animation: flight-path 3.5s linear forwards;
+        }
+
+        .shooting-star {
             width: 150px;
             height: 2px;
             background: linear-gradient(90deg, #fff, transparent);
-            z-index: 5;
             filter: drop-shadow(0 0 5px #fff);
             transform: rotate(-35deg);
-            animation: shooting 3s linear forwards;
         }
 
-        /* 外星人流星 */
         .alien-meteor {
-            position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background-image: url('202007241643330.jpg');
             background-size: cover;
             background-position: center;
             border-radius: 50%;
-            z-index: 5;
-            box-shadow: 0 0 15px var(--neon-blue);
-            animation: shooting 4s linear forwards, spinning 2s linear infinite;
-        }
-
-        @keyframes shooting {
-            0% { transform: translate(0, 0) scale(0); opacity: 0; }
-            5% { opacity: 1; transform: translate(-10px, 7px) scale(1); }
-            100% { transform: translate(-1200px, 840px) scale(1); opacity: 0; }
-        }
-
-        @keyframes spinning {
-            from { transform: translate(var(--tx, 0), var(--ty, 0)) rotate(0deg); }
-            to { transform: translate(var(--tx, 0), var(--ty, 0)) rotate(360deg); }
+            box-shadow: 0 0 20px var(--neon-blue);
+            animation: alien-spin 2s linear infinite;
         }
 
         .portal {
@@ -148,7 +174,7 @@
         .enter-btn {
             padding: 15px 40px;
             border: 1px solid var(--neon-blue);
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.5);
             color: var(--neon-blue);
             font-size: 1.1em;
             text-decoration: none;
@@ -167,6 +193,7 @@
             background: var(--neon-blue);
             color: #000;
             box-shadow: 0 0 30px var(--neon-blue);
+            transform: translateY(-2px);
         }
 
         footer {
@@ -178,8 +205,15 @@
         }
 
         @media (max-width: 600px) {
-            h1 { font-size: 1.8em; letter-spacing: 3px; }
-            p { font-size: 0.85em; letter-spacing: 1px; }
+            h1 {
+                font-size: 1.8em;
+                letter-spacing: 3px;
+            }
+
+            p {
+                font-size: 0.85em;
+                letter-spacing: 1px;
+            }
         }
     </style>
 </head>
@@ -206,7 +240,7 @@
 
     <script>
         const starsContainer = document.getElementById('stars');
-        const starCount = 100;
+        const starCount = 120;
 
         for (let i = 0; i < starCount; i++) {
             const star = document.createElement('div');
@@ -223,25 +257,35 @@
 
         function createMeteor() {
             const isAlien = Math.random() > 0.6;
-            const star = document.createElement('div');
-            
+
+            // 創建飛行路徑容器
+            const wrapper = document.createElement('div');
+            wrapper.className = 'meteor-wrapper';
+            wrapper.style.top = Math.random() * 50 + '%';
+            wrapper.style.left = (Math.random() * 30 + 70) + '%';
+
+            // 創建內容 (流星或外星人)
+            const content = document.createElement('div');
             if (isAlien) {
-                star.className = 'alien-meteor';
-                // 由於動畫中有旋轉，我們需要處理 transform
+                content.className = 'alien-meteor';
             } else {
-                star.className = 'shooting-star';
+                content.className = 'shooting-star';
             }
-            
-            star.style.top = Math.random() * 50 + '%';
-            star.style.left = (Math.random() * 30 + 70) + '%';
-            starsContainer.appendChild(star);
-            
-            setTimeout(() => star.remove(), 4000);
+
+            wrapper.appendChild(content);
+            starsContainer.appendChild(wrapper);
+
+            setTimeout(() => wrapper.remove(), 4000);
         }
 
-        setInterval(() => {
-            if (Math.random() > 0.4) createMeteor();
-        }, 3000);
+        // 隨機間隔產生
+        (function meteorLoop() {
+            const next = 2000 + Math.random() * 5000;
+            setTimeout(() => {
+                createMeteor();
+                meteorLoop();
+            }, next);
+        })();
     </script>
 
 </body>
