@@ -4,11 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>捕捉宇宙的脈動 | 天文股展覽</title>
+    <title>捕捉宇宙的脈動 | 地科展覽</title>
     <style>
         :root {
-            --neon-blue: #00d4ff;
+            --neon-blue: #00f2ff;
             --accent-gold: #ffcc00;
+            --deep-space: #02040a;
+            --nebula-purple: rgba(88, 28, 255, 0.15);
         }
 
         body,
@@ -18,7 +20,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #000;
+            background-color: var(--deep-space);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
             display: flex;
             flex-direction: column;
@@ -27,6 +29,7 @@
             color: white;
         }
 
+        /* 遙遠深空背景 */
         .stars-container {
             position: fixed;
             top: 0;
@@ -34,7 +37,25 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, #001133 0%, #000 100%);
+            background: 
+                radial-gradient(circle at 50% 50%, #0a1020 0%, #02040a 100%);
+        }
+
+        /* 雲氣效果 */
+        .stars-container::after {
+            content: "";
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: 
+                radial-gradient(circle at 30% 40%, var(--nebula-purple) 0%, transparent 40%),
+                radial-gradient(circle at 70% 60%, rgba(0, 242, 255, 0.05) 0%, transparent 40%);
+            filter: blur(80px);
+            animation: nebula-drift 60s infinite linear;
+        }
+
+        @keyframes nebula-drift {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .star {
@@ -42,84 +63,127 @@
             background: white;
             border-radius: 50%;
             opacity: 0.5;
+            z-index: 1;
+        }
+
+        .twinkle {
             animation: twinkle var(--duration) infinite ease-in-out;
         }
 
         @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
 
-            0%,
-            100% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
+        /* 流星系統 */
+        .shooting-star {
+            position: absolute;
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,1) 0%, transparent 100%);
+            border-radius: 100px;
+            filter: drop-shadow(0 0 6px white);
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0;
+            transform: rotate(-35deg);
+            animation: shooting 3s linear forwards;
+        }
 
-            50% {
-                opacity: 1;
-                transform: scale(1.2);
-            }
+        @keyframes shooting {
+            0% { transform: translateX(0) translateY(0) rotate(-35deg) scale(0); opacity: 0; }
+            10% { transform: translateX(-20px) translateY(14px) rotate(-35deg) scale(1); opacity: 1; }
+            90% { transform: translateX(-400px) translateY(280px) rotate(-35deg) scale(1); opacity: 1; }
+            100% { transform: translateX(-600px) translateY(420px) rotate(-35deg) scale(0); opacity: 0; }
         }
 
         .portal {
             text-align: center;
-            padding: 20px;
+            padding: 40px;
             z-index: 10;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
-            font-size: 2.2em;
-            letter-spacing: 5px;
+            font-size: 2.8em;
+            letter-spacing: 8px;
             margin: 0;
-            color: var(--neon-blue);
-            text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
-            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 20px var(--neon-blue), 0 0 40px rgba(0, 242, 255, 0.3);
+            font-weight: 900;
+            position: relative;
         }
 
         p {
-            font-size: 1em;
-            color: #aaa;
+            font-size: 1.1em;
+            color: var(--neon-blue);
             margin-top: 15px;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            font-family: monospace;
+            opacity: 0.8;
         }
 
-        /* 按鈕群組容器 */
         .btn-group {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-top: 40px;
+            gap: 20px;
+            margin-top: 50px;
             align-items: center;
         }
 
         .enter-btn {
-            padding: 15px 40px;
-            border: 1px solid var(--neon-blue);
-            background: transparent;
+            padding: 18px 50px;
+            border: 2px solid var(--neon-blue);
+            background: rgba(0, 242, 255, 0.05);
             color: var(--neon-blue);
-            font-size: 1.1em;
+            font-size: 1.2em;
             text-decoration: none;
-            border-radius: 50px;
-            transition: all 0.3s;
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
-            display: inline-block;
+            border-radius: 100px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            width: 180px;
-            /* 固定寬度讓按鈕視覺一致 */
+            width: 220px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .enter-btn:hover,
-        .enter-btn:active {
+        .enter-btn::after {
+            content: "";
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: 0.6s;
+        }
+
+        .enter-btn:hover::after {
+            left: 120%;
+        }
+
+        .enter-btn:hover {
             background: var(--neon-blue);
             color: #000;
-            box-shadow: 0 0 30px var(--neon-blue);
+            box-shadow: 0 0 40px var(--neon-blue);
+            transform: translateY(-5px) scale(1.05);
         }
 
         footer {
             position: absolute;
             bottom: 30px;
-            font-size: 0.8em;
-            color: #444;
-            letter-spacing: 1px;
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 2px;
+            font-family: monospace;
         }
     </style>
 </head>
@@ -130,7 +194,7 @@
 
     <div class="portal">
         <h1>捕捉宇宙的脈動</h1>
-        <p>— 2026 Earth Science Exhibition —</p>
+        <p>DEEP SPACE EXPLORATION — 2026</p>
 
         <div class="btn-group">
             <a href="radial_velocity_method.html" class="enter-btn">徑向速度法</a>
@@ -144,22 +208,66 @@
 
     <script>
         const starsContainer = document.getElementById('stars');
-        const starCount = 100;
-
-        for (let i = 0; i < starCount; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            const size = Math.random() * 2 + 1 + 'px';
-            star.style.width = size;
-            star.style.height = size;
-            star.style.top = Math.random() * 100 + '%';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
-            star.style.animationDelay = Math.random() * 5 + 's';
-            starsContainer.appendChild(star);
+        
+        // 建立星場
+        function createStarField() {
+            const starCount = 200;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star' + (Math.random() > 0.3 ? ' twinkle' : '');
+                const size = Math.random() * 2.5 + 0.5;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+                star.style.animationDelay = Math.random() * 5 + 's';
+                star.style.opacity = Math.random();
+                starsContainer.appendChild(star);
+            }
         }
+
+        // 建立流星
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            
+            // 隨機起始位置 (通常從右上或右側飛入)
+            const startY = Math.random() * 60; // 0-60% 高度
+            const startX = 60 + Math.random() * 40; // 60-100% 寬度
+            
+            star.style.top = startY + '%';
+            star.style.left = startX + '%';
+            
+            starsContainer.appendChild(star);
+            
+            // 動畫結束後移除
+            setTimeout(() => {
+                star.remove();
+            }, 4000);
+        }
+
+        createStarField();
+
+        // 隨機間隔產生流星
+        function spawnLoop() {
+            const nextSpawn = 2000 + Math.random() * 6000;
+            setTimeout(() => {
+                createShootingStar();
+                spawnLoop();
+            }, nextSpawn);
+        }
+
+        spawnLoop();
+
+        // 滑鼠移動時背景微動 (視差效果)
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth - 0.5;
+            const y = e.clientY / window.innerHeight - 0.5;
+            starsContainer.style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+        });
     </script>
 
 </body>
 
-</html>
+</html>
