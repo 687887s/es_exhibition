@@ -18,7 +18,8 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #000;
+            /* 將星場漸層設在 body，確保不擋住內容 */
+            background: radial-gradient(circle at center, #001133 0%, #000 100%);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
             display: flex;
             flex-direction: column;
@@ -27,15 +28,16 @@
             color: white;
         }
 
-        /* 恢復原本的星場背景 (取消圖片背景) */
+        /* 內容容器層 (透明，僅用於放置星星) */
         .stars-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at center, #001133 0%, #000 100%);
+            z-index: 1;
+            background: transparent;
+            pointer-events: none;
         }
 
         .star {
@@ -51,13 +53,13 @@
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* 流星 - 僅保留光跡效果 */
+        /* 流星 - 確保 z-index 足夠高且不被遮擋 */
         .shooting-star {
             position: absolute;
             width: 120px;
             height: 2px;
             background: linear-gradient(90deg, #fff, transparent);
-            z-index: 5;
+            z-index: 100;
             pointer-events: none;
             opacity: 0;
             transform: rotate(-35deg);
@@ -67,13 +69,14 @@
         @keyframes shooting {
             0% { transform: translate(0, 0) rotate(-35deg) scale(0); opacity: 0; }
             10% { opacity: 1; transform: translate(-20px, 14px) rotate(-35deg) scale(1); }
-            100% { transform: translate(-800px, 560px) rotate(-35deg) scale(1); opacity: 0; }
+            100% { transform: translate(-1000px, 700px) rotate(-35deg) scale(1); opacity: 0; }
         }
 
         .portal {
             text-align: center;
             padding: 20px;
             z-index: 10;
+            position: relative;
         }
 
         h1 {
@@ -103,7 +106,7 @@
         .enter-btn {
             padding: 15px 40px;
             border: 1px solid var(--neon-blue);
-            background: transparent;
+            background: rgba(0, 0, 0, 0.3);
             color: var(--neon-blue);
             font-size: 1.1em;
             text-decoration: none;
@@ -115,6 +118,7 @@
             width: 180px;
             text-align: center;
             -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(5px);
         }
 
         .enter-btn:hover {
@@ -129,9 +133,9 @@
             font-size: 0.8em;
             color: #444;
             letter-spacing: 1px;
+            z-index: 10;
         }
 
-        /* 手機版文字適配 */
         @media (max-width: 600px) {
             h1 { font-size: 1.8em; letter-spacing: 3px; }
             p { font-size: 0.85em; letter-spacing: 1px; }
