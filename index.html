@@ -18,7 +18,9 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #000;
+            /* 直接將背景圖設在 body，避免被其他層遮擋 */
+            background: #000 url('bg.png') no-repeat center center;
+            background-size: cover;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
             display: flex;
             flex-direction: column;
@@ -27,28 +29,16 @@
             color: white;
         }
 
-        /* 核心背景：宇宙深空圖 */
-        .bg-image {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: url('bg.png') no-repeat center center;
-            background-size: cover;
-            filter: brightness(0.7);
-        }
-
-        /* 星場疊加層 */
+        /* 星場疊加層 (確保背景透明，不遮擋 body 背景) */
         .stars-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%) !important;
+            z-index: 1;
+            background: transparent;
+            pointer-events: none;
         }
 
         .star {
@@ -64,30 +54,31 @@
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* 流星：強化顯示效果 */
+        /* 流星 - 強化視覺效果 */
         .shooting-star {
             position: absolute;
             width: 150px;
             height: 2px;
-            background: linear-gradient(90deg, #fff, rgba(255,255,255,0.4), transparent);
+            background: linear-gradient(90deg, #fff, transparent);
             z-index: 5;
             pointer-events: none;
             opacity: 0;
-            filter: drop-shadow(0 0 6px #fff);
+            filter: drop-shadow(0 0 5px #fff);
             transform: rotate(-35deg);
-            animation: shooting 2.8s cubic-bezier(0.1, 0, 0.2, 1) forwards;
+            animation: shooting 3s linear forwards;
         }
 
         @keyframes shooting {
             0% { transform: translate(0, 0) rotate(-35deg) scale(0); opacity: 0; }
-            5% { opacity: 1; transform: translate(-10px, 7px) rotate(-35deg) scale(1); }
-            100% { transform: translate(-1500px, 1050px) rotate(-35deg) scale(1); opacity: 0; }
+            10% { opacity: 1; transform: translate(-20px, 14px) rotate(-35deg) scale(1); }
+            100% { transform: translate(-1000px, 700px) rotate(-35deg) scale(1); opacity: 0; }
         }
 
         .portal {
             text-align: center;
             padding: 20px;
             z-index: 10;
+            position: relative;
         }
 
         h1 {
@@ -117,7 +108,7 @@
         .enter-btn {
             padding: 15px 40px;
             border: 1px solid var(--neon-blue);
-            background: rgba(0, 242, 255, 0.05);
+            background: rgba(0, 0, 0, 0.3); /* 半透明背景 */
             color: var(--neon-blue);
             font-size: 1.1em;
             text-decoration: none;
@@ -132,8 +123,7 @@
             backdrop-filter: blur(5px);
         }
 
-        .enter-btn:hover,
-        .enter-btn:active {
+        .enter-btn:hover {
             background: var(--neon-blue);
             color: #000;
             box-shadow: 0 0 30px var(--neon-blue);
@@ -143,7 +133,7 @@
             position: absolute;
             bottom: 30px;
             font-size: 0.8em;
-            color: #444;
+            color: #666;
             letter-spacing: 1px;
         }
 
@@ -157,7 +147,6 @@
 
 <body>
 
-    <div class="bg-image"></div>
     <div class="stars-container" id="stars"></div>
 
     <div class="portal">
@@ -176,9 +165,8 @@
 
     <script>
         const starsContainer = document.getElementById('stars');
-        const starCount = 120;
+        const starCount = 100;
 
-        // 星場
         for (let i = 0; i < starCount; i++) {
             const star = document.createElement('div');
             star.className = 'star';
@@ -192,26 +180,18 @@
             starsContainer.appendChild(star);
         }
 
-        // 流星
         function createShootingStar() {
             const star = document.createElement('div');
             star.className = 'shooting-star';
             star.style.top = Math.random() * 40 + '%';
             star.style.left = (Math.random() * 30 + 70) + '%';
             starsContainer.appendChild(star);
-            setTimeout(() => star.remove(), 2800);
+            setTimeout(() => star.remove(), 3500);
         }
 
-        // 循環產生流星
-        function meteorLoop() {
-            const next = 3000 + Math.random() * 5000;
-            setTimeout(() => {
-                createShootingStar();
-                meteorLoop();
-            }, next);
-        }
-
-            meteorLoop();
+        setInterval(() => {
+            if (Math.random() > 0.4) createShootingStar();
+        }, 4000);
     </script>
 
 </body>
