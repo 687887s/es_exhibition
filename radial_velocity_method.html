@@ -795,8 +795,30 @@
             <div class="canvas-container">
                 <canvas id="superpositionCanvas"></canvas>
             </div>
+            
+            <!-- 疊加控制項 -->
+            <div class="controls">
+                <div class="control-item">
+                    <div class="control-label"><span style="color:var(--vibrant-gold)">行星 A 質量 (大波)</span><span id="mValA" style="color:white">6.0</span></div>
+                    <input type="range" id="mSldA" min="1" max="15" value="6" step="0.1">
+                </div>
+                <div class="control-item">
+                    <div class="control-label"><span style="color:var(--vibrant-gold)">行星 A 速度</span><span id="sValA" style="color:white">2.00</span></div>
+                    <input type="range" id="sSldA" min="0.5" max="10" value="2" step="0.1">
+                </div>
+                <div style="width:100%; height:1px; background:rgba(255,255,255,0.1); margin:10px 0;"></div>
+                <div class="control-item">
+                    <div class="control-label"><span style="color:var(--tech-cyan)">行星 B 質量 (小波)</span><span id="mValB" style="color:white">2.5</span></div>
+                    <input type="range" id="mSldB" min="1" max="15" value="2.5" step="0.1">
+                </div>
+                <div class="control-item">
+                    <div class="control-label"><span style="color:var(--tech-cyan)">行星 B 速度</span><span id="sValB" style="color:white">7.50</span></div>
+                    <input type="range" id="sSldB" min="0.5" max="15" value="7.5" step="0.1">
+                </div>
+            </div>
+
             <div class="image-meta">
-                <div class="image-caption">模擬多顆行星造成的複雜徑向速度曲線（波形疊加）</div>
+                <div class="image-caption">調整滑桿觀察不同行星組合疊加出的複雜訊號</div>
                 <div class="image-citation">Source: <b>2026 Earth Science Exhibition</b></div>
             </div>
 
@@ -1062,8 +1084,14 @@
 
         // --- 疊加波形模擬器 (Section 5) ---
         const multiCanvas = document.getElementById('superpositionCanvas'), mCtx = multiCanvas.getContext('2d');
+        const mSldA = document.getElementById('mSldA'), sSldA = document.getElementById('sSldA');
+        const mSldB = document.getElementById('mSldB'), sSldB = document.getElementById('sSldB');
+        const mValA = document.getElementById('mValA'), sValA = document.getElementById('sValA');
+        const mValB = document.getElementById('mValB'), sValB = document.getElementById('sValB');
+
         let multiPoints = [];
         let multiAngle1 = 0, multiAngle2 = 0;
+        let lastMultiTime = performance.now();
 
         function resizeMulti() {
             const w = multiCanvas.clientWidth; if (w === 0) return;
@@ -1073,32 +1101,45 @@
         }
 
         function drawMulti(timestamp) {
+            timestamp = timestamp || performance.now();
+            const dt = (timestamp - lastMultiTime) / 1000;
+            lastMultiTime = timestamp;
+
             if (multiCanvas.clientWidth > 0 && Math.abs(multiCanvas.width - Math.floor(multiCanvas.clientWidth * window.devicePixelRatio)) > 2) resizeMulti();
             const w = multiCanvas.width / window.devicePixelRatio, h = multiCanvas.height / window.devicePixelRatio;
             if (w === 0 || h === 0) { requestAnimationFrame(drawMulti); return; }
 
-            const dt = 0.016; 
-            multiAngle1 += 2.0 * dt; 
-            multiAngle2 += 7.5 * dt; 
+            // 讀取滑桿數值
+            const mA = parseFloat(mSldA.value), sA = parseFloat(sSldA.value);
+            const mB = parseFloat(mSldB.value), sB = parseFloat(sSldB.value);
+            mValA.innerText = mA.toFixed(1); sValA.innerText = sA.toFixed(2);
+            mValB.innerText = mB.toFixed(1); sValB.innerText = sB.toFixed(2);
 
-            const v1 = Math.sin(multiAngle1) * 0.6;
-            const v2 = Math.sin(multiAngle2) * 0.25;
+            // 物理疊加邏輯
+            multiAngle1 += sA * dt * 0.5; 
+            multiAngle2 += sB * dt * 0.5; 
+
+            const v1 = Math.sin(multiAngle1) * (mA / 15.0) * 0.6;
+            const v2 = Math.sin(multiAngle2) * (mB / 15.0) * 0.6;
             const combinedV = v1 + v2;
 
             multiPoints.push({ x: w * 0.95, y: combinedV });
             if (multiPoints.length > 500) multiPoints.shift();
             multiPoints.forEach(p => p.x -= 1.8);
 
+            // 背景與漸變
             const grad = mCtx.createLinearGradient(0, 0, 0, h);
             grad.addColorStop(0, 'rgba(255, 68, 68, 0.25)'); 
             grad.addColorStop(0.5, 'rgba(0, 0, 0, 1)');      
             grad.addColorStop(1, 'rgba(68, 170, 255, 0.25)'); 
             mCtx.fillStyle = grad; mCtx.fillRect(0, 0, w, h);
 
+            // 座標軸
             mCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; mCtx.setLineDash([5, 5]);
             mCtx.beginPath(); mCtx.moveTo(0, h/2); mCtx.lineTo(w, h/2); mCtx.stroke();
             mCtx.setLineDash([]);
 
+            // 繪製波形
             mCtx.strokeStyle = '#fff'; mCtx.lineWidth = 2.5; mCtx.shadowBlur = 12; mCtx.shadowColor = '#fff';
             mCtx.beginPath();
             multiPoints.forEach((p, i) => {
@@ -1108,13 +1149,14 @@
             });
             mCtx.stroke(); mCtx.shadowBlur = 0;
 
+            // 標籤
             mCtx.font = '10px monospace';
             mCtx.fillStyle = '#ff4444'; mCtx.fillText('REDSHIFT (+)', 15, 25);
             mCtx.fillStyle = '#44aaff'; mCtx.fillText('BLUESHIFT (-)', 15, h - 15);
             
             const currentVText = (combinedV * 100).toFixed(1);
             mCtx.fillStyle = combinedV > 0 ? '#ff4444' : '#44aaff';
-            mCtx.fillText(`REAL_TIME_RV: ${combinedV > 0 ? '+' : ''}${currentVText} m/s`, w - 160, 25);
+            mCtx.fillText(`COMBINED_RV: ${combinedV > 0 ? '+' : ''}${currentVText} m/s`, w - 180, 25);
 
             requestAnimationFrame(drawMulti);
         }
