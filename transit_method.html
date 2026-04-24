@@ -83,13 +83,13 @@
                 linear-gradient(90deg, rgba(255, 0, 0, 0.008), rgba(0, 255, 0, 0.005), rgba(0, 255, 0, 0.008));
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
-            z-index: 9999;
+            z-index: 7000;
         }
 
         header {
             position: sticky;
             top: 0;
-            z-index: 9000;
+            z-index: 4000;
             background: rgba(5, 10, 16, 0.95);
             backdrop-filter: blur(10px);
             padding: 15px 4vw;
@@ -122,7 +122,6 @@
             padding: 60px 45px;
             border: 1px solid var(--tech-cyan);
             position: relative;
-            z-index: 10;
             opacity: 0.6;
             clip-path: inset(49.5% 35% 49.5% 35%);
             filter: drop-shadow(0 0 10px var(--neon-blue)) brightness(1.5);
@@ -704,14 +703,14 @@
 
         <section id="section3">
             <div class="pixel-mascot" id="mascot-s3"
-                style="left: 50%; margin-left: -18px; animation: peek-slide 2s infinite alternate ease-in-out;"
+                style="left: 20px; animation: peek-slide 2s infinite alternate ease-in-out;"
                 onclick="mascotStep(this)">
                 <div class="mascot-body" style="background: #fff;">
                     <div class="mascot-eyes"></div>
                 </div>
                 <div class="mascot-label" style="color:#fff; border-color:#fff">UNIT_GAMMA</div>
             </div>
-            <div class="black-hole" id="bh-s3" style="left: 50%; margin-left: -32px; top:6px;"></div>
+            <div class="black-hole" id="bh-s3" style="left: 6px; top:6px;"></div>
 
             <h2>它的大氣層有什麼？光譜的指紋</h2>
             <p><strong>大氣層的濾鏡：</strong> 當行星經過恆星前方時，恆星發出的光會穿過行星邊緣的大氣層。大氣中的化學分子（例如水蒸氣、氧氣、甚至甲烷）會吸收特定顏色的光。</p>
