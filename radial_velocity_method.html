@@ -132,159 +132,418 @@
         }
 
         @keyframes hologramExpandDetailed {
-            0% { clip-path: inset(49.5% 35% 49.5% 35%); filter: brightness(2); transform: translate(0, 0); box-shadow: 0px 0px 0px transparent; }
-            40% { clip-path: inset(49.5% -30px 49.5% -30px); filter: brightness(3); transform: translate(0, 0); box-shadow: 0px 0px 0px transparent; opacity: 1; }
-            85% { clip-path: inset(-50px -30px -30px -30px); filter: brightness(1); transform: translate(0, 0); box-shadow: 0px 0px 0px transparent; opacity: 1; }
-            100% { clip-path: inset(-500% -500% -500% -500%); filter: brightness(1); transform: translate(-4px, -4px); box-shadow: 4px 4px 0px var(--tech-cyan); opacity: 1; }
+            0% {
+                clip-path: inset(49.5% 35% 49.5% 35%);
+                filter: brightness(2);
+                transform: translate(0, 0);
+                box-shadow: 0px 0px 0px transparent;
+            }
+
+            40% {
+                clip-path: inset(49.5% -30px 49.5% -30px);
+                filter: brightness(3);
+                transform: translate(0, 0);
+                box-shadow: 0px 0px 0px transparent;
+                opacity: 1;
+            }
+
+            85% {
+                clip-path: inset(-50px -30px -30px -30px);
+                filter: brightness(1);
+                transform: translate(0, 0);
+                box-shadow: 0px 0px 0px transparent;
+                opacity: 1;
+            }
+
+            100% {
+                clip-path: inset(-500% -500% -500% -500%);
+                filter: brightness(1);
+                transform: translate(-4px, -4px);
+                box-shadow: 4px 4px 0px var(--tech-cyan);
+                opacity: 1;
+            }
         }
 
         section::after {
             content: "";
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border-top: 1px solid var(--neon-blue);
             border-bottom: 1px solid var(--neon-blue);
-            pointer-events: none; opacity: 0.3; transition: opacity 1s;
+            pointer-events: none;
+            opacity: 0.3;
+            transition: opacity 1s;
         }
 
-        section.is-active::after { opacity: 0.6; }
+        section.is-active::after {
+            opacity: 0.6;
+        }
 
         section::before {
             content: "";
             position: absolute;
-            top: -1px; left: -1px; width: 18px; height: 18px;
+            top: -1px;
+            left: -1px;
+            width: 18px;
+            height: 18px;
             border-top: 3px solid var(--neon-blue);
             border-left: 3px solid var(--neon-blue);
-            opacity: 0; transition: opacity 0.5s 1.2s; z-index: 2;
+            opacity: 0;
+            transition: opacity 0.5s 1.2s;
+            z-index: 2;
         }
 
-        section.is-active::before { opacity: 1; }
+        section.is-active::before {
+            opacity: 1;
+        }
 
         h2 {
             color: var(--vibrant-gold);
-            margin-top: 0; margin-bottom: 25px;
-            font-size: 1.4em; display: flex; align-items: center; text-transform: uppercase;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
         }
 
-        h2::before { content: ">> "; color: var(--neon-blue); font-family: monospace; margin-right: 5px; }
+        h2::before {
+            content: ">> ";
+            color: var(--neon-blue);
+            font-family: monospace;
+            margin-right: 5px;
+        }
 
-        .highlight { color: var(--neon-blue); font-weight: bold; }
+        .highlight {
+            color: var(--neon-blue);
+            font-weight: bold;
+        }
 
         .tech-image {
-            max-width: 100%; height: auto; display: block; margin: 40px auto;
-            border: 1px solid var(--tech-cyan); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 40px auto;
+            border: 1px solid var(--tech-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
         }
 
         .image-meta {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            font-size: 0.75em; margin-top: -15px; margin-bottom: 25px;
-            font-family: monospace; letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 0.75em;
+            margin-top: -15px;
+            margin-bottom: 25px;
+            font-family: monospace;
+            letter-spacing: 1px;
         }
 
-        .image-caption { color: rgba(0, 242, 255, 0.8); text-align: left; max-width: 60%; }
-        .image-citation { color: rgba(0, 242, 255, 0.5); text-align: right; max-width: 35%; }
-        .image-citation a { color: rgba(0, 242, 255, 0.8); text-decoration: none; border-bottom: 1px dashed rgba(0, 242, 255, 0.4); transition: all 0.3s; }
-        .image-citation a:hover { color: var(--neon-blue); border-bottom: 1px solid var(--neon-blue); text-shadow: 0 0 5px rgba(0, 242, 255, 0.5); }
-        .image-citation b { color: rgba(0, 242, 255, 0.8); }
+        .image-caption {
+            color: rgba(0, 242, 255, 0.8);
+            text-align: left;
+            max-width: 60%;
+        }
+
+        .image-citation {
+            color: rgba(0, 242, 255, 0.5);
+            text-align: right;
+            max-width: 35%;
+        }
+
+        .image-citation a {
+            color: rgba(0, 242, 255, 0.8);
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(0, 242, 255, 0.4);
+            transition: all 0.3s;
+        }
+
+        .image-citation a:hover {
+            color: var(--neon-blue);
+            border-bottom: 1px solid var(--neon-blue);
+            text-shadow: 0 0 5px rgba(0, 242, 255, 0.5);
+        }
+
+        .image-citation b {
+            color: rgba(0, 242, 255, 0.8);
+        }
 
         .canvas-container {
-            margin: 30px -45px; background: rgba(0, 0, 0, 0.95); position: relative;
-            border-top: 1px solid var(--tech-cyan); border-bottom: 1px solid var(--tech-cyan);
-            overflow: hidden; line-height: 0;
+            margin: 30px -45px;
+            background: rgba(0, 0, 0, 0.95);
+            position: relative;
+            border-top: 1px solid var(--tech-cyan);
+            border-bottom: 1px solid var(--tech-cyan);
+            overflow: hidden;
+            line-height: 0;
         }
 
-        canvas { display: block; width: 100%; height: auto; }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
 
         .controls {
-            padding: 30px; background: rgba(6, 14, 22, 0.95); border-bottom: 1px solid var(--tech-cyan);
+            padding: 30px;
+            background: rgba(6, 14, 22, 0.95);
+            border-bottom: 1px solid var(--tech-cyan);
             margin: 0 -45px -60px -45px;
         }
 
-        .control-item { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
 
         .control-label {
-            font-size: 0.85em; color: var(--neon-blue); display: flex;
-            justify-content: space-between; font-family: monospace;
+            font-size: 0.85em;
+            color: var(--neon-blue);
+            display: flex;
+            justify-content: space-between;
+            font-family: monospace;
         }
 
         input[type="range"] {
-            -webkit-appearance: none; width: 100%; height: 4px; background: #1a3040; outline: none; touch-action: none;
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #1a3040;
+            outline: none;
+            touch-action: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 14px; height: 22px; background: var(--neon-blue);
-            border: 1px solid white; cursor: pointer; box-shadow: 0 0 10px var(--neon-blue);
+            -webkit-appearance: none;
+            width: 14px;
+            height: 22px;
+            background: var(--neon-blue);
+            border: 1px solid white;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-blue);
         }
 
         .pixel-mascot {
-            position: absolute; width: 36px; height: 22px; z-index: 10; top: -26px; cursor: pointer;
+            position: absolute;
+            width: 36px;
+            height: 22px;
+            z-index: 10;
+            top: -26px;
+            cursor: pointer;
             transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
-            filter: drop-shadow(0 0 8px var(--neon-blue)); -webkit-tap-highlight-color: transparent;
+            filter: drop-shadow(0 0 8px var(--neon-blue));
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .pixel-mascot.active { z-index: 6000 !important; }
+        .pixel-mascot.active {
+            z-index: 6000 !important;
+        }
 
         .mascot-body {
-            width: 100%; height: 100%; background: var(--neon-blue); position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--neon-blue);
+            position: relative;
             box-shadow: -4px 4px 0 var(--neon-blue), 4px 4px 0 var(--neon-blue), -8px 4px 0 var(--neon-blue), 8px 4px 0 var(--neon-blue), 0 -4px 0 var(--neon-blue);
         }
 
-        .mascot-eyes { position: absolute; top: 4px; left: 4px; right: 4px; height: 6px; display: flex; justify-content: space-around; pointer-events: none; }
-        .mascot-eyes::before, .mascot-eyes::after { content: ""; width: 6px; height: 6px; background: #000; animation: blink 4s infinite; }
+        .mascot-eyes {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            height: 6px;
+            display: flex;
+            justify-content: space-around;
+            pointer-events: none;
+        }
 
-        @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+        .mascot-eyes::before,
+        .mascot-eyes::after {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background: #000;
+            animation: blink 4s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            90%,
+            100% {
+                transform: scaleY(1);
+            }
+
+            95% {
+                transform: scaleY(0.1);
+            }
+        }
 
         .mascot-body::after {
-            content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
-            width: 4px; height: 10px; background: var(--neon-blue); animation: ant-p 0.5s infinite alternate;
+            content: "";
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 10px;
+            background: var(--neon-blue);
+            animation: ant-p 0.5s infinite alternate;
         }
 
-        @keyframes ant-p { from { height: 5px; opacity: 0.6; } to { height: 12px; opacity: 1; } }
+        @keyframes ant-p {
+            from {
+                height: 5px;
+                opacity: 0.6;
+            }
+
+            to {
+                height: 12px;
+                opacity: 1;
+            }
+        }
 
         .black-hole {
-            position: absolute; width: 64px; height: 20px; background: #000; border-radius: 50%;
-            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff; z-index: 5;
-            transform: scale(0); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none; opacity: 0;
+            position: absolute;
+            width: 64px;
+            height: 20px;
+            background: #000;
+            border-radius: 50%;
+            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff;
+            z-index: 5;
+            transform: scale(0);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            opacity: 0;
         }
 
-        .black-hole.visible { transform: scale(1); opacity: 1; }
+        .black-hole.visible {
+            transform: scale(1);
+            opacity: 1;
+        }
 
         .mascot-label {
-            font-size: 9px; font-family: monospace; color: var(--neon-blue);
-            position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85); padding: 2px 6px; border: 1px solid var(--neon-blue);
-            white-space: nowrap; pointer-events: none;
+            font-size: 9px;
+            font-family: monospace;
+            color: var(--neon-blue);
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            padding: 2px 6px;
+            border: 1px solid var(--neon-blue);
+            white-space: nowrap;
+            pointer-events: none;
         }
 
-        @keyframes idle-f { 0% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-40px) rotate(180deg) scale(1.1); } 100% { transform: translateY(0) rotate(360deg) scale(1); } }
-        .pixel-mascot.idle-jump { animation: idle-f 0.8s ease-in-out !important; }
-        .pixel-mascot.idle-color .mascot-body { filter: hue-rotate(180deg) brightness(1.3); transition: filter 0.5s; }
+        @keyframes idle-f {
+            0% {
+                transform: translateY(0) rotate(0);
+            }
 
-        @keyframes peek-bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+            50% {
+                transform: translateY(-40px) rotate(180deg) scale(1.1);
+            }
 
-        .back-nav { text-align: center; margin: 60px 0; }
+            100% {
+                transform: translateY(0) rotate(360deg) scale(1);
+            }
+        }
+
+        .pixel-mascot.idle-jump {
+            animation: idle-f 0.8s ease-in-out !important;
+        }
+
+        .pixel-mascot.idle-color .mascot-body {
+            filter: hue-rotate(180deg) brightness(1.3);
+            transition: filter 0.5s;
+        }
+
+        @keyframes peek-bounce {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-5px);
+            }
+        }
+
+        .back-nav {
+            text-align: center;
+            margin: 60px 0;
+        }
+
         .back-btn {
-            color: var(--neon-blue); text-decoration: none; font-size: 1em; border: 1px solid var(--neon-blue);
-            padding: 18px 40px; text-transform: uppercase; letter-spacing: 4px; transition: all 0.3s;
-            font-family: monospace; background: rgba(0, 242, 255, 0.05);
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 1em;
+            border: 1px solid var(--neon-blue);
+            padding: 18px 40px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            transition: all 0.3s;
+            font-family: monospace;
+            background: rgba(0, 242, 255, 0.05);
         }
-        .back-btn:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 25px var(--neon-blue); }
+
+        .back-btn:hover {
+            background: var(--neon-blue);
+            color: black;
+            box-shadow: 0 0 25px var(--neon-blue);
+        }
 
         footer {
-            text-align: center; padding: 60px 20px; font-size: 0.75em; color: #446688;
-            background: #010305; letter-spacing: 4px; font-family: monospace;
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 0.75em;
+            color: #446688;
+            background: #010305;
+            letter-spacing: 4px;
+            font-family: monospace;
             border-top: 1px solid rgba(0, 242, 255, 0.2);
         }
 
         @media (max-width: 768px) {
-            section { padding: 30px 15px; margin: 40px auto; }
-            h2 { font-size: 1.15em; }
-            .image-meta { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .image-caption, .image-citation { max-width: 100% !important; text-align: left; }
-            .pixel-mascot { transform: scale(0.75); }
-            .canvas-container { margin: 25px -15px; }
-            .controls { margin: 0 -15px -30px -15px; }
+            section {
+                padding: 30px 15px;
+                margin: 40px auto;
+            }
+
+            h2 {
+                font-size: 1.15em;
+            }
+
+            .image-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .image-caption,
+            .image-citation {
+                max-width: 100% !important;
+                text-align: left;
+            }
+
+            .pixel-mascot {
+                transform: scale(0.75);
+            }
+
+            .canvas-container {
+                margin: 25px -15px;
+            }
+
+            .controls {
+                margin: 0 -15px -30px -15px;
+            }
         }
     </style>
 </head>
@@ -293,10 +552,15 @@
     <div class="bg-layer" id="bgLayer"></div>
 
     <header id="mainHeader">
-        <h1>捕捉宇宙的律動</h1>
-        <p style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">RADIAL_VELOCITY_ANALYSIS</p>
-        <div class="pixel-mascot" id="mascot-header" style="right: 30px; top: 50px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
-            <div class="mascot-body"><div class="mascot-eyes"></div></div>
+        <h1>捕捉宇宙的律動──徑向速度法</h1>
+        <p
+            style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">
+            RADIAL_VELOCITY_ANALYSIS</p>
+        <div class="pixel-mascot" id="mascot-header"
+            style="right: 30px; top: 50px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
+            <div class="mascot-body">
+                <div class="mascot-eyes"></div>
+            </div>
             <div class="mascot-label">RADAR_WATCHER</div>
         </div>
         <div class="black-hole" id="bh-header" style="right: 16px; top: 76px;"></div>
@@ -304,108 +568,157 @@
 
     <div class="container">
         <section id="section-1">
-            <div class="pixel-mascot" id="mascot-s1" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;" onclick="mascotStep(this)">
-                <div class="mascot-body" style="background: var(--vibrant-gold);"><div class="mascot-eyes"></div></div>
-                <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">WAVE_ALPHA</div>
+            <div class="pixel-mascot" id="mascot-s1" style="left: 20px; animation: peek-bounce 0.6s infinite alternate;"
+                onclick="mascotStep(this)">
+                <div class="mascot-body" style="background: var(--vibrant-gold);">
+                    <div class="mascot-eyes"></div>
+                </div>
+                <div class="mascot-label" style="color:var(--vibrant-gold); border-color:var(--vibrant-gold)">WAVE_ALPHA
+                </div>
             </div>
             <div class="black-hole" id="bh-s1" style="left: 6px; top: 6px;"></div>
             <h2>都卜勒效應：宇宙的變聲器！</h2>
-            <p>你有注意過救護車經過時，警笛聲會從「尖銳」變成「低沉」嗎？這就是神奇的<span class="highlight">「都卜勒效應」</span>！在浩瀚的宇宙中，光波也玩著同樣的遊戲：當發光的天體靠近我們時，光波會被「擠壓」，遠離時則會被「拉長」。</p>
+            <p>你有注意過救護車經過時，警笛聲會從「尖銳」變成「低沉」嗎？這就是神奇的<span
+                    class="highlight">「都卜勒效應」</span>！在浩瀚的宇宙中，光波也玩著同樣的遊戲：當發光的天體靠近我們時，光波會被「擠壓」，遠離時則會被「拉長」。</p>
             <img src="460450.jpg" alt="都卜勒效應示意圖" class="tech-image">
             <div class="image-meta">
                 <div class="image-caption">都卜勒效應示意圖</div>
-                <div class="image-citation">Source: <a href="https://www.ehanlin.com.tw/app/keyword/%E9%AB%98%E4%B8%AD/%E7%89%A9%E7%90%86/%E8%81%B2%E6%B3%A2%E7%9A%84%E9%83%BD%E5%8D%9C%E5%8B%92%E6%95%88%E6%87%89.html" target="_blank">翰林雲端學院</a></div>
+                <div class="image-citation">Source: <a
+                        href="https://www.ehanlin.com.tw/app/keyword/%E9%AB%98%E4%B8%AD/%E7%89%A9%E7%90%86/%E8%81%B2%E6%B3%A2%E7%9A%84%E9%83%BD%E5%8D%9C%E5%8B%92%E6%95%88%E6%87%89.html"
+                        target="_blank">翰林雲端學院</a></div>
             </div>
-            <p>天文學家就是利用這個小把戲來觀察星星的「舞步」！當恆星向我們衝過來時，光波被擠壓，顏色會偏向藍色，我們稱為<span class="highlight">「藍移 (Blue Shift)」</span>；相反地，當恆星離我們遠去時，光波被拉長，顏色就會偏向紅色，這就是所謂的<span class="highlight">「紅移 (Red Shift)」</span>喔！</p>
+            <p>天文學家就是利用這個小把戲來觀察星星的「舞步」！當恆星向我們衝過來時，光波被擠壓，顏色會偏向藍色，我們稱為<span class="highlight">「藍移 (Blue
+                    Shift)」</span>；相反地，當恆星離我們遠去時，光波被拉長，顏色就會偏向紅色，這就是所謂的<span class="highlight">「紅移 (Red Shift)」</span>喔！
+            </p>
             <img src="Geoscience Astronomy 3.gif" alt="都卜勒效應示意圖" class="tech-image" style="margin-bottom: 5px;">
             <img src="Geoscience Astronomy.gif" alt="都卜勒效應示意圖" class="tech-image" style="margin-top: 5px">
             <div class="image-meta">
-                <div class="image-caption" style="max-width:75%">圖一：鴨子靠近時水波波長變短；鴨子遠離時水波波長變長<br>圖二：波源靠近時，波長變短（藍移）；波源遠離時，波長變長（紅移）</div>
-                <div class="image-citation">Source: <a href="https://javalab.org/en/doppler_effect_and_redshift_en/" target="_blank">Javalab</a></div>
+                <div class="image-caption" style="max-width:75%">
+                    圖一：鴨子靠近時水波波長變短；鴨子遠離時水波波長變長<br>圖二：波源靠近時，波長變短（藍移）；波源遠離時，波長變長（紅移）</div>
+                <div class="image-citation">Source: <a href="https://javalab.org/en/doppler_effect_and_redshift_en/"
+                        target="_blank">Javalab</a></div>
             </div>
             <div class="canvas-container"><canvas id="wobbleCanvas"></canvas></div>
             <div class="controls">
-                <div class="control-item"><div class="control-label"><span>恆星晃動幅度 (行星質量)</span><span id="massVal" style="color:white">5.0</span></div><input type="range" id="massSlider" min="1" max="15" value="5" step="0.1"></div>
-                <div class="control-item"><div class="control-label"><span>公轉速度 (色偏頻率)</span><span id="speedVal" style="color:white">3.00</span></div><input type="range" id="speedSlider" min="0.5" max="10" value="3" step="0.1"></div>
+                <div class="control-item">
+                    <div class="control-label"><span>恆星晃動幅度 (行星質量)</span><span id="massVal"
+                            style="color:white">5.0</span></div><input type="range" id="massSlider" min="1" max="15"
+                        value="5" step="0.1">
+                </div>
+                <div class="control-item">
+                    <div class="control-label"><span>公轉速度 (色偏頻率)</span><span id="speedVal"
+                            style="color:white">3.00</span></div><input type="range" id="speedSlider" min="0.5" max="10"
+                        value="3" step="0.1">
+                </div>
             </div>
         </section>
 
         <section id="section-2">
-            <div class="pixel-mascot" id="mascot-s2" style="right: 20px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
-                <div class="mascot-body" style="background: var(--neon-blue);"><div class="mascot-eyes"></div></div>
+            <div class="pixel-mascot" id="mascot-s2"
+                style="right: 20px; animation: peek-bounce 0.8s infinite alternate-reverse;" onclick="mascotStep(this)">
+                <div class="mascot-body" style="background: var(--neon-blue);">
+                    <div class="mascot-eyes"></div>
+                </div>
                 <div class="mascot-label">TEACHING_AID</div>
             </div>
             <div class="black-hole" id="bh-s2" style="right: 6px; top: 6px;"></div>
             <h2>宇宙的隱形拔河：共同質心</h2>
-            <p>為了讓大家親眼見證宇宙間的重力魔法，我們準備了這個簡單的實體教具！<br><span class="highlight">>> 裝備介紹：</span>這裡的「大球」是母恆星，而「小球」就是圍繞著它轉的系外行星啦。</p>
+            <p>為了讓大家親眼見證宇宙間的重力魔法，我們準備了這個簡單的實體教具！<br><span class="highlight">>>
+                    裝備介紹：</span>這裡的「大球」是母恆星，而「小球」就是圍繞著它轉的系外行星啦。</p>
             <p><span class="highlight">[ 第一回合：孤單的恆星 ]</span><br>當畫面上只有恆星（大球）孤軍奮戰時，它就像個安靜的巨無霸，穩穩地待在正中央，完全不會亂動。</p>
-            <p><span class="highlight">[ 第二回合：行星來搗亂！ ]</span><br>一旦小行星（小球）加入公轉的行列，雖然它很小，但它的重力還是會拉扯大恆星！這會讓它們的<span class="highlight">「共同質心」</span>往小球那邊偏過去。轉動教具看看，你會發現大恆星竟然也被帶著，發生了一圈一圈規規律的<span class="highlight">「晃動 (Wobble)」</span>呢！</p>
+            <p><span class="highlight">[ 第二回合：行星來搗亂！ ]</span><br>一旦小行星（小球）加入公轉的行列，雖然它很小，但它的重力還是會拉扯大恆星！這會讓它們的<span
+                    class="highlight">「共同質心」</span>往小球那邊偏過去。轉動教具看看，你會發現大恆星竟然也被帶著，發生了一圈一圈規規律的<span class="highlight">「晃動
+                    (Wobble)」</span>呢！</p>
             <div class="image-placeholder">[ 請置入：實體教具操作照片 ]</div>
             <div class="image-meta">
                 <div class="image-caption">透過轉動教具，觀察大球繞著共同質心晃動</div>
                 <div class="image-citation">Source: <b>2026 Earth Science Exhibition</b></div>
             </div>
-            <p>這就是科學家尋找系外行星的終極大絕招：即使小行星太暗、我們根本看不見它，但只要抓到恆星在「規律地搖擺」，我們就能<span class="highlight">「間接抓到」</span>這顆調皮的隱形行星囉！</p>
+            <p>這就是科學家尋找系外行星的終極大絕招：即使小行星太暗、我們根本看不見它，但只要抓到恆星在「規律地搖擺」，我們就能<span class="highlight">「間接抓到」</span>這顆調皮的隱形行星囉！
+            </p>
         </section>
 
         <section id="section-3">
-            <div class="pixel-mascot" id="mascot-s3" style="left: 20px; animation: peek-bounce 1.2s infinite alternate;" onclick="mascotStep(this)">
-                <div class="mascot-body" style="background: var(--tech-cyan);"><div class="mascot-eyes"></div></div>
+            <div class="pixel-mascot" id="mascot-s3" style="left: 20px; animation: peek-bounce 1.2s infinite alternate;"
+                onclick="mascotStep(this)">
+                <div class="mascot-body" style="background: var(--tech-cyan);">
+                    <div class="mascot-eyes"></div>
+                </div>
                 <div class="mascot-label">RADIAL_UNIT</div>
             </div>
             <div class="black-hole" id="bh-s3" style="left: 6px; top: 6px;"></div>
             <h2>尋星必殺技：徑向速度法</h2>
-            <p>把「都卜勒效應」加上「恆星的晃動」混在一起，就會變成天文學家最強的尋星武器——<span class="highlight">「徑向速度法 (Radial Velocity Method)」</span>！當恆星被隱形的行星拉扯著，一下靠近我們、一下又遠離我們時，它的星光就會像變色龍一樣，週期性地在「紅移」和「藍移」之間變換。</p>
+            <p>把「都卜勒效應」加上「恆星的晃動」混在一起，就會變成天文學家最強的尋星武器——<span class="highlight">「徑向速度法 (Radial Velocity
+                    Method)」</span>！當恆星被隱形的行星拉扯著，一下靠近我們、一下又遠離我們時，它的星光就會像變色龍一樣，週期性地在「紅移」和「藍移」之間變換。</p>
             <img src="Exoplanet Doppler Spectroscopy.gif" alt="徑向速度法光譜偏移示意圖" class="tech-image">
             <div class="image-meta">
                 <div class="image-caption">徑向速度法光譜偏移示意圖</div>
-                <div class="image-citation">Source: <a href="https://tam.gov.taipei/News_Content.aspx?n=EF86D8AF23B9A85B&sms=F32C4FF0AC5C2801&s=3B8E3C74A66858C9" target="_blank">台北市立天文科學教育館</a></div>
+                <div class="image-citation">Source: <a
+                        href="https://tam.gov.taipei/News_Content.aspx?n=EF86D8AF23B9A85B&sms=F32C4FF0AC5C2801&s=3B8E3C74A66858C9"
+                        target="_blank">台北市立天文科學教育館</a></div>
             </div>
-            <p>這種找星星的方法對<span class="highlight">「大胖子行星」</span>特別有效哦！如果行星超級重、又靠恆星很近，恆星就會被甩得更大力，光譜顏色的變化也會超級明顯。科學家只要像偵探一樣分析這些光譜，就能精準算出這顆行星的<span class="highlight">公轉週期</span>跟它的<span class="highlight">最低質量</span>！</p>
+            <p>這種找星星的方法對<span
+                    class="highlight">「大胖子行星」</span>特別有效哦！如果行星超級重、又靠恆星很近，恆星就會被甩得更大力，光譜顏色的變化也會超級明顯。科學家只要像偵探一樣分析這些光譜，就能精準算出這顆行星的<span
+                    class="highlight">公轉週期</span>跟它的<span class="highlight">最低質量</span>！</p>
         </section>
 
         <section id="section-4">
-            <div class="pixel-mascot" id="mascot-s4" style="left: 50%; margin-left: -18px; animation: peek-bounce 2s infinite alternate ease-in-out;" onclick="mascotStep(this)">
-                <div class="mascot-body" style="background: #fff;"><div class="mascot-eyes"></div></div>
+            <div class="pixel-mascot" id="mascot-s4"
+                style="left: 50%; margin-left: -18px; animation: peek-bounce 2s infinite alternate ease-in-out;"
+                onclick="mascotStep(this)">
+                <div class="mascot-body" style="background: #fff;">
+                    <div class="mascot-eyes"></div>
+                </div>
                 <div class="mascot-label" style="color:#fff; border-color:#fff">PEGASI_51</div>
             </div>
             <div class="black-hole" id="bh-s4" style="left: 50%; margin-left: -32px; top: 6px;"></div>
             <h2>人類的第一個外星鄰居：51 Pegasi b</h2>
-            <p>在 1995 年，兩位超厲害的天文學家（馬約爾與奎洛茲）就是靠著徑向速度法，在「飛馬座 51」這顆跟太陽很像的恆星旁邊，成功揪出了人類史上發現的第一顆系外行星——<span class="highlight">51 Pegasi b</span>！</p>
+            <p>在 1995 年，兩位超厲害的天文學家（馬約爾與奎洛茲）就是靠著徑向速度法，在「飛馬座 51」這顆跟太陽很像的恆星旁邊，成功揪出了人類史上發現的第一顆系外行星——<span
+                    class="highlight">51 Pegasi b</span>！</p>
             <img src="Artist_impression_of_the_exoplanet_51_Pegasi_b.jpg" alt="51 Pegasi b 藝術想像圖" class="tech-image">
             <div class="image-meta">
                 <div class="image-caption">51 Pegasi b 藝術想像圖：人類發現的第一顆太陽系外行星</div>
-                <div class="image-citation">Source: <a href="https://en.wikipedia.org/wiki/51_Pegasi_b" target="_blank">ESO/M. Kornmesser</a></div>
+                <div class="image-citation">Source: <a href="https://en.wikipedia.org/wiki/51_Pegasi_b"
+                        target="_blank">ESO/M. Kornmesser</a></div>
             </div>
-            <p>這顆行星明明有著木星一半的超級大體重，卻緊緊貼著母恆星在公轉，繞一圈竟然只要短短的 4.2 天！想像一下，那裡可是個表面溫度飆破攝氏 1000 度的地獄啊！也因為它，天文界多了一個超酷的新名詞：<span class="highlight">「熱木星 (Hot Jupiter)」</span>。</p>
+            <p>這顆行星明明有著木星一半的超級大體重，卻緊緊貼著母恆星在公轉，繞一圈竟然只要短短的 4.2 天！想像一下，那裡可是個表面溫度飆破攝氏 1000 度的地獄啊！也因為它，天文界多了一個超酷的新名詞：<span
+                    class="highlight">「熱木星 (Hot Jupiter)」</span>。</p>
             <p>這個打破常規的超級大發現，讓人類在尋找宇宙生命的路上邁進了一大步，這兩位科學家甚至因此抱走了 <span class="highlight">2019 年諾貝爾物理學獎</span>呢！</p>
         </section>
 
         <section id="section-5">
-            <div class="pixel-mascot" id="mascot-s5" style="right: 20px; animation: peek-bounce 1s infinite alternate;" onclick="mascotStep(this)">
-                <div class="mascot-body" style="background: var(--neon-blue);"><div class="mascot-eyes"></div></div>
+            <div class="pixel-mascot" id="mascot-s5" style="right: 20px; animation: peek-bounce 1s infinite alternate;"
+                onclick="mascotStep(this)">
+                <div class="mascot-body" style="background: var(--neon-blue);">
+                    <div class="mascot-eyes"></div>
+                </div>
                 <div class="mascot-label">WAVE_MULTI</div>
             </div>
             <div class="black-hole" id="bh-s5" style="right: 6px; top: 6px;"></div>
             <h2>外星家庭大亂鬥：波形的疊加</h2>
-            <p>如果恆星身旁不只一顆行星，而是一整個「小跟班家族」呢？這時候徑向速度的曲線就會變成一團亂七八糟的波浪！這就像是在看海浪：那些起伏很大的「大波浪」，代表著跑得慢或是特別重的行星；而上面那些密密麻麻的「小碎浪」，就是離恆星很近、跑得飛快的小行星啦！</p>
+            <p>如果恆星身旁不只一顆行星，而是一整個「小跟班家族」呢？這時候徑向速度的曲線就會變成一團亂七八糟的波浪！這就像是在看海浪：那些起伏很大的「大波浪」，代表著跑得慢或是特別重的行星；而上面那些密密麻麻的「小碎浪」，就是離恆星很近、跑得飛快的小行星啦！
+            </p>
             <div class="canvas-container"><canvas id="superpositionCanvas"></canvas></div>
             <div class="controls">
                 <div class="control-item">
-                    <div class="control-label"><span style="color:white">行星 A 質量 (低頻)</span><span id="mValA" style="color:white">6.0</span></div>
+                    <div class="control-label"><span style="color:white">行星 A 質量 (低頻)</span><span id="mValA"
+                            style="color:white">6.0</span></div>
                     <input type="range" id="mSldA" min="1" max="15" value="6" step="0.1">
                 </div>
                 <div class="control-item">
-                    <div class="control-label"><span style="color:white">行星 A 速度</span><span id="sValA" style="color:white">2.00</span></div>
+                    <div class="control-label"><span style="color:white">行星 A 速度</span><span id="sValA"
+                            style="color:white">2.00</span></div>
                     <input type="range" id="sSldA" min="0.5" max="10" value="2" step="0.1">
                 </div>
                 <div style="width:100%; height:1px; background:rgba(255,255,255,0.1); margin:10px 0;"></div>
                 <div class="control-item">
-                    <div class="control-label"><span style="color:white">行星 B 質量 (高頻)</span><span id="mValB" style="color:white">2.5</span></div>
+                    <div class="control-label"><span style="color:white">行星 B 質量 (高頻)</span><span id="mValB"
+                            style="color:white">2.5</span></div>
                     <input type="range" id="mSldB" min="1" max="15" value="2.5" step="0.1">
                 </div>
                 <div class="control-item">
-                    <div class="control-label"><span style="color:white">行星 B 速度</span><span id="sValB" style="color:white">7.50</span></div>
+                    <div class="control-label"><span style="color:white">行星 B 速度</span><span id="sValB"
+                            style="color:white">7.50</span></div>
                     <input type="range" id="sSldB" min="0.5" max="15" value="7.5" step="0.1">
                 </div>
             </div>
@@ -514,7 +827,7 @@
             ctx.beginPath(); ctx.globalAlpha = 0.5; ctx.ellipse(cX, cY, wobbleAmp, 4, 0, 0, Math.PI * 2); ctx.strokeStyle = "#00f2ff"; ctx.lineWidth = 2; ctx.stroke();
             ctx.globalAlpha = 1; ctx.beginPath(); ctx.moveTo(cX - 8, cY); ctx.lineTo(cX + 8, cY); ctx.moveTo(cX, cY - 8); ctx.lineTo(cX, cY + 8); ctx.strokeStyle = 'rgba(0, 242, 255, 0.6)'; ctx.stroke();
             const mFactor = mS / 15.0, rawIntensity = Math.cos(angle), dopplerIntensity = rawIntensity * mFactor;
-            let starHue; const baseHue = 50; 
+            let starHue; const baseHue = 50;
             if (dopplerIntensity >= 0) starHue = baseHue - (dopplerIntensity * 50);
             else starHue = baseHue + (Math.abs(dopplerIntensity) * 160);
             const starGrad = ctx.createRadialGradient(sX, cY, 5, sX, cY, starR);
@@ -566,14 +879,14 @@
             mCtx.fillStyle = '#000'; mCtx.fillRect(0, 0, w, h);
             const trackH = h / 3;
             const drawTrack = (yCenter, points, label, color) => {
-                const grad = mCtx.createLinearGradient(0, yCenter - trackH/2, 0, yCenter + trackH/2);
+                const grad = mCtx.createLinearGradient(0, yCenter - trackH / 2, 0, yCenter + trackH / 2);
                 grad.addColorStop(0, 'rgba(255, 68, 68, 0.15)'); grad.addColorStop(0.5, 'rgba(0, 0, 0, 1)'); grad.addColorStop(1, 'rgba(68, 170, 255, 0.15)');
-                mCtx.fillStyle = grad; mCtx.fillRect(0, yCenter - trackH/2, w, trackH);
+                mCtx.fillStyle = grad; mCtx.fillRect(0, yCenter - trackH / 2, w, trackH);
                 mCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; mCtx.setLineDash([5, 5]); mCtx.beginPath(); mCtx.moveTo(0, yCenter); mCtx.lineTo(w, yCenter); mCtx.stroke(); mCtx.setLineDash([]);
                 mCtx.strokeStyle = color; mCtx.lineWidth = 2.2; mCtx.shadowBlur = 8; mCtx.shadowColor = color; mCtx.beginPath();
                 points.forEach((p, i) => { const dy = yCenter - (p.y * trackH * 0.38); if (p.x > 0) { if (i === 0) mCtx.moveTo(p.x, dy); else mCtx.lineTo(p.x, dy); } });
                 mCtx.stroke(); mCtx.shadowBlur = 0;
-                mCtx.font = '10px monospace'; mCtx.fillStyle = 'rgba(255,255,255,0.6)'; mCtx.fillText(label, 15, yCenter - trackH/2 + 20);
+                mCtx.font = '10px monospace'; mCtx.fillStyle = 'rgba(255,255,255,0.6)'; mCtx.fillText(label, 15, yCenter - trackH / 2 + 20);
             };
             drawTrack(trackH * 0.5, multiPointsCombined, 'COMBINED SIGNAL (SUPERPOSITION)', '#fff');
             drawTrack(trackH * 1.5, multiPointsA, 'COMPONENT A (LOW FREQUENCY)', '#fff');
@@ -597,4 +910,5 @@
         initHologramReveal();
     </script>
 </body>
+
 </html>

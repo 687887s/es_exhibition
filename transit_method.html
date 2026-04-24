@@ -378,114 +378,51 @@
 
         /* --- 外星人系統樣式 --- */
         .pixel-mascot {
-            position: absolute;
-            width: 32px;
-            height: 24px;
-            z-index: 20;
-            top: -24px;
-            cursor: pointer;
-            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            filter: drop-shadow(0 0 8px var(--neon-blue));
-            -webkit-tap-highlight-color: transparent;
+            position: absolute; width: 36px; height: 22px; z-index: 10; top: -26px; cursor: pointer;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+            filter: drop-shadow(0 0 8px var(--neon-blue)); -webkit-tap-highlight-color: transparent;
         }
 
-        .pixel-mascot.active {
-            z-index: 6000 !important;
-        }
+        .pixel-mascot.active { z-index: 6000 !important; }
 
         .mascot-body {
-            width: 100%;
-            height: 100%;
-            background: var(--neon-blue);
-            position: relative;
-            box-shadow: -4px 4px 0 var(--neon-blue), 4px 4px 0 var(--neon-blue), -8px 8px 0 var(--neon-blue), 8px 8px 0 var(--neon-blue);
+            width: 100%; height: 100%; background: var(--neon-blue); position: relative;
+            box-shadow: -4px 4px 0 var(--neon-blue), 4px 4px 0 var(--neon-blue), -8px 4px 0 var(--neon-blue), 8px 4px 0 var(--neon-blue), 0 -4px 0 var(--neon-blue);
         }
 
-        .mascot-eyes {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            right: 4px;
-            height: 4px;
-            display: flex;
-            justify-content: space-around;
+        .mascot-eyes { position: absolute; top: 4px; left: 4px; right: 4px; height: 6px; display: flex; justify-content: space-around; pointer-events: none; }
+        .mascot-eyes::before, .mascot-eyes::after { content: ""; width: 6px; height: 6px; background: #000; animation: blink 4s infinite; }
+
+        @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+
+        .mascot-body::after {
+            content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            width: 4px; height: 10px; background: var(--neon-blue); animation: ant-p 0.5s infinite alternate;
         }
 
-        .mascot-eyes::before,
-        .mascot-eyes::after {
-            content: "";
-            width: 4px;
-            height: 4px;
-            background: #000;
-            animation: eye-blink 3s infinite;
-        }
-
-        @keyframes eye-blink {
-
-            0%,
-            90%,
-            100% {
-                transform: scaleY(1);
-            }
-
-            95% {
-                transform: scaleY(0.1);
-            }
-        }
+        @keyframes ant-p { from { height: 5px; opacity: 0.6; } to { height: 12px; opacity: 1; } }
 
         .black-hole {
-            position: absolute;
-            width: 64px;
-            height: 20px;
-            background: #000;
-            border-radius: 50%;
-            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff;
-            z-index: -1;
-            transform: scale(0);
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none;
-            opacity: 0;
+            position: absolute; width: 64px; height: 20px; background: #000; border-radius: 50%;
+            box-shadow: 0 0 25px 4px var(--neon-blue), inset 0 0 10px #fff; z-index: 5;
+            transform: scale(0); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none; opacity: 0;
         }
 
-        .black-hole.visible {
-            transform: scale(1);
-            opacity: 1;
-        }
+        .black-hole.visible { transform: scale(1); opacity: 1; }
 
         .mascot-label {
-            font-size: 9px;
-            font-family: monospace;
-            color: var(--neon-blue);
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 1px 4px;
-            border: 1px solid var(--neon-blue);
-            white-space: nowrap;
-            pointer-events: none;
+            font-size: 9px; font-family: monospace; color: var(--neon-blue);
+            position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85); padding: 2px 6px; border: 1px solid var(--neon-blue);
+            white-space: nowrap; pointer-events: none;
         }
 
-        @keyframes peek-bounce {
-            from {
-                transform: translateY(0);
-            }
+        @keyframes idle-f { 0% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-40px) rotate(180deg) scale(1.1); } 100% { transform: translateY(0) rotate(360deg) scale(1); } }
+        .pixel-mascot.idle-jump { animation: idle-f 0.8s ease-in-out !important; }
+        .pixel-mascot.idle-color .mascot-body { filter: hue-rotate(180deg) brightness(1.3); transition: filter 0.5s; }
 
-            to {
-                transform: translateY(-5px);
-            }
-        }
-
-        @keyframes peek-slide {
-            0% {
-                transform: translateX(-10px);
-            }
-
-            100% {
-                transform: translateX(10px);
-            }
-        }
+        @keyframes peek-bounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
 
         .back-nav {
             text-align: center;
@@ -578,7 +515,7 @@
         <h1>捕捉宇宙的閃爍──凌日法</h1>
         <p
             style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">
-            TRANSIT_METHOD_ANALYSIS_UNIT_B2</p>
+            TRANSIT_METHOD_ANALYSIS</p>
 
         <div class="pixel-mascot" id="mascot-header"
             style="right: 30px; top: 50px; animation: peek-bounce 0.7s infinite alternate;" onclick="mascotStep(this)">
@@ -735,7 +672,7 @@
         const canvas = document.getElementById('transitCanvas');
         const ctx = canvas.getContext('2d');
         const bgLayer = document.getElementById('bgLayer');
-        const headerEl = document.getElementById('mainHeader');
+        const headerEl = document.getElementById('mainHeader'), footerEl = document.getElementById('mainFooter');
         const sizeSlider = document.getElementById('sizeSlider');
         const speedSlider = document.getElementById('speedSlider');
         const sizeVal = document.getElementById('sizeVal');
