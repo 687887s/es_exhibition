@@ -613,7 +613,7 @@
     <div class="bg-layer" id="bgLayer"></div>
 
     <header id="mainHeader">
-        <h1>捕捉宇宙的閃爍<br>──凌日法──</h1>
+        <h1>捕捉宇宙的閃爍<br>─凌日法─</h1>
         <p
             style="color:var(--tech-cyan); font-size:0.75em; margin-top:5px; font-family: monospace; letter-spacing:1px;">
             TRANSIT_METHOD_ANALYSIS</p>
@@ -911,17 +911,23 @@
             ctx.fillStyle = starGrad; ctx.beginPath(); ctx.arc(sX, sY, starR, 0, Math.PI * 2); ctx.fill();
             if (planetZ > 0) drawPlanet(sX + (planetX - w / 2) * 0.5, sY, planetR, 1.0, hIntensity, inTransit);
 
-            // 絕對還原 450 縮放倍率
+            // 修正：動態縮放倍率以適應不同螢幕高度，並加上裁切保護以免超出框線
             const graphX = w * 0.05, graphY = h * 0.6, graphW = w * 0.9, graphH = h * 0.3;
             ctx.strokeStyle = 'rgba(0, 242, 255, 0.4)'; ctx.strokeRect(graphX, graphY, graphW, graphH);
+            
+            ctx.save();
+            // 建立裁切區域
+            ctx.beginPath(); ctx.rect(graphX, graphY, graphW, graphH); ctx.clip();
+            
             ctx.strokeStyle = COLOR_VIBRANT_GOLD; ctx.lineWidth = 2.5; ctx.shadowBlur = 10; ctx.shadowColor = COLOR_VIBRANT_GOLD;
             ctx.beginPath();
             points.forEach((p, i) => {
                 const dX = graphX + (p.x - (w * 0.05));
-                const dY = graphY + (1.0 - p.y) * 450 + 35;
-                if (dX > graphX && dX < graphX + graphW) { if (i === 0) ctx.moveTo(dX, dY); else ctx.lineTo(dX, dY); }
+                // 將絕對值 450 改為相對於 graphH 的動態縮放 (約 graphH * 4)
+                const dY = graphY + (graphH * 0.2) + (1.0 - p.y) * (graphH * 4.5);
+                if (i === 0) ctx.moveTo(dX, dY); else ctx.lineTo(dX, dY);
             });
-            ctx.stroke(); ctx.shadowBlur = 0;
+            ctx.stroke(); ctx.restore(); ctx.shadowBlur = 0;
 
             const bA = (2 * Math.PI * (timestamp / 1000)) / breathPeriod;
             bgLayer.style.setProperty('--pulse-opacity', 0.15 + ((Math.sin(bA) + 1) / 2 * 0.95));
